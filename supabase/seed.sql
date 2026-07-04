@@ -1,6 +1,8 @@
 -- PC 부품 호환성 체커 v1 — Supabase 스키마 및 시드 데이터
 -- 관리자가 Table Editor에서 수동 입력하기 전, 초기 테스트 데이터를 한 번에 넣기 위한 스크립트.
 -- src/lib/seed-data.ts 의 목데이터와 1:1로 대응한다.
+-- Supabase SQL Editor에서 전체 실행. v1은 로그인 없는 공개 조회형 도구이므로
+-- anon(publishable key)에 SELECT만 허용하는 RLS 정책을 함께 건다.
 
 create table if not exists cpus (
   id text primary key,
@@ -172,3 +174,16 @@ insert into coolers (id, brand, name, type, supported_sockets, max_tdp_w, height
   ('cooler-h150i', 'Corsair', 'iCUE H150i ELITE (수랭 360mm)', 'aqua', array['LGA1700','AM5','AM4'], null, null, 360, 259000),
   ('cooler-kraken-x63', 'NZXT', 'Kraken X63 (수랭 280mm)', 'aqua', array['LGA1700','AM5','AM4'], null, null, 280, 219000)
 on conflict (id) do nothing;
+
+-- 공개 읽기 정책: 로그인 없는 v1 특성상 anon(publishable key)에 SELECT만 허용
+do $$
+declare
+  t text;
+begin
+  foreach t in array array['cpus','motherboards','rams','ssds','gpus','psus','pc_cases','coolers']
+  loop
+    execute format('alter table %I enable row level security', t);
+    execute format('drop policy if exists "public read" on %I', t);
+    execute format('create policy "public read" on %I for select to anon using (true)', t);
+  end loop;
+end $$;

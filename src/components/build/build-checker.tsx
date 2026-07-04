@@ -5,9 +5,9 @@ import { CaseIllustration } from "./case-illustration";
 import { CategorySection } from "./category-section";
 import { SummaryPanel } from "./summary-panel";
 import { CATEGORY_ORDER } from "@/lib/compatibility";
-import { SEED } from "@/lib/seed-data";
+import type { PartsData } from "@/lib/supabase/fetch-parts";
 
-export function BuildChecker() {
+export function BuildChecker({ parts }: { parts: PartsData }) {
   return (
     <BuildProvider>
       <div className="mx-auto max-w-6xl px-4 pb-24 pt-6 lg:px-6 lg:pt-10">
@@ -35,7 +35,7 @@ export function BuildChecker() {
           <div className="flex flex-col gap-4">
             <SummaryPanel />
             {CATEGORY_ORDER.map((category) => (
-              <CategorySection key={category} category={category} options={SEED[category]} />
+              <CategorySection key={category} category={category} options={parts[category]} />
             ))}
           </div>
         </div>
