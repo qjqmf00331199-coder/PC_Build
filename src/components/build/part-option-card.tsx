@@ -3,33 +3,55 @@
 import type { Part } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-function formatKrw(value: number) {
-  return `₩${value.toLocaleString("ko-KR")}`;
+function meta(part: Part): string | null {
+  switch (part.category) {
+    case "cpu":
+      return part.brand;
+    case "gpu":
+      return part.series;
+    case "case":
+      return part.tower_type;
+    default:
+      return null;
+  }
+}
+
+function title(part: Part): string {
+  switch (part.category) {
+    case "cpu":
+      return `${part.tier} ${part.model}`;
+    default:
+      return part.model;
+  }
 }
 
 function specLine(part: Part): string {
   switch (part.category) {
     case "cpu":
-      return `${part.socket} · TDP ${part.tdp_w}W · ${part.cores}`;
+      return `${part.socket} · ${part.cores_threads} · TDP ${part.tdp_w}W · ${part.base_ghz}~${part.boost_ghz}GHz`;
     case "motherboard":
-      return `${part.socket} · ${part.ram_type} · ${part.form_factor} · M.2×${part.m2_slots}`;
+      return `${part.socket} · ${part.chipset} · ${part.form_factor} · ${part.memory_type}`;
     case "ram":
-      return `${part.type}-${part.speed_mhz} · ${part.capacity_gb}GB`;
+      return `${part.type}-${part.speed_mhz}${part.voltage_v ? ` · ${part.voltage_v}V` : ""}`;
     case "ssd":
-      return part.interface === "NVMe"
-        ? `NVMe PCIe${part.pcie_version}.0 · ${part.capacity_gb / 1000}TB`
-        : `SATA · ${part.capacity_gb / 1000}TB`;
+      return `${part.type} · ${part.interface}`;
     case "gpu":
-      return `${part.length_mm}mm · 권장 PSU ${part.recommended_psu_w}W · ${part.vram_gb}GB`;
+      return `VRAM ${part.vram_gb}GB${part.tdp_w ? ` · TDP ${part.tdp_w}W` : ""} · 권장 PSU ${part.recommended_psu_w}W · ${part.length_mm}mm`;
     case "psu":
-      return `${part.wattage_w}W · ${part.form_factor} · ${part.rating}`;
+      return `${part.watt}W · ${part.grade} · ${part.form_factor}`;
     case "case":
-      return `GPU ${part.max_gpu_length_mm}mm · ${part.psu_form_factor} · 쿨러 ${part.max_cooler_height_mm}mm`;
+      return `GPU ${part.gpu_max_length_mm}mm · 쿨러 ${part.cpu_cooler_max_height_mm}mm`;
     case "cooler":
       return part.type === "air"
-        ? `공랭 · 높이 ${part.height_mm}mm · TDP ${part.max_tdp_w ?? "-"}W`
+        ? `공랭 · 높이 ${part.height_mm}mm`
         : `수랭 · 라디에이터 ${part.radiator_size_mm}mm`;
   }
+}
+
+function noteText(part: Part): string | null {
+  if (!("extra" in part)) return null;
+  const note = part.extra?.note;
+  return typeof note === "string" ? note : null;
 }
 
 export function PartOptionCard({
@@ -41,6 +63,9 @@ export function PartOptionCard({
   selected: boolean;
   onSelect: () => void;
 }) {
+  const metaLabel = meta(part);
+  const note = noteText(part);
+
   return (
     <button
       type="button"
@@ -52,16 +77,16 @@ export function PartOptionCard({
       )}
     >
       <div className="flex w-full items-center justify-between gap-2">
-        <span className="text-xs text-[#9CA3AF]">{part.brand}</span>
+        <span className="text-xs text-[#9CA3AF]">{metaLabel ?? " "}</span>
         {selected && (
           <span className="rounded-full bg-[#6366F1]/15 px-2 py-0.5 text-[10px] font-medium text-[#6366F1]">
             선택됨
           </span>
         )}
       </div>
-      <span className="text-sm font-medium text-[#E4E4E7]">{part.name}</span>
+      <span className="text-sm font-medium text-[#E4E4E7]">{title(part)}</span>
       <span className="font-mono text-xs text-[#9CA3AF]">{specLine(part)}</span>
-      <span className="font-mono text-xs text-[#E4E4E7]">{formatKrw(part.price_krw)}</span>
+      {note && <span className="text-xs italic text-[#F59E0B]/80">{note}</span>}
     </button>
   );
 }

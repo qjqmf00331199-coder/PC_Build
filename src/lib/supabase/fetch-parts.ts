@@ -3,14 +3,14 @@ import { SEED } from "../seed-data";
 import type { PartMap } from "../types";
 
 const TABLE_BY_CATEGORY: Record<keyof PartMap, string> = {
-  cpu: "cpus",
-  motherboard: "motherboards",
-  ram: "rams",
-  ssd: "ssds",
-  gpu: "gpus",
-  psu: "psus",
-  case: "pc_cases",
-  cooler: "coolers",
+  cpu: "cpu",
+  motherboard: "motherboard",
+  ram: "ram",
+  ssd: "ssd",
+  gpu: "gpu",
+  psu: "psu",
+  case: "pc_case",
+  cooler: "cooler",
 };
 
 export type PartsData = { [K in keyof PartMap]: PartMap[K][] };
@@ -25,7 +25,7 @@ export async function getAllParts(): Promise<PartsData> {
   try {
     const results = await Promise.all(
       categories.map((category) =>
-        supabase!.from(TABLE_BY_CATEGORY[category]).select("*").order("price_krw")
+        supabase!.from(TABLE_BY_CATEGORY[category]).select("*").order("id")
       )
     );
 

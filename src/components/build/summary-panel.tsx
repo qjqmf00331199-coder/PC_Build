@@ -26,7 +26,7 @@ export function SummaryPanel() {
           : "bg-[#22C55E]";
 
   const barWidth = selections.psu
-    ? Math.min(100, Math.max(4, (totalPowerW / selections.psu.wattage_w) * 100))
+    ? Math.min(100, Math.max(4, (totalPowerW / selections.psu.watt) * 100))
     : 0;
 
   return (

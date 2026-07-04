@@ -1,103 +1,109 @@
-export type Socket = "LGA1700" | "AM5" | "AM4";
-export type RamType = "DDR5" | "DDR4";
-export type FormFactor = "ATX" | "mATX" | "ITX";
-export type PsuFormFactor = "ATX" | "SFX";
 export type CoolerType = "air" | "aqua";
 
 export interface CPU {
   id: string;
   category: "cpu";
-  name: string;
   brand: string;
-  socket: Socket;
+  tier: string;
+  model: string;
+  codename: string | null;
+  socket: string;
+  cores_threads: string;
+  base_ghz: number;
+  boost_ghz: number;
+  cache: string;
   tdp_w: number;
-  cores: string;
-  price_krw: number;
+  memory: string;
+  extra: Record<string, unknown> | null;
 }
 
 export interface Motherboard {
   id: string;
   category: "motherboard";
-  name: string;
-  brand: string;
-  socket: Socket;
-  ram_type: RamType;
-  max_ram_speed_mhz: number;
-  max_ram_capacity_gb: number;
-  m2_slots: number;
-  m2_interface: number; // max supported PCIe generation for M.2
-  form_factor: FormFactor;
-  price_krw: number;
+  model: string;
+  socket: string;
+  chipset: string;
+  form_factor: string;
+  width_mm: number;
+  depth_mm: number;
+  pcie_x16_usable_slots: number;
+  pcie_x16_total_slots: number | null;
+  memory_type: string;
+  extra: Record<string, unknown> | null;
 }
 
 export interface RAM {
   id: string;
   category: "ram";
-  name: string;
-  brand: string;
-  type: RamType;
+  type: string;
+  model: string;
   speed_mhz: number;
-  capacity_gb: number;
-  price_krw: number;
+  heatsink_height_mm: number | null;
+  voltage_v: number | null;
+  extra: Record<string, unknown> | null;
 }
 
 export interface SSD {
   id: string;
   category: "ssd";
-  name: string;
-  brand: string;
-  interface: "NVMe" | "SATA";
-  pcie_version: number | null;
-  capacity_gb: number;
-  price_krw: number;
+  model: string;
+  type: string;
+  interface: string;
 }
 
 export interface GPU {
   id: string;
   category: "gpu";
-  name: string;
-  brand: string;
-  length_mm: number;
-  recommended_psu_w: number;
+  series: string;
+  model: string;
   vram_gb: number;
-  price_krw: number;
+  tdp_w: number | null;
+  connector: string;
+  recommended_psu_w: number;
+  length_mm: number;
+  thickness: string;
+  fans: number;
+  verified: boolean;
+  extra: Record<string, unknown> | null;
 }
 
 export interface PSU {
   id: string;
   category: "psu";
-  name: string;
-  brand: string;
-  wattage_w: number;
-  form_factor: PsuFormFactor;
-  rating: string;
-  price_krw: number;
+  model: string;
+  watt: number;
+  grade: string;
+  length_mm: number;
+  atx_version: string;
+  form_factor: string;
+  extra: Record<string, unknown> | null;
 }
 
 export interface PCCase {
   id: string;
   category: "case";
-  name: string;
-  brand: string;
-  max_gpu_length_mm: number;
-  psu_form_factor: PsuFormFactor;
-  supported_form_factors: FormFactor[];
-  max_cooler_height_mm: number;
-  supported_radiator_sizes: number[];
-  price_krw: number;
+  model: string;
+  tower_type: string;
+  supported_mb: string;
+  gpu_max_length_mm: number;
+  cpu_cooler_max_height_mm: number;
+  psu_support: string;
+  psu_position: string;
+  psu_max_length_mm: string | number | null;
+  radiator_top_mm: string | number | null;
+  radiator_front_mm: string | number | null;
+  radiator_side_mm: string | number | null;
 }
 
 export interface Cooler {
   id: string;
   category: "cooler";
-  name: string;
-  brand: string;
+  model: string;
   type: CoolerType;
-  supported_sockets: Socket[];
-  max_tdp_w: number | null;
   height_mm: number | null;
   radiator_size_mm: number | null;
-  price_krw: number;
+  supported_sockets: string;
+  extra: Record<string, unknown> | null;
 }
 
 export type Part = CPU | Motherboard | RAM | SSD | GPU | PSU | PCCase | Cooler;

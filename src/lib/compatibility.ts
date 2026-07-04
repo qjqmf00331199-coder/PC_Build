@@ -11,9 +11,41 @@ function higher(a: CompatLevel, b: CompatLevel): CompatLevel {
   return LEVEL_RANK[a] >= LEVEL_RANK[b] ? a : b;
 }
 
+function splitTokens(value: string | null | undefined, delimiters: RegExp): string[] {
+  if (!value) return [];
+  return value
+    .split(delimiters)
+    .map((s) => s.replace(/\([^)]*\)/g, "").trim())
+    .filter(Boolean);
+}
+
+function parseRadiatorSizes(pcCase: {
+  radiator_top_mm: string | number | null;
+  radiator_front_mm: string | number | null;
+  radiator_side_mm: string | number | null;
+}): number[] {
+  const sizes = new Set<number>();
+  for (const raw of [pcCase.radiator_top_mm, pcCase.radiator_front_mm, pcCase.radiator_side_mm]) {
+    if (raw === null) continue;
+    const field = String(raw);
+    if (field.includes("불가")) continue;
+    for (const token of field.split("/")) {
+      const n = parseInt(token.trim(), 10);
+      if (!Number.isNaN(n)) sizes.add(n);
+    }
+  }
+  return [...sizes];
+}
+
+function psuFormFactorToken(value: string): "ATX" | "SFX" | null {
+  if (value.includes("SFX")) return "SFX";
+  if (value.includes("ATX")) return "ATX";
+  return null;
+}
+
 export function evaluateIssues(sel: Selections): CompatIssue[] {
   const issues: CompatIssue[] = [];
-  const { cpu, motherboard, ram, ssd, gpu, psu, case: pcCase, cooler } = sel;
+  const { cpu, motherboard, ram, gpu, psu, case: pcCase, cooler } = sel;
 
   // CPU <-> Motherboard
   if (cpu && motherboard && cpu.socket !== motherboard.socket) {
@@ -25,135 +57,108 @@ export function evaluateIssues(sel: Selections): CompatIssue[] {
     });
   }
 
-  // Motherboard <-> RAM
-  if (motherboard && ram) {
-    if (ram.type !== motherboard.ram_type) {
-      issues.push({
-        id: "mobo-ram-type",
-        level: "danger",
-        categories: ["motherboard", "ram"],
-        message: `RAM 규격 불일치: 메인보드는 ${motherboard.ram_type}, RAM은 ${ram.type}입니다.`,
-      });
-    } else {
-      if (ram.speed_mhz > motherboard.max_ram_speed_mhz) {
-        issues.push({
-          id: "mobo-ram-speed",
-          level: "warning",
-          categories: ["motherboard", "ram"],
-          message: `RAM 속도(${ram.speed_mhz}MHz)가 메인보드 최대 지원 속도(${motherboard.max_ram_speed_mhz}MHz)를 초과해 다운클럭됩니다.`,
-        });
-      }
-      if (ram.capacity_gb > motherboard.max_ram_capacity_gb) {
-        issues.push({
-          id: "mobo-ram-capacity",
-          level: "danger",
-          categories: ["motherboard", "ram"],
-          message: `RAM 용량(${ram.capacity_gb}GB)이 메인보드 최대 지원 용량(${motherboard.max_ram_capacity_gb}GB)을 초과합니다.`,
-        });
-      }
-    }
+  // Motherboard <-> RAM (규격만 체크: 데이터에 메인보드 최대속도/용량 필드 없음)
+  if (motherboard && ram && ram.type !== motherboard.memory_type) {
+    issues.push({
+      id: "mobo-ram-type",
+      level: "danger",
+      categories: ["motherboard", "ram"],
+      message: `RAM 규격 불일치: 메인보드는 ${motherboard.memory_type}, RAM은 ${ram.type}입니다.`,
+    });
   }
 
   // GPU <-> Case
-  if (gpu && pcCase && gpu.length_mm > pcCase.max_gpu_length_mm) {
+  if (gpu && pcCase && gpu.length_mm > pcCase.gpu_max_length_mm) {
     issues.push({
       id: "gpu-case-length",
       level: "danger",
       categories: ["gpu", "case"],
-      message: `GPU 길이(${gpu.length_mm}mm)가 케이스 최대 허용 길이(${pcCase.max_gpu_length_mm}mm)를 초과합니다.`,
+      message: `GPU 길이(${gpu.length_mm}mm)가 케이스 최대 허용 길이(${pcCase.gpu_max_length_mm}mm)를 초과합니다.`,
     });
   }
 
   // GPU <-> PSU
-  if (gpu && psu && psu.wattage_w < gpu.recommended_psu_w) {
+  if (gpu && psu && psu.watt < gpu.recommended_psu_w) {
     issues.push({
       id: "gpu-psu-wattage",
       level: "danger",
       categories: ["gpu", "psu"],
-      message: `PSU 용량(${psu.wattage_w}W)이 GPU 권장 파워(${gpu.recommended_psu_w}W)보다 부족합니다.`,
+      message: `PSU 용량(${psu.watt}W)이 GPU 권장 파워(${gpu.recommended_psu_w}W)보다 부족합니다.`,
     });
   }
 
   // PSU <-> Case
-  if (psu && pcCase && psu.form_factor !== pcCase.psu_form_factor) {
-    issues.push({
-      id: "psu-case-formfactor",
-      level: "danger",
-      categories: ["psu", "case"],
-      message: `PSU 폼팩터(${psu.form_factor})가 케이스 지원 규격(${pcCase.psu_form_factor})과 다릅니다.`,
-    });
+  if (psu && pcCase) {
+    const psuToken = psuFormFactorToken(psu.form_factor);
+    if (psuToken && !pcCase.psu_support.includes(psuToken)) {
+      issues.push({
+        id: "psu-case-formfactor",
+        level: "danger",
+        categories: ["psu", "case"],
+        message: `PSU 폼팩터(${psu.form_factor})가 케이스 지원 규격(${pcCase.psu_support})과 다릅니다.`,
+      });
+    }
   }
 
   // Cooler <-> CPU
   if (cooler && cpu) {
-    if (!cooler.supported_sockets.includes(cpu.socket)) {
+    const sockets = splitTokens(cooler.supported_sockets, /;/);
+    if (!sockets.includes(cpu.socket)) {
       issues.push({
         id: "cooler-cpu-socket",
         level: "danger",
         categories: ["cooler", "cpu"],
         message: `쿨러가 CPU 소켓(${cpu.socket})을 지원하지 않습니다.`,
       });
-    } else if (cooler.max_tdp_w !== null && cooler.max_tdp_w < cpu.tdp_w) {
-      issues.push({
-        id: "cooler-cpu-tdp",
-        level: "warning",
-        categories: ["cooler", "cpu"],
-        message: `쿨러 최대 지원 TDP(${cooler.max_tdp_w}W)가 CPU TDP(${cpu.tdp_w}W)보다 낮아 발열에 취약할 수 있습니다.`,
-      });
+    } else {
+      const ratedTdp = cooler.extra?.tdp_rated_w;
+      if (typeof ratedTdp === "number" && ratedTdp < cpu.tdp_w) {
+        issues.push({
+          id: "cooler-cpu-tdp",
+          level: "warning",
+          categories: ["cooler", "cpu"],
+          message: `쿨러 정격 TDP(${ratedTdp}W)가 CPU TDP(${cpu.tdp_w}W)보다 낮아 발열에 취약할 수 있습니다.`,
+        });
+      }
     }
   }
 
   // Cooler(air) <-> Case
   if (cooler && pcCase && cooler.type === "air" && cooler.height_mm !== null) {
-    if (cooler.height_mm > pcCase.max_cooler_height_mm) {
+    if (cooler.height_mm > pcCase.cpu_cooler_max_height_mm) {
       issues.push({
         id: "cooler-case-height",
         level: "danger",
         categories: ["cooler", "case"],
-        message: `공랭 쿨러 높이(${cooler.height_mm}mm)가 케이스 최대 허용 높이(${pcCase.max_cooler_height_mm}mm)를 초과합니다.`,
+        message: `공랭 쿨러 높이(${cooler.height_mm}mm)가 케이스 최대 허용 높이(${pcCase.cpu_cooler_max_height_mm}mm)를 초과합니다.`,
       });
     }
   }
 
   // Cooler(aqua) <-> Case
   if (cooler && pcCase && cooler.type === "aqua" && cooler.radiator_size_mm !== null) {
-    if (!pcCase.supported_radiator_sizes.includes(cooler.radiator_size_mm)) {
+    const supported = parseRadiatorSizes(pcCase);
+    if (!supported.includes(cooler.radiator_size_mm)) {
       issues.push({
         id: "cooler-case-radiator",
         level: "danger",
         categories: ["cooler", "case"],
-        message: `수랭 라디에이터(${cooler.radiator_size_mm}mm)를 케이스가 지원하지 않습니다.`,
-      });
-    }
-  }
-
-  // SSD <-> Motherboard
-  if (ssd && motherboard && ssd.interface === "NVMe") {
-    if (motherboard.m2_slots <= 0) {
-      issues.push({
-        id: "ssd-mobo-slot",
-        level: "danger",
-        categories: ["ssd", "motherboard"],
-        message: `메인보드에 M.2 슬롯이 없어 NVMe SSD를 장착할 수 없습니다.`,
-      });
-    } else if (ssd.pcie_version !== null && ssd.pcie_version > motherboard.m2_interface) {
-      issues.push({
-        id: "ssd-mobo-pcie",
-        level: "warning",
-        categories: ["ssd", "motherboard"],
-        message: `SSD(PCIe ${ssd.pcie_version}.0)가 메인보드 M.2 슬롯(PCIe ${motherboard.m2_interface}.0) 하위 호환으로 동작해 최대 속도가 제한됩니다.`,
+        message: `수랭 라디에이터(${cooler.radiator_size_mm}mm)를 케이스가 지원하지 않습니다${supported.length ? ` (지원: ${supported.join("/")}mm)` : ""}.`,
       });
     }
   }
 
   // Motherboard <-> Case
-  if (motherboard && pcCase && !pcCase.supported_form_factors.includes(motherboard.form_factor)) {
-    issues.push({
-      id: "mobo-case-formfactor",
-      level: "danger",
-      categories: ["motherboard", "case"],
-      message: `메인보드 폼팩터(${motherboard.form_factor})가 케이스 지원 규격과 맞지 않습니다.`,
-    });
+  if (motherboard && pcCase) {
+    const supportedFormFactors = splitTokens(pcCase.supported_mb, /[;,]/);
+    if (!supportedFormFactors.includes(motherboard.form_factor)) {
+      issues.push({
+        id: "mobo-case-formfactor",
+        level: "danger",
+        categories: ["motherboard", "case"],
+        message: `메인보드 폼팩터(${motherboard.form_factor})가 케이스 지원 규격(${pcCase.supported_mb})과 맞지 않습니다.`,
+      });
+    }
   }
 
   return issues;
@@ -183,20 +188,19 @@ export function computeCategoryStatus(
   return status;
 }
 
-const GPU_DRAW_RATIO = 0.68; // recommended_psu_w already includes headroom over real draw
-const BASELINE_DRAW_W = 75; // motherboard + RAM + storage + fans baseline
+const BASELINE_DRAW_W = 75; // 메인보드 + RAM + 저장장치 + 팬 등 기저 소비전력
 
 export function estimateTotalPowerW(sel: Selections): number {
   let total = BASELINE_DRAW_W;
   if (sel.cpu) total += sel.cpu.tdp_w;
-  if (sel.gpu) total += Math.round(sel.gpu.recommended_psu_w * GPU_DRAW_RATIO);
+  if (sel.gpu?.tdp_w) total += sel.gpu.tdp_w;
   return total;
 }
 
 export function computePsuMarginPct(sel: Selections): number | null {
   if (!sel.psu) return null;
   const total = estimateTotalPowerW(sel);
-  return Math.round(((sel.psu.wattage_w - total) / sel.psu.wattage_w) * 1000) / 10;
+  return Math.round(((sel.psu.watt - total) / sel.psu.watt) * 1000) / 10;
 }
 
 export const CATEGORY_ORDER: PartCategory[] = [
