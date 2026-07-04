@@ -69,6 +69,9 @@ export function CategoryDetail<K extends PartCategory>({
   const status = categoryStatus[category];
   const relevantIssues = issuesFor(category);
 
+  const [pickedId, setPickedId] = useState<string | undefined>(selected?.id);
+  const pickedPart = options.find((o) => o.id === pickedId);
+
   return (
     <div>
       <button
@@ -93,12 +96,15 @@ export function CategoryDetail<K extends PartCategory>({
         <div className="order-1 lg:order-2 lg:sticky lg:top-6 lg:self-start">
           {options.length > 0 ? (
             <DetailPanel
-              part={selected}
+              part={pickedPart}
+              committed={pickedPart?.id === selected?.id}
               status={status}
               placeholderIcon={Icon}
-              onDeselect={() => {
-                if (!selected) return;
-                selectPart(category, selected);
+              onConfirm={() => {
+                if (!pickedPart) return;
+                if (selected?.id !== pickedPart.id) {
+                  selectPart(category, pickedPart);
+                }
                 closeCategory();
               }}
             />
@@ -135,8 +141,17 @@ export function CategoryDetail<K extends PartCategory>({
             <PartOptionCard
               key={part.id}
               part={part}
-              selected={selected?.id === part.id}
-              onSelect={() => selectPart(category, part)}
+              selected={pickedId === part.id}
+              onSelect={() => {
+                if (selected?.id === part.id) {
+                  // clicking the already-committed item again deselects it directly
+                  selectPart(category, part);
+                  setPickedId(undefined);
+                  closeCategory();
+                } else {
+                  setPickedId(part.id);
+                }
+              }}
             />
           ))}
         </div>
@@ -147,14 +162,16 @@ export function CategoryDetail<K extends PartCategory>({
 
 function DetailPanel({
   part,
+  committed,
   status,
   placeholderIcon: PlaceholderIcon,
-  onDeselect,
+  onConfirm,
 }: {
   part: Part | undefined;
+  committed: boolean;
   status: "success" | "warning" | "danger" | "idle";
   placeholderIcon: typeof ImageOff;
-  onDeselect: () => void;
+  onConfirm: () => void;
 }) {
   const imageUrl = useProductImage(part ? partImageQuery(part) : null);
 
@@ -204,9 +221,11 @@ function DetailPanel({
           {metaLabel && <p className="text-xs text-[#9CA3AF]">{metaLabel}</p>}
           <h3 className="text-base font-semibold text-[#E4E4E7]">{partTitle(part)}</h3>
         </div>
-        <span className="shrink-0 rounded-full bg-[#6366F1]/15 px-2 py-0.5 text-[10px] font-medium text-[#6366F1]">
-          선택됨
-        </span>
+        {committed && (
+          <span className="shrink-0 rounded-full bg-[#6366F1]/15 px-2 py-0.5 text-[10px] font-medium text-[#6366F1]">
+            선택됨
+          </span>
+        )}
       </div>
 
       {note && <p className="mt-1 text-xs italic text-[#F59E0B]/80">{note}</p>}
@@ -222,10 +241,10 @@ function DetailPanel({
 
       <button
         type="button"
-        onClick={onDeselect}
-        className="mt-5 w-full rounded-lg border border-[#27272A] py-2.5 text-sm font-medium text-[#9CA3AF] transition-colors duration-150 hover:border-[#3F3F46]"
+        onClick={onConfirm}
+        className="mt-5 w-full rounded-lg bg-[#6366F1] py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-[#6366F1]/90"
       >
-        선택 해제
+        이 제품 선택하기
       </button>
     </div>
   );
