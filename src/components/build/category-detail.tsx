@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, AlertTriangle, XCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowLeft, AlertTriangle, ImageOff, XCircle } from "lucide-react";
 import type { Part, PartCategory, PartMap } from "@/lib/types";
 import { CATEGORY_LABEL } from "@/lib/compatibility";
 import { CATEGORY_ICON } from "@/lib/category-icons";
@@ -20,10 +20,15 @@ const STATUS_COLOR: Record<"success" | "warning" | "danger" | "idle", string> = 
 
 const imageCache = new Map<string, string | null>();
 
-function useProductImage(query: string): string | null {
-  const [image, setImage] = useState<string | null>(imageCache.get(query) ?? null);
+function useProductImage(query: string | null): string | null {
+  const [image, setImage] = useState<string | null>(query ? imageCache.get(query) ?? null : null);
 
   useEffect(() => {
+    if (!query) {
+      setImage(null);
+      return;
+    }
+
     const cached = imageCache.get(query);
     if (cached !== undefined) {
       setImage(cached);
@@ -64,12 +69,6 @@ export function CategoryDetail<K extends PartCategory>({
   const status = categoryStatus[category];
   const relevantIssues = issuesFor(category);
 
-  const [previewId, setPreviewId] = useState<string | undefined>(selected?.id ?? options[0]?.id);
-  const previewPart = useMemo(
-    () => options.find((o) => o.id === previewId) ?? selected ?? options[0],
-    [options, previewId, selected]
-  );
-
   return (
     <div>
       <button
@@ -92,13 +91,14 @@ export function CategoryDetail<K extends PartCategory>({
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {/* photo + detailed spec panel: shown first on mobile, right column on desktop */}
         <div className="order-1 lg:order-2 lg:sticky lg:top-6 lg:self-start">
-          {previewPart ? (
+          {options.length > 0 ? (
             <DetailPanel
-              part={previewPart}
-              selected={selected?.id === previewPart.id}
+              part={selected}
               status={status}
-              onToggleSelect={() => {
-                selectPart(category, previewPart);
+              placeholderIcon={Icon}
+              onDeselect={() => {
+                if (!selected) return;
+                selectPart(category, selected);
                 closeCategory();
               }}
             />
@@ -136,11 +136,7 @@ export function CategoryDetail<K extends PartCategory>({
               key={part.id}
               part={part}
               selected={selected?.id === part.id}
-              onSelect={() => {
-                selectPart(category, part);
-                setPreviewId(part.id);
-              }}
-              onHover={() => setPreviewId(part.id)}
+              onSelect={() => selectPart(category, part)}
             />
           ))}
         </div>
@@ -151,20 +147,40 @@ export function CategoryDetail<K extends PartCategory>({
 
 function DetailPanel({
   part,
-  selected,
   status,
-  onToggleSelect,
+  placeholderIcon: PlaceholderIcon,
+  onDeselect,
 }: {
-  part: Part;
-  selected: boolean;
+  part: Part | undefined;
   status: "success" | "warning" | "danger" | "idle";
-  onToggleSelect: () => void;
+  placeholderIcon: typeof ImageOff;
+  onDeselect: () => void;
 }) {
-  const Icon = CATEGORY_ICON[part.category];
+  const imageUrl = useProductImage(part ? partImageQuery(part) : null);
+
+  if (!part) {
+    return (
+      <div className="rounded-lg border border-[#27272A] bg-[#151517] p-5">
+        <div className="mb-4 flex aspect-square w-full items-center justify-center rounded-lg border border-[#27272A] bg-white/[0.02]">
+          <PlaceholderIcon className="h-16 w-16 text-[#3F3F46]" strokeWidth={1.25} />
+        </div>
+        <p className="text-sm text-[#9CA3AF]">
+          왼쪽 목록에서 제품을 선택하면 사진과 상세 스펙이 여기에 표시됩니다.
+        </p>
+        <button
+          type="button"
+          disabled
+          className="mt-5 w-full cursor-not-allowed rounded-lg border border-[#27272A] py-2.5 text-sm font-medium text-[#9CA3AF]/50"
+        >
+          제품을 선택하세요
+        </button>
+      </div>
+    );
+  }
+
   const metaLabel = partMeta(part);
   const note = partNote(part);
   const specs = partFullSpecs(part);
-  const imageUrl = useProductImage(partImageQuery(part));
 
   return (
     <div className="rounded-lg border border-[#27272A] bg-[#151517] p-5">
@@ -179,7 +195,7 @@ function DetailPanel({
           // eslint-disable-next-line @next/next/no-img-element
           <img src={imageUrl} alt={partTitle(part)} className="h-full w-full object-contain" />
         ) : (
-          <Icon className="h-16 w-16" strokeWidth={1.25} style={{ color: STATUS_COLOR[status] }} />
+          <PlaceholderIcon className="h-16 w-16" strokeWidth={1.25} style={{ color: STATUS_COLOR[status] }} />
         )}
       </div>
 
@@ -188,11 +204,9 @@ function DetailPanel({
           {metaLabel && <p className="text-xs text-[#9CA3AF]">{metaLabel}</p>}
           <h3 className="text-base font-semibold text-[#E4E4E7]">{partTitle(part)}</h3>
         </div>
-        {selected && (
-          <span className="shrink-0 rounded-full bg-[#6366F1]/15 px-2 py-0.5 text-[10px] font-medium text-[#6366F1]">
-            선택됨
-          </span>
-        )}
+        <span className="shrink-0 rounded-full bg-[#6366F1]/15 px-2 py-0.5 text-[10px] font-medium text-[#6366F1]">
+          선택됨
+        </span>
       </div>
 
       {note && <p className="mt-1 text-xs italic text-[#F59E0B]/80">{note}</p>}
@@ -208,15 +222,10 @@ function DetailPanel({
 
       <button
         type="button"
-        onClick={onToggleSelect}
-        className={cn(
-          "mt-5 w-full rounded-lg py-2.5 text-sm font-medium transition-colors duration-150",
-          selected
-            ? "border border-[#27272A] text-[#9CA3AF] hover:border-[#3F3F46]"
-            : "bg-[#6366F1] text-white hover:bg-[#6366F1]/90"
-        )}
+        onClick={onDeselect}
+        className="mt-5 w-full rounded-lg border border-[#27272A] py-2.5 text-sm font-medium text-[#9CA3AF] transition-colors duration-150 hover:border-[#3F3F46]"
       >
-        {selected ? "선택 해제" : "이 제품 선택"}
+        선택 해제
       </button>
     </div>
   );
