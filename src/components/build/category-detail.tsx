@@ -73,17 +73,17 @@ export function CategoryDetail<K extends PartCategory>({
   const pickedPart = options.find((o) => o.id === pickedId);
 
   return (
-    <div>
+    <div className="lg:flex lg:h-full lg:flex-col">
       <button
         type="button"
         onClick={closeCategory}
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-[#9CA3AF] transition-colors duration-150 hover:text-[#E4E4E7]"
+        className="mb-4 inline-flex shrink-0 items-center gap-1.5 text-sm text-[#9CA3AF] transition-colors duration-150 hover:text-[#E4E4E7]"
       >
         <ArrowLeft className="h-4 w-4" strokeWidth={2} />
         전체 카테고리
       </button>
 
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex shrink-0 items-center justify-between">
         <div className="flex items-center gap-2.5">
           <Icon className="h-5 w-5 text-[#9CA3AF]" strokeWidth={1.75} />
           <h2 className="text-base font-semibold text-[#E4E4E7]">{CATEGORY_LABEL[category]}</h2>
@@ -91,9 +91,9 @@ export function CategoryDetail<K extends PartCategory>({
         <StatusBadge level={status} />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-2">
         {/* photo + detailed spec panel: shown first on mobile, right column on desktop */}
-        <div className="order-1 lg:order-2 lg:sticky lg:top-6 lg:self-start">
+        <div className="order-1 lg:order-2 lg:h-full lg:overflow-y-auto lg:pr-1">
           {options.length > 0 ? (
             <DetailPanel
               part={pickedPart}
@@ -136,7 +136,7 @@ export function CategoryDetail<K extends PartCategory>({
         </div>
 
         {/* product list: own scroll container so scrolling it never moves the rest of the page */}
-        <div className="order-2 lg:order-1 flex max-h-[60vh] flex-col gap-2.5 overflow-y-auto pr-1 lg:max-h-[calc(100vh-8rem)]">
+        <div className="order-2 lg:order-1 flex max-h-[60vh] flex-col gap-2.5 overflow-y-auto pr-1 lg:h-full lg:max-h-none">
           {options.map((part) => (
             <PartOptionCard
               key={part.id}
@@ -178,8 +178,8 @@ function DetailPanel({
   if (!part) {
     return (
       <div className="rounded-lg border border-[#27272A] bg-[#151517] p-5">
-        <div className="mb-4 flex aspect-square w-full items-center justify-center rounded-lg border border-[#27272A] bg-white/[0.02]">
-          <PlaceholderIcon className="h-16 w-16 text-[#3F3F46]" strokeWidth={1.25} />
+        <div className="mb-4 flex h-40 w-full items-center justify-center rounded-lg border border-[#27272A] bg-white/[0.02]">
+          <PlaceholderIcon className="h-14 w-14 text-[#3F3F46]" strokeWidth={1.25} />
         </div>
         <p className="text-sm text-[#9CA3AF]">
           왼쪽 목록에서 제품을 선택하면 사진과 상세 스펙이 여기에 표시됩니다.
@@ -202,7 +202,7 @@ function DetailPanel({
   return (
     <div className="rounded-lg border border-[#27272A] bg-[#151517] p-5">
       <div
-        className="mb-4 flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg border transition-colors duration-300 ease-in-out"
+        className="mb-4 flex h-40 w-full items-center justify-center overflow-hidden rounded-lg border transition-colors duration-300 ease-in-out"
         style={{
           borderColor: STATUS_COLOR[status],
           backgroundColor: `${STATUS_COLOR[status]}0F`,
@@ -212,7 +212,7 @@ function DetailPanel({
           // eslint-disable-next-line @next/next/no-img-element
           <img src={imageUrl} alt={partTitle(part)} className="h-full w-full object-contain" />
         ) : (
-          <PlaceholderIcon className="h-16 w-16" strokeWidth={1.25} style={{ color: STATUS_COLOR[status] }} />
+          <PlaceholderIcon className="h-14 w-14" strokeWidth={1.25} style={{ color: STATUS_COLOR[status] }} />
         )}
       </div>
 

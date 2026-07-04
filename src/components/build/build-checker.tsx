@@ -10,8 +10,8 @@ import type { PartsData } from "@/lib/supabase/fetch-parts";
 export function BuildChecker({ parts }: { parts: PartsData }) {
   return (
     <BuildProvider>
-      <div className="mx-auto max-w-6xl px-4 pb-24 pt-6 lg:px-6 lg:pt-10">
-        <header className="mb-6 lg:mb-10">
+      <div className="mx-auto max-w-6xl px-4 pb-24 pt-6 lg:flex lg:h-screen lg:flex-col lg:overflow-hidden lg:px-6 lg:pb-6 lg:pt-6">
+        <header className="mb-6 shrink-0 lg:mb-6">
           <h1 className="text-xl font-semibold text-[#E4E4E7] lg:text-2xl">
             PC 부품 호환성 체커
           </h1>
@@ -25,17 +25,19 @@ export function BuildChecker({ parts }: { parts: PartsData }) {
           <CaseIllustration compact />
         </div>
 
-        <div className="lg:grid lg:grid-cols-[300px_1fr] lg:items-start lg:gap-8">
-          {/* left sticky illustration panel (desktop) */}
-          <aside className="hidden lg:sticky lg:top-10 lg:block lg:rounded-lg lg:border lg:border-[#27272A] lg:bg-[#151517] lg:p-6">
+        <div className="lg:grid lg:min-h-0 lg:flex-1 lg:grid-cols-[300px_1fr] lg:items-stretch lg:gap-8">
+          {/* left illustration panel (desktop): fixed in place, own scroll if it ever overflows */}
+          <aside className="hidden lg:block lg:h-full lg:overflow-y-auto lg:rounded-lg lg:border lg:border-[#27272A] lg:bg-[#151517] lg:p-6">
             <CaseIllustration />
             <SelectedPartsList />
           </aside>
 
           {/* right column */}
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 lg:h-full lg:min-h-0 lg:overflow-hidden">
             <SummaryPanel />
-            <CategoryStage parts={parts} />
+            <div className="lg:min-h-0 lg:flex-1 lg:overflow-hidden">
+              <CategoryStage parts={parts} />
+            </div>
           </div>
         </div>
       </div>
