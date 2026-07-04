@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, AlertTriangle, XCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { ArrowLeft, AlertTriangle, ImageOff, XCircle } from "lucide-react";
 import type { Part, PartCategory, PartMap } from "@/lib/types";
 import { CATEGORY_LABEL } from "@/lib/compatibility";
 import { CATEGORY_ICON } from "@/lib/category-icons";
@@ -20,10 +20,15 @@ const STATUS_COLOR: Record<"success" | "warning" | "danger" | "idle", string> = 
 
 const imageCache = new Map<string, string | null>();
 
-function useProductImage(query: string): string | null {
-  const [image, setImage] = useState<string | null>(imageCache.get(query) ?? null);
+function useProductImage(query: string | null): string | null {
+  const [image, setImage] = useState<string | null>(query ? imageCache.get(query) ?? null : null);
 
   useEffect(() => {
+    if (!query) {
+      setImage(null);
+      return;
+    }
+
     const cached = imageCache.get(query);
     if (cached !== undefined) {
       setImage(cached);
@@ -58,30 +63,27 @@ export function CategoryDetail<K extends PartCategory>({
   category: K;
   options: PartMap[K][];
 }) {
-  const { selections, categoryStatus, selectPart, issuesFor, closeCategory } = useBuild();
+  const { selections, categoryStatus, selectPart, issuesFor, closeCategory, preview, previewPick } =
+    useBuild();
   const Icon = CATEGORY_ICON[category as PartCategory];
   const selected = selections[category];
   const status = categoryStatus[category];
   const relevantIssues = issuesFor(category);
 
-  const [previewId, setPreviewId] = useState<string | undefined>(selected?.id ?? options[0]?.id);
-  const previewPart = useMemo(
-    () => options.find((o) => o.id === previewId) ?? selected ?? options[0],
-    [options, previewId, selected]
-  );
+  const pickedPart = preview as PartMap[K] | undefined;
 
   return (
-    <div>
+    <div className="lg:flex lg:h-full lg:flex-col">
       <button
         type="button"
         onClick={closeCategory}
-        className="mb-4 inline-flex items-center gap-1.5 text-sm text-[#9CA3AF] transition-colors duration-150 hover:text-[#E4E4E7]"
+        className="mb-4 inline-flex shrink-0 items-center gap-1.5 text-sm text-[#9CA3AF] transition-colors duration-150 hover:text-[#E4E4E7]"
       >
         <ArrowLeft className="h-4 w-4" strokeWidth={2} />
         전체 카테고리
       </button>
 
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex shrink-0 items-center justify-between">
         <div className="flex items-center gap-2.5">
           <Icon className="h-5 w-5 text-[#9CA3AF]" strokeWidth={1.75} />
           <h2 className="text-base font-semibold text-[#E4E4E7]">{CATEGORY_LABEL[category]}</h2>
@@ -89,15 +91,22 @@ export function CategoryDetail<K extends PartCategory>({
         <StatusBadge level={status} />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-2">
         {/* photo + detailed spec panel: shown first on mobile, right column on desktop */}
-        <div className="order-1 lg:order-2 lg:sticky lg:top-6 lg:self-start">
-          {previewPart ? (
+        <div className="order-1 lg:order-2 lg:h-full lg:overflow-y-auto lg:pr-1">
+          {options.length > 0 ? (
             <DetailPanel
-              part={previewPart}
-              selected={selected?.id === previewPart.id}
+              part={pickedPart}
+              committed={pickedPart?.id === selected?.id}
               status={status}
-              onToggleSelect={() => selectPart(category, previewPart)}
+              placeholderIcon={Icon}
+              onConfirm={() => {
+                if (!pickedPart) return;
+                if (selected?.id !== pickedPart.id) {
+                  selectPart(category, pickedPart);
+                }
+                closeCategory();
+              }}
             />
           ) : (
             <div className="rounded-lg border border-[#27272A] bg-[#151517] p-6 text-sm text-[#9CA3AF]">
@@ -127,17 +136,21 @@ export function CategoryDetail<K extends PartCategory>({
         </div>
 
         {/* product list: own scroll container so scrolling it never moves the rest of the page */}
-        <div className="order-2 lg:order-1 flex max-h-[60vh] flex-col gap-2.5 overflow-y-auto pr-1 lg:max-h-[calc(100vh-8rem)]">
+        <div className="order-2 lg:order-1 flex max-h-[60vh] flex-col gap-2.5 overflow-y-auto pr-1 lg:h-full lg:max-h-none">
           {options.map((part) => (
             <PartOptionCard
               key={part.id}
               part={part}
-              selected={selected?.id === part.id}
+              selected={pickedPart?.id === part.id}
               onSelect={() => {
-                selectPart(category, part);
-                setPreviewId(part.id);
+                if (selected?.id === part.id) {
+                  // clicking the already-committed item again deselects it directly
+                  selectPart(category, part);
+                  closeCategory();
+                } else {
+                  previewPick(part);
+                }
               }}
-              onHover={() => setPreviewId(part.id)}
             />
           ))}
         </div>
@@ -148,25 +161,47 @@ export function CategoryDetail<K extends PartCategory>({
 
 function DetailPanel({
   part,
-  selected,
+  committed,
   status,
-  onToggleSelect,
+  placeholderIcon: PlaceholderIcon,
+  onConfirm,
 }: {
-  part: Part;
-  selected: boolean;
+  part: Part | undefined;
+  committed: boolean;
   status: "success" | "warning" | "danger" | "idle";
-  onToggleSelect: () => void;
+  placeholderIcon: typeof ImageOff;
+  onConfirm: () => void;
 }) {
-  const Icon = CATEGORY_ICON[part.category];
+  const imageUrl = useProductImage(part ? partImageQuery(part) : null);
+
+  if (!part) {
+    return (
+      <div className="rounded-lg border border-[#27272A] bg-[#151517] p-5">
+        <div className="mb-4 flex h-40 w-full items-center justify-center rounded-lg border border-[#27272A] bg-white/[0.02]">
+          <PlaceholderIcon className="h-14 w-14 text-[#3F3F46]" strokeWidth={1.25} />
+        </div>
+        <p className="text-sm text-[#9CA3AF]">
+          왼쪽 목록에서 제품을 선택하면 사진과 상세 스펙이 여기에 표시됩니다.
+        </p>
+        <button
+          type="button"
+          disabled
+          className="mt-5 w-full cursor-not-allowed rounded-lg border border-[#27272A] py-2.5 text-sm font-medium text-[#9CA3AF]/50"
+        >
+          제품을 선택하세요
+        </button>
+      </div>
+    );
+  }
+
   const metaLabel = partMeta(part);
   const note = partNote(part);
   const specs = partFullSpecs(part);
-  const imageUrl = useProductImage(partImageQuery(part));
 
   return (
     <div className="rounded-lg border border-[#27272A] bg-[#151517] p-5">
       <div
-        className="mb-4 flex aspect-square w-full items-center justify-center overflow-hidden rounded-lg border transition-colors duration-300 ease-in-out"
+        className="mb-4 flex h-40 w-full items-center justify-center overflow-hidden rounded-lg border transition-colors duration-300 ease-in-out"
         style={{
           borderColor: STATUS_COLOR[status],
           backgroundColor: `${STATUS_COLOR[status]}0F`,
@@ -176,7 +211,7 @@ function DetailPanel({
           // eslint-disable-next-line @next/next/no-img-element
           <img src={imageUrl} alt={partTitle(part)} className="h-full w-full object-contain" />
         ) : (
-          <Icon className="h-16 w-16" strokeWidth={1.25} style={{ color: STATUS_COLOR[status] }} />
+          <PlaceholderIcon className="h-14 w-14" strokeWidth={1.25} style={{ color: STATUS_COLOR[status] }} />
         )}
       </div>
 
@@ -185,7 +220,7 @@ function DetailPanel({
           {metaLabel && <p className="text-xs text-[#9CA3AF]">{metaLabel}</p>}
           <h3 className="text-base font-semibold text-[#E4E4E7]">{partTitle(part)}</h3>
         </div>
-        {selected && (
+        {committed && (
           <span className="shrink-0 rounded-full bg-[#6366F1]/15 px-2 py-0.5 text-[10px] font-medium text-[#6366F1]">
             선택됨
           </span>
@@ -205,15 +240,10 @@ function DetailPanel({
 
       <button
         type="button"
-        onClick={onToggleSelect}
-        className={cn(
-          "mt-5 w-full rounded-lg py-2.5 text-sm font-medium transition-colors duration-150",
-          selected
-            ? "border border-[#27272A] text-[#9CA3AF] hover:border-[#3F3F46]"
-            : "bg-[#6366F1] text-white hover:bg-[#6366F1]/90"
-        )}
+        onClick={onConfirm}
+        className="mt-5 w-full rounded-lg bg-[#6366F1] py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-[#6366F1]/90"
       >
-        {selected ? "선택 해제" : "이 제품 선택"}
+        이 제품 선택하기
       </button>
     </div>
   );

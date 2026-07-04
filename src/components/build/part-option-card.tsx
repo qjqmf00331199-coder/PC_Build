@@ -8,12 +8,10 @@ export function PartOptionCard({
   part,
   selected,
   onSelect,
-  onHover,
 }: {
   part: Part;
   selected: boolean;
   onSelect: () => void;
-  onHover?: () => void;
 }) {
   const metaLabel = partMeta(part);
   const note = partNote(part);
@@ -22,12 +20,12 @@ export function PartOptionCard({
     <button
       type="button"
       onClick={onSelect}
-      onMouseEnter={onHover}
-      onFocus={onHover}
       aria-pressed={selected}
       className={cn(
-        "flex flex-col items-start gap-1 rounded-lg border border-[#27272A] bg-[#151517] px-4 py-3 text-left transition-colors duration-150 hover:border-[#3F3F46]",
-        selected && "ring-1 ring-[#6366F1] border-[#6366F1]/50"
+        "flex flex-col items-start gap-1 rounded-lg border-2 bg-[#151517] px-4 py-3 text-left transition-colors duration-150",
+        selected
+          ? "border-[#6366F1] bg-[#6366F1]/5"
+          : "border-[#27272A] hover:border-[#3F3F46]"
       )}
     >
       <div className="flex w-full items-center justify-between gap-2">

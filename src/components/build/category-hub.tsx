@@ -14,7 +14,7 @@ export function CategoryHub({ parts }: { parts: PartsData }) {
   const { selections, categoryStatus, issuesFor, openCategory } = useBuild();
 
   return (
-    <div>
+    <div className="lg:h-full lg:overflow-y-auto lg:pr-1">
       <h2 className="mb-3 text-sm font-semibold text-[#E4E4E7]">카테고리 선택</h2>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {CATEGORY_ORDER.map((category) => (
@@ -55,8 +55,10 @@ function CategoryCard<K extends PartCategory>({
       type="button"
       onClick={onOpen}
       className={cn(
-        "flex flex-col gap-3 rounded-lg border border-[#27272A] bg-[#151517] p-5 text-left transition-colors duration-150 hover:border-[#3F3F46]",
-        selected && "ring-1 ring-[#6366F1] border-[#6366F1]/50"
+        "flex flex-col gap-3 rounded-lg border-2 bg-[#151517] p-5 text-left transition-colors duration-150",
+        selected
+          ? "border-[#6366F1] bg-[#6366F1]/5"
+          : "border-[#27272A] hover:border-[#3F3F46]"
       )}
     >
       <div className="flex items-center justify-between">

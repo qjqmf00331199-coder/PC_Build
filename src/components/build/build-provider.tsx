@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
-import type { CompatIssue, CompatLevel, PartCategory, PartMap, Selections } from "@/lib/types";
+import type { CompatIssue, CompatLevel, Part, PartCategory, PartMap, Selections } from "@/lib/types";
 import {
   CATEGORY_ORDER,
   computeCategoryStatus,
@@ -12,6 +12,7 @@ import {
 
 interface BuildContextValue {
   selections: Selections;
+  effectiveSelections: Selections;
   issues: CompatIssue[];
   categoryStatus: Record<PartCategory, CompatLevel>;
   totalPowerW: number;
@@ -21,8 +22,10 @@ interface BuildContextValue {
   selectPart: <K extends PartCategory>(category: K, part: PartMap[K]) => void;
   issuesFor: (category: PartCategory) => CompatIssue[];
   activeCategory: PartCategory | null;
+  preview: Part | undefined;
   openCategory: (category: PartCategory) => void;
   closeCategory: () => void;
+  previewPick: (part: Part | undefined) => void;
 }
 
 const BuildContext = createContext<BuildContextValue | null>(null);
@@ -30,6 +33,7 @@ const BuildContext = createContext<BuildContextValue | null>(null);
 export function BuildProvider({ children }: { children: ReactNode }) {
   const [selections, setSelections] = useState<Selections>({});
   const [activeCategory, setActiveCategory] = useState<PartCategory | null>(null);
+  const [preview, setPreview] = useState<Part | undefined>(undefined);
 
   const selectPart = <K extends PartCategory>(category: K, part: PartMap[K]) => {
     setSelections((prev) => {
@@ -43,14 +47,27 @@ export function BuildProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const issues = useMemo(() => evaluateIssues(selections), [selections]);
+  // while browsing a category, overlay the not-yet-committed pick so the
+  // sidebar/illustration/power stats preview it live without saving it
+  const effectiveSelections = useMemo(() => {
+    if (!activeCategory) return selections;
+    const next = { ...selections } as Record<string, unknown>;
+    if (preview) {
+      next[activeCategory] = preview;
+    } else {
+      delete next[activeCategory];
+    }
+    return next as Selections;
+  }, [selections, activeCategory, preview]);
+
+  const issues = useMemo(() => evaluateIssues(effectiveSelections), [effectiveSelections]);
   const categoryStatus = useMemo(
-    () => computeCategoryStatus(selections, issues),
-    [selections, issues]
+    () => computeCategoryStatus(effectiveSelections, issues),
+    [effectiveSelections, issues]
   );
-  const totalPowerW = useMemo(() => estimateTotalPowerW(selections), [selections]);
-  const psuMarginPct = useMemo(() => computePsuMarginPct(selections), [selections]);
-  const selectedCount = CATEGORY_ORDER.filter((c) => selections[c]).length;
+  const totalPowerW = useMemo(() => estimateTotalPowerW(effectiveSelections), [effectiveSelections]);
+  const psuMarginPct = useMemo(() => computePsuMarginPct(effectiveSelections), [effectiveSelections]);
+  const selectedCount = CATEGORY_ORDER.filter((c) => effectiveSelections[c]).length;
 
   const issuesFor = (category: PartCategory) =>
     issues.filter((issue) => issue.categories.includes(category));
@@ -59,6 +76,7 @@ export function BuildProvider({ children }: { children: ReactNode }) {
     <BuildContext.Provider
       value={{
         selections,
+        effectiveSelections,
         issues,
         categoryStatus,
         totalPowerW,
@@ -68,8 +86,16 @@ export function BuildProvider({ children }: { children: ReactNode }) {
         selectPart,
         issuesFor,
         activeCategory,
-        openCategory: setActiveCategory,
-        closeCategory: () => setActiveCategory(null),
+        preview,
+        openCategory: (category) => {
+          setPreview(selections[category]);
+          setActiveCategory(category);
+        },
+        closeCategory: () => {
+          setPreview(undefined);
+          setActiveCategory(null);
+        },
+        previewPick: setPreview,
       }}
     >
       {children}
