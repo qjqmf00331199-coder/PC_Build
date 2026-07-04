@@ -14,7 +14,7 @@ const DOT_COLOR: Record<"success" | "warning" | "danger" | "idle", string> = {
 };
 
 export function SelectedPartsList() {
-  const { selections, categoryStatus, openCategory } = useBuild();
+  const { effectiveSelections, categoryStatus, openCategory } = useBuild();
 
   return (
     <div className="mt-5 border-t border-[#27272A] pt-4">
@@ -24,7 +24,7 @@ export function SelectedPartsList() {
       <ul className="space-y-1">
         {CATEGORY_ORDER.map((category) => {
           const Icon = CATEGORY_ICON[category];
-          const part = selections[category];
+          const part = effectiveSelections[category];
           const status = categoryStatus[category];
           return (
             <li key={category}>

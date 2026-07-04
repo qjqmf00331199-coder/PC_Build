@@ -63,14 +63,14 @@ export function CategoryDetail<K extends PartCategory>({
   category: K;
   options: PartMap[K][];
 }) {
-  const { selections, categoryStatus, selectPart, issuesFor, closeCategory } = useBuild();
+  const { selections, categoryStatus, selectPart, issuesFor, closeCategory, preview, previewPick } =
+    useBuild();
   const Icon = CATEGORY_ICON[category as PartCategory];
   const selected = selections[category];
   const status = categoryStatus[category];
   const relevantIssues = issuesFor(category);
 
-  const [pickedId, setPickedId] = useState<string | undefined>(selected?.id);
-  const pickedPart = options.find((o) => o.id === pickedId);
+  const pickedPart = preview as PartMap[K] | undefined;
 
   return (
     <div className="lg:flex lg:h-full lg:flex-col">
@@ -141,15 +141,14 @@ export function CategoryDetail<K extends PartCategory>({
             <PartOptionCard
               key={part.id}
               part={part}
-              selected={pickedId === part.id}
+              selected={pickedPart?.id === part.id}
               onSelect={() => {
                 if (selected?.id === part.id) {
                   // clicking the already-committed item again deselects it directly
                   selectPart(category, part);
-                  setPickedId(undefined);
                   closeCategory();
                 } else {
-                  setPickedId(part.id);
+                  previewPick(part);
                 }
               }}
             />

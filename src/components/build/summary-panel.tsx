@@ -5,7 +5,7 @@ import { useBuild } from "./build-provider";
 import { cn } from "@/lib/utils";
 
 export function SummaryPanel() {
-  const { selectedCount, totalCategories, totalPowerW, psuMarginPct, selections } = useBuild();
+  const { selectedCount, totalCategories, totalPowerW, psuMarginPct, effectiveSelections } = useBuild();
 
   const marginColor =
     psuMarginPct === null
@@ -25,8 +25,8 @@ export function SummaryPanel() {
           ? "bg-[#F59E0B]"
           : "bg-[#22C55E]";
 
-  const barWidth = selections.psu
-    ? Math.min(100, Math.max(4, (totalPowerW / selections.psu.watt) * 100))
+  const barWidth = effectiveSelections.psu
+    ? Math.min(100, Math.max(4, (totalPowerW / effectiveSelections.psu.watt) * 100))
     : 0;
 
   return (
@@ -62,7 +62,7 @@ export function SummaryPanel() {
         </div>
       </div>
 
-      {selections.psu && (
+      {effectiveSelections.psu && (
         <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#27272A]">
           <div
             className={cn("h-full rounded-full transition-[width] duration-300 ease-in-out", barColor)}
