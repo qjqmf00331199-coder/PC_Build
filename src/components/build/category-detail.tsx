@@ -97,7 +97,10 @@ export function CategoryDetail<K extends PartCategory>({
               part={previewPart}
               selected={selected?.id === previewPart.id}
               status={status}
-              onToggleSelect={() => selectPart(category, previewPart)}
+              onToggleSelect={() => {
+                selectPart(category, previewPart);
+                closeCategory();
+              }}
             />
           ) : (
             <div className="rounded-lg border border-[#27272A] bg-[#151517] p-6 text-sm text-[#9CA3AF]">
