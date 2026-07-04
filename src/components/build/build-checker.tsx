@@ -2,9 +2,9 @@
 
 import { BuildProvider } from "./build-provider";
 import { CaseIllustration } from "./case-illustration";
-import { CategorySection } from "./category-section";
+import { CategoryStage } from "./category-stage";
+import { SelectedPartsList } from "./selected-parts-list";
 import { SummaryPanel } from "./summary-panel";
-import { CATEGORY_ORDER } from "@/lib/compatibility";
 import type { PartsData } from "@/lib/supabase/fetch-parts";
 
 export function BuildChecker({ parts }: { parts: PartsData }) {
@@ -29,14 +29,13 @@ export function BuildChecker({ parts }: { parts: PartsData }) {
           {/* left sticky illustration panel (desktop) */}
           <aside className="hidden lg:sticky lg:top-10 lg:block lg:rounded-lg lg:border lg:border-[#27272A] lg:bg-[#151517] lg:p-6">
             <CaseIllustration />
+            <SelectedPartsList />
           </aside>
 
           {/* right column */}
           <div className="flex flex-col gap-4">
             <SummaryPanel />
-            {CATEGORY_ORDER.map((category) => (
-              <CategorySection key={category} category={category} options={parts[category]} />
-            ))}
+            <CategoryStage parts={parts} />
           </div>
         </div>
       </div>

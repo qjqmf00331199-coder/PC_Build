@@ -20,12 +20,16 @@ interface BuildContextValue {
   totalCategories: number;
   selectPart: <K extends PartCategory>(category: K, part: PartMap[K]) => void;
   issuesFor: (category: PartCategory) => CompatIssue[];
+  activeCategory: PartCategory | null;
+  openCategory: (category: PartCategory) => void;
+  closeCategory: () => void;
 }
 
 const BuildContext = createContext<BuildContextValue | null>(null);
 
 export function BuildProvider({ children }: { children: ReactNode }) {
   const [selections, setSelections] = useState<Selections>({});
+  const [activeCategory, setActiveCategory] = useState<PartCategory | null>(null);
 
   const selectPart = <K extends PartCategory>(category: K, part: PartMap[K]) => {
     setSelections((prev) => {
@@ -63,6 +67,9 @@ export function BuildProvider({ children }: { children: ReactNode }) {
         totalCategories: CATEGORY_ORDER.length,
         selectPart,
         issuesFor,
+        activeCategory,
+        openCategory: setActiveCategory,
+        closeCategory: () => setActiveCategory(null),
       }}
     >
       {children}
