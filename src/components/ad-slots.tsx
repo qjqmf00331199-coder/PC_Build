@@ -1,10 +1,17 @@
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
-export function AdSlots() {
+export function AdSlots({ narrow = false }: { narrow?: boolean }) {
+  // side rails need (viewport width - centered content width) / 2 >= rail width(192px).
+  // the build page's content maxes out at 1152px so it only fits from 2xl(1536px) up;
+  // the AI wizard / landing screens are much narrower (max-w-2xl/3xl), so they already
+  // have room from xl(1280px) up — showing rails there instead of leaving a dead gutter.
+  const railBreakpoint = narrow ? "xl:flex" : "2xl:flex";
+
   return (
     <>
       {/* desktop: 160x600 rails, only when there's enough side gutter beyond the centered app column */}
-      <div className="fixed inset-y-0 left-0 z-[60] hidden w-48 items-center justify-end pr-6 2xl:flex">
+      <div className={cn("fixed inset-y-0 left-0 z-[60] hidden w-48 items-center justify-end pr-6", railBreakpoint)}>
         <Image
           src="/ad-desktop.jpg"
           alt="광고"
@@ -13,7 +20,7 @@ export function AdSlots() {
           className="rounded-lg border border-[#27272A] bg-[#151517] object-contain"
         />
       </div>
-      <div className="fixed inset-y-0 right-0 z-[60] hidden w-48 items-center justify-start pl-6 2xl:flex">
+      <div className={cn("fixed inset-y-0 right-0 z-[60] hidden w-48 items-center justify-start pl-6", railBreakpoint)}>
         <Image
           src="/ad-desktop.jpg"
           alt="광고"

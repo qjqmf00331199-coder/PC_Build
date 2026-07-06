@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AdSlots } from "@/components/ad-slots";
 import { BuildChecker } from "@/components/build/build-checker";
 import { AiRecommendWizard } from "@/components/ai-recommend/ai-recommend-wizard";
 import type { PartsData } from "@/lib/supabase/fetch-parts";
@@ -21,6 +22,7 @@ export function LandingGate({ parts }: { parts: PartsData }) {
   if (view === "build") {
     return (
       <div className="relative">
+        <AdSlots />
         <button
           type="button"
           onClick={() => {
@@ -38,18 +40,22 @@ export function LandingGate({ parts }: { parts: PartsData }) {
 
   if (view === "ai") {
     return (
-      <AiRecommendWizard
-        onCancel={() => setView("landing")}
-        onApply={(selections) => {
-          setInitialSelections(selections);
-          setView("build");
-        }}
-      />
+      <>
+        <AdSlots narrow />
+        <AiRecommendWizard
+          onCancel={() => setView("landing")}
+          onApply={(selections) => {
+            setInitialSelections(selections);
+            setView("build");
+          }}
+        />
+      </>
     );
   }
 
   return (
     <div className="relative mx-auto flex min-h-dvh max-w-3xl flex-col items-center justify-center px-6 py-16 text-center">
+      <AdSlots narrow />
       <div className="mb-2 flex items-center gap-2 text-[10px] tracking-[0.2em] text-[var(--accent)] sm:text-xs">
         <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
         실시간 하드웨어 호환성 체크

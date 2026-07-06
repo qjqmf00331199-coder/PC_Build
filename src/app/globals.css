@@ -76,6 +76,63 @@
   animation: step-slide-in-backward 0.32s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* AI 추천 로딩 화면: 어두운 로고 위에 밝은 로고를 얹고, 그 밝은 레이어의 너비를
+   왼쪽->오른쪽으로 키워가며(overflow로 잘라내는 게 마스크 위치 이동과 동일한 효과)
+   글자 색이 차오르는 것처럼 보이게 한다. 채움 끝단에는 발광 엣지를 붙여 강조. */
+.logo-charge {
+  position: relative;
+  display: inline-block;
+  line-height: 1;
+}
+
+.logo-charge-fill {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  width: 0%;
+  animation: logo-charge-wipe 2.2s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+}
+
+.logo-charge-fill-inner {
+  display: block;
+  white-space: nowrap;
+}
+
+.logo-charge-fill::after {
+  content: "";
+  position: absolute;
+  top: -6%;
+  bottom: -6%;
+  right: 0;
+  width: 3px;
+  background: var(--accent);
+  box-shadow: 0 0 14px 3px color-mix(in srgb, var(--accent) 75%, transparent);
+}
+
+@keyframes logo-charge-wipe {
+  0% {
+    width: 0%;
+    opacity: 1;
+  }
+  68% {
+    width: 100%;
+    opacity: 1;
+  }
+  82% {
+    width: 100%;
+    opacity: 0;
+  }
+  83% {
+    width: 0%;
+    opacity: 0;
+  }
+  100% {
+    width: 0%;
+    opacity: 1;
+  }
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

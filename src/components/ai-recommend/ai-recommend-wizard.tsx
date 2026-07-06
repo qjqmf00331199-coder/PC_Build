@@ -228,8 +228,19 @@ export function AiRecommendWizard({
       )}
 
       {phase === "loading" && (
-        <div className="flex flex-col items-center justify-center gap-4 rounded-lg border border-[#27272A] bg-[#151517] py-20 text-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#27272A] border-t-[var(--accent)]" />
+        <div className="flex flex-col items-center justify-center gap-6 rounded-lg border border-[#27272A] bg-[#151517] py-20 text-center">
+          <div className="logo-charge text-4xl font-extrabold tracking-tight sm:text-5xl" role="img" aria-label="TriFIT 로딩 중">
+            <span className="block">
+              <span className="text-[#3F3F46]">Tri</span>
+              <span className="text-[#3F3F46]">FIT</span>
+            </span>
+            <span className="logo-charge-fill" aria-hidden="true">
+              <span className="logo-charge-fill-inner">
+                <span className="text-[#E4E4E7]">Tri</span>
+                <span className="text-[var(--accent)]">FIT</span>
+              </span>
+            </span>
+          </div>
           <p className="text-sm text-[#9CA3AF]">AI가 답변을 바탕으로 부품 조합을 고르고 있어요...</p>
         </div>
       )}
@@ -248,7 +259,12 @@ export function AiRecommendWizard({
       )}
 
       {phase === "result" && result && (
-        <div className="rounded-lg border border-[#27272A] bg-[#151517] p-5">
+        <div>
+          <div className="mb-6 flex justify-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/trifit_animation.gif" alt="TriFIT" className="h-12 w-auto select-none" />
+          </div>
+          <div className="rounded-lg border border-[#27272A] bg-[#151517] p-5">
           <h3 className="mb-2 text-sm font-semibold text-[#E4E4E7]">추천 조합</h3>
           <p className="mb-4 text-xs text-[#9CA3AF]">{result.reason}</p>
 
@@ -301,6 +317,7 @@ export function AiRecommendWizard({
           >
             이대로 견적 짜기 →
           </button>
+          </div>
         </div>
       )}
     </div>
