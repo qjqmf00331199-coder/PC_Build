@@ -52,20 +52,20 @@ export function SummaryPanel({ compact = false }: { compact?: boolean }) {
         />
       </div>
 
-      <div className={cn("grid gap-4", compact ? "grid-cols-1 gap-2" : "grid-cols-2")}>
+      <div className={cn("grid gap-4", compact ? "grid-cols-2 gap-x-3 gap-y-0" : "grid-cols-2")}>
         <div>
-          <span className={cn("block text-[#9CA3AF]", compact ? "text-[10px]" : "text-xs")}>
+          <span className={cn("block text-[#9CA3AF]", compact ? "text-[9px]" : "text-xs")}>
             예상 총 소비전력
           </span>
-          <span className={cn("font-mono font-semibold text-[#E4E4E7]", compact ? "text-sm" : "text-lg")}>
+          <span className={cn("font-mono font-semibold text-[#E4E4E7]", compact ? "text-xs" : "text-lg")}>
             {totalPowerW}W
           </span>
         </div>
         <div>
-          <span className={cn("flex items-center gap-1 text-[#9CA3AF]", compact ? "text-[10px]" : "text-xs")}>
+          <span className={cn("flex items-center gap-1 text-[#9CA3AF]", compact ? "text-[9px]" : "text-xs")}>
             <Gauge className="h-3 w-3" /> PSU 여유율
           </span>
-          <span className={cn("font-mono font-semibold", compact ? "text-sm" : "text-lg", marginColor)}>
+          <span className={cn("font-mono font-semibold", compact ? "text-xs" : "text-lg", marginColor)}>
             {psuMarginPct === null ? "-" : `${psuMarginPct}%`}
           </span>
         </div>

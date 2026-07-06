@@ -43,22 +43,24 @@ function BuildCheckerShell({ parts }: { parts: PartsData }) {
   return (
     <div
       className={cn(
-        "relative mx-auto flex h-dvh max-w-6xl flex-col overflow-hidden px-3 pb-4 pt-5 sm:px-4 sm:pt-6 lg:px-6 lg:pb-6 lg:pt-6",
+        "relative mx-auto flex h-dvh max-w-6xl flex-col overflow-hidden px-3 pb-[72px] pt-3 sm:px-4 sm:pt-4 lg:px-6 lg:pb-6 lg:pt-4",
         isMikuBuild && "miku-theme"
       )}
     >
-      <header className="relative mb-6 shrink-0">
-        <div className="mb-2 flex items-center gap-2 text-[10px] tracking-[0.2em] text-[var(--accent)] lg:text-xs">
+      <header className="relative mb-3 shrink-0">
+        <div className="mb-1.5 flex items-center gap-2 text-[10px] tracking-[0.2em] text-[var(--accent)] lg:text-xs">
           <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
           실시간 하드웨어 호환성 체크
         </div>
-        <h1 className="text-2xl font-extrabold tracking-tight lg:text-4xl">
-          <span className="text-[#E4E4E7]">Tri</span>
-          <span className="text-[var(--accent)]">FIT</span>
-        </h1>
-        <p className="mt-1 text-sm tracking-wide text-[#9CA3AF]">
-          부품을 고르면 즉시 소켓·전원·크기 호환성을 확인합니다.
-        </p>
+        <div className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          <h1 className="text-2xl font-extrabold tracking-tight lg:text-4xl">
+            <span className="text-[#E4E4E7]">Tri</span>
+            <span className="text-[var(--accent)]">FIT</span>
+          </h1>
+          <p className="text-[11px] tracking-wide text-[#9CA3AF] lg:text-sm">
+            부품을 고르면 즉시 소켓·전원·크기 호환성을 확인합니다.
+          </p>
+        </div>
         {isMikuBuild && (
           // eslint-disable-next-line @next/next/no-img-element
           <img

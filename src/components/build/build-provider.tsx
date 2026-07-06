@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
 import type { CompatIssue, CompatLevel, Part, PartCategory, PartMap, Selections } from "@/lib/types";
 import type { PartsData } from "@/lib/supabase/fetch-parts";
 import {
@@ -23,6 +23,7 @@ interface BuildContextValue {
   totalCategories: number;
   selectPart: <K extends PartCategory>(category: K, part: PartMap[K]) => void;
   issuesFor: (category: PartCategory) => CompatIssue[];
+  levelForOption: (category: PartCategory, part: Part) => CompatLevel;
   activeCategory: PartCategory | null;
   preview: Part | undefined;
   openCategory: (category: PartCategory) => void;
@@ -76,6 +77,26 @@ export function BuildProvider({ children, parts }: { children: ReactNode; parts:
   const issuesFor = (category: PartCategory) =>
     issues.filter((issue) => issue.categories.includes(category));
 
+  // per-option preview: how would this candidate part fare against the OTHER
+  // already-committed categories (not the in-progress preview of this same category)
+  const levelForOption = useCallback(
+    (category: PartCategory, part: Part): CompatLevel => {
+      const others = { ...selections } as Record<string, unknown>;
+      delete others[category];
+      const hasOtherSelection = CATEGORY_ORDER.some((c) => c !== category && others[c]);
+      if (!hasOtherSelection) return "idle";
+
+      const hypothetical = { ...others, [category]: part } as Selections;
+      const candidateIssues = evaluateIssues(hypothetical).filter((issue) =>
+        issue.categories.includes(category)
+      );
+      if (candidateIssues.some((issue) => issue.level === "danger")) return "danger";
+      if (candidateIssues.some((issue) => issue.level === "warning")) return "warning";
+      return "success";
+    },
+    [selections]
+  );
+
   return (
     <BuildContext.Provider
       value={{
@@ -89,6 +110,7 @@ export function BuildProvider({ children, parts }: { children: ReactNode; parts:
         totalCategories: CATEGORY_ORDER.length,
         selectPart,
         issuesFor,
+        levelForOption,
         activeCategory,
         preview,
         openCategory: (category) => {

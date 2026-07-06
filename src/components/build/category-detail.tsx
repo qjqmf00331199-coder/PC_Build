@@ -64,8 +64,16 @@ export function CategoryDetail<K extends PartCategory>({
   category: K;
   options: PartMap[K][];
 }) {
-  const { selections, categoryStatus, selectPart, issuesFor, closeCategory, preview, previewPick } =
-    useBuild();
+  const {
+    selections,
+    categoryStatus,
+    selectPart,
+    issuesFor,
+    levelForOption,
+    closeCategory,
+    preview,
+    previewPick,
+  } = useBuild();
   const Icon = CATEGORY_ICON[category as PartCategory];
   const selected = selections[category];
   const status = categoryStatus[category];
@@ -87,17 +95,16 @@ export function CategoryDetail<K extends PartCategory>({
 
   return (
     <div className="flex h-full flex-col">
-      <button
-        type="button"
-        onClick={closeCategory}
-        className="mb-4 inline-flex shrink-0 items-center gap-1.5 text-sm text-[#9CA3AF] transition-colors duration-150 hover:text-[#E4E4E7]"
-      >
-        <ArrowLeft className="h-4 w-4" strokeWidth={2} />
-        전체 카테고리
-      </button>
-
       <div className="mb-4 flex shrink-0 items-center justify-between gap-3">
-        <div className="flex shrink-0 items-center gap-2.5">
+        <div className="flex shrink-0 items-center gap-1.5">
+          <button
+            type="button"
+            onClick={closeCategory}
+            aria-label="전체 카테고리"
+            className="rounded-md p-1 text-[#9CA3AF] transition-colors duration-150 hover:text-[#E4E4E7]"
+          >
+            <ArrowLeft className="h-4 w-4" strokeWidth={2} />
+          </button>
           <Icon className="h-5 w-5 text-[#9CA3AF]" strokeWidth={1.75} />
           <h2 className="text-base font-semibold text-[#E4E4E7]">{CATEGORY_LABEL[category]}</h2>
         </div>
@@ -185,6 +192,7 @@ export function CategoryDetail<K extends PartCategory>({
               key={part.id}
               part={part}
               selected={pickedPart?.id === part.id}
+              compatLevel={levelForOption(category, part)}
               onSelect={() => {
                 if (selected?.id === part.id) {
                   // clicking the already-committed item again deselects it directly
