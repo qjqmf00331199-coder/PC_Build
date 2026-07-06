@@ -63,8 +63,10 @@ function BuildCheckerShell({ parts, onLogoClick }: { parts: PartsData; onLogoCli
         </div>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
           <button type="button" onClick={onLogoClick} className="shrink-0" aria-label="처음 화면으로">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/trifit_animation.gif" alt="TriFIT" className="h-8 w-auto select-none lg:h-11" />
+            <h1 className="text-2xl font-extrabold tracking-tight lg:text-4xl">
+              <span className="text-[#E4E4E7]">Tri</span>
+              <span className="text-[var(--accent)]">FIT</span>
+            </h1>
           </button>
           <p className="text-[11px] tracking-wide text-[#9CA3AF] lg:text-sm">
             부품을 고르면 즉시 소켓·전원·크기 호환성을 확인합니다.

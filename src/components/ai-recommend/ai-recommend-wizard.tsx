@@ -259,12 +259,7 @@ export function AiRecommendWizard({
       )}
 
       {phase === "result" && result && (
-        <div>
-          <div className="mb-6 flex justify-center">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/trifit_animation.gif" alt="TriFIT" className="h-12 w-auto select-none" />
-          </div>
-          <div className="rounded-lg border border-[#27272A] bg-[#151517] p-5">
+        <div className="rounded-lg border border-[#27272A] bg-[#151517] p-5">
           <h3 className="mb-2 text-sm font-semibold text-[#E4E4E7]">추천 조합</h3>
           <p className="mb-4 text-xs text-[#9CA3AF]">{result.reason}</p>
 
@@ -317,7 +312,6 @@ export function AiRecommendWizard({
           >
             이대로 견적 짜기 →
           </button>
-          </div>
         </div>
       )}
     </div>
