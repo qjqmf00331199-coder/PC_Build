@@ -6,6 +6,7 @@ import type { Part, PartCategory, PartMap } from "@/lib/types";
 import { CATEGORY_LABEL } from "@/lib/compatibility";
 import { CATEGORY_ICON } from "@/lib/category-icons";
 import { partFullSpecs, partImageQuery, partMeta, partNote, partTitle } from "@/lib/part-specs";
+import { localImageOverride } from "@/lib/local-images";
 import { useBuild } from "./build-provider";
 import { PartOptionCard } from "./part-option-card";
 import { StatusBadge } from "./status-badge";
@@ -21,7 +22,9 @@ const STATUS_COLOR: Record<"success" | "warning" | "danger" | "idle", string> = 
 
 const imageCache = new Map<string, string | null>();
 
-function useProductImage(query: string | null): string | null {
+function useProductImage(part: Part | null): string | null {
+  const override = part ? localImageOverride(part) : null;
+  const query = part && !override ? partImageQuery(part) : null;
   const [image, setImage] = useState<string | null>(query ? imageCache.get(query) ?? null : null);
 
   useEffect(() => {
@@ -54,7 +57,7 @@ function useProductImage(query: string | null): string | null {
     };
   }, [query]);
 
-  return image;
+  return override ?? image;
 }
 
 export function CategoryDetail<K extends PartCategory>({
@@ -80,7 +83,7 @@ export function CategoryDetail<K extends PartCategory>({
   const relevantIssues = issuesFor(category);
 
   const pickedPart = preview as PartMap[K] | undefined;
-  const imageUrl = useProductImage(pickedPart ? partImageQuery(pickedPart) : null);
+  const imageUrl = useProductImage(pickedPart ?? null);
 
   const [search, setSearch] = useState("");
   useEffect(() => {
