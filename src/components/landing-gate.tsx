@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AdSlots } from "@/components/ad-slots";
 import { BuildChecker } from "@/components/build/build-checker";
 import { AiRecommendWizard } from "@/components/ai-recommend/ai-recommend-wizard";
@@ -14,10 +14,49 @@ const FEATURES = [
 ];
 
 type View = "landing" | "ai" | "build";
+type NavState = { view: View; depth: number };
 
 export function LandingGate({ parts }: { parts: PartsData }) {
   const [view, setView] = useState<View>("landing");
   const [initialSelections, setInitialSelections] = useState<Selections | undefined>(undefined);
+
+  // intercept the mobile/browser back button so it steps back through in-app
+  // screens (landing <-> ai/build <-> category detail, the latter owned by
+  // BuildProvider) instead of leaving the site
+  useEffect(() => {
+    // the React view state above always starts fresh at "landing" on mount
+    // (selections aren't persisted either), so pin the history entry to match
+    // regardless of whatever stale state a prior session left behind
+    window.history.replaceState({ ...window.history.state, view: "landing", depth: 0 }, "");
+    const onPopState = (e: PopStateEvent) => {
+      const state = e.state as NavState | null;
+      setView(state?.view ?? "landing");
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
+  // one level deeper than wherever we are now (landing -> ai/build)
+  const enter = (next: View) => {
+    const depth = ((window.history.state as NavState | null)?.depth ?? 0) + 1;
+    window.history.pushState({ ...window.history.state, view: next, depth }, "");
+    setView(next);
+  };
+
+  // swap the current screen without adding a back-button step (ai wizard -> build results)
+  const swapInPlace = (next: View) => {
+    const depth = (window.history.state as NavState | null)?.depth ?? 0;
+    window.history.replaceState({ ...window.history.state, view: next, depth }, "");
+    setView(next);
+  };
+
+  // jump straight back to the landing screen regardless of how deep we are
+  // (e.g. the TriFit logo click from inside an open category detail)
+  const backToLanding = () => {
+    const depth = (window.history.state as NavState | null)?.depth ?? 0;
+    if (depth > 0) window.history.go(-depth);
+    else setView("landing");
+  };
 
   if (view === "build") {
     return (
@@ -28,7 +67,7 @@ export function LandingGate({ parts }: { parts: PartsData }) {
           initialSelections={initialSelections}
           onLogoClick={() => {
             setInitialSelections(undefined);
-            setView("landing");
+            backToLanding();
           }}
         />
       </div>
@@ -40,10 +79,10 @@ export function LandingGate({ parts }: { parts: PartsData }) {
       <>
         <AdSlots narrow />
         <AiRecommendWizard
-          onCancel={() => setView("landing")}
+          onCancel={backToLanding}
           onApply={(selections) => {
             setInitialSelections(selections);
-            setView("build");
+            swapInPlace("build");
           }}
         />
       </>
@@ -82,7 +121,7 @@ export function LandingGate({ parts }: { parts: PartsData }) {
       <div className="mt-12 flex flex-col items-center gap-3 sm:flex-row">
         <button
           type="button"
-          onClick={() => setView("ai")}
+          onClick={() => enter("ai")}
           className={cn(
             "rounded-full border border-[var(--accent)] px-8 py-3.5 text-sm font-bold text-[var(--accent)]",
             "transition-transform hover:scale-[1.03] active:scale-[0.98]"
@@ -92,7 +131,7 @@ export function LandingGate({ parts }: { parts: PartsData }) {
         </button>
         <button
           type="button"
-          onClick={() => setView("build")}
+          onClick={() => enter("build")}
           className={cn(
             "rounded-full bg-[var(--accent)] px-8 py-3.5 text-sm font-bold text-[#0a0a0b]",
             "transition-transform hover:scale-[1.03] active:scale-[0.98]"

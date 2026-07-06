@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { CompatIssue, CompatLevel, Part, PartCategory, PartMap, Selections } from "@/lib/types";
 import type { PartsData } from "@/lib/supabase/fetch-parts";
 import {
@@ -47,6 +47,18 @@ export function BuildProvider({
   const [selections, setSelections] = useState<Selections>(initialSelections ?? {});
   const [activeCategory, setActiveCategory] = useState<PartCategory | null>(null);
   const [preview, setPreview] = useState<Part | undefined>(undefined);
+
+  // opening a category pushes a history entry (see openCategory below) so the
+  // mobile/browser back button closes the detail view instead of leaving the site
+  useEffect(() => {
+    const onPopState = (e: PopStateEvent) => {
+      const category = (e.state as { trifitCategory?: PartCategory } | null)?.trifitCategory ?? null;
+      setActiveCategory(category);
+      setPreview(category ? selections[category] : undefined);
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, [selections]);
 
   const selectPart = <K extends PartCategory>(category: K, part: PartMap[K]) => {
     setSelections((prev) => {
@@ -130,12 +142,14 @@ export function BuildProvider({
         activeCategory,
         preview,
         openCategory: (category) => {
+          const base = (window.history.state as { depth?: number } | null) ?? {};
+          window.history.pushState({ ...base, trifitCategory: category, depth: (base.depth ?? 0) + 1 }, "");
           setPreview(selections[category]);
           setActiveCategory(category);
         },
         closeCategory: () => {
-          setPreview(undefined);
-          setActiveCategory(null);
+          if (activeCategory === null) return;
+          window.history.back();
         },
         previewPick: setPreview,
         isMikuBuild,
