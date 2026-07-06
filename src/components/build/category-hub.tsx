@@ -55,7 +55,7 @@ function CategoryCard<K extends PartCategory>({
       type="button"
       onClick={onOpen}
       className={cn(
-        "flex flex-col gap-3 rounded-lg border-2 bg-[#151517] p-5 text-left transition-colors duration-150",
+        "flex flex-col gap-3 rounded-lg border-2 bg-[#151517] p-3 text-left transition-colors duration-150 sm:p-4 lg:p-5",
         selected
           ? "border-[var(--accent)] bg-[var(--accent)]/5"
           : "border-[#27272A] hover:border-[#3F3F46]"

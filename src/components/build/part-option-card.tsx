@@ -22,7 +22,7 @@ export function PartOptionCard({
       onClick={onSelect}
       aria-pressed={selected}
       className={cn(
-        "flex flex-col items-start gap-1 rounded-lg border-2 bg-[#151517] px-4 py-3 text-left transition-colors duration-150",
+        "flex flex-col items-start gap-1 rounded-lg border-2 bg-[#151517] px-3 py-2.5 text-left transition-colors duration-150 sm:px-4 sm:py-3",
         selected
           ? "border-[var(--accent)] bg-[var(--accent)]/5"
           : "border-[#27272A] hover:border-[#3F3F46]"

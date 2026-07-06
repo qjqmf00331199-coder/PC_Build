@@ -43,7 +43,7 @@ function BuildCheckerShell({ parts }: { parts: PartsData }) {
   return (
     <div
       className={cn(
-        "relative mx-auto flex h-dvh max-w-6xl flex-col overflow-hidden px-4 pb-4 pt-6 lg:px-6 lg:pb-6 lg:pt-6",
+        "relative mx-auto flex h-dvh max-w-6xl flex-col overflow-hidden px-3 pb-4 pt-5 sm:px-4 sm:pt-6 lg:px-6 lg:pb-6 lg:pt-6",
         isMikuBuild && "miku-theme"
       )}
     >

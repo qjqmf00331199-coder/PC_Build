@@ -123,7 +123,7 @@ export function CategoryDetail<K extends PartCategory>({
         {/* photo: sits next to build progress on mobile, stretched to match its height; folded into the detail column on desktop */}
         {options.length > 0 && (
           <div className="col-start-2 row-start-1 lg:hidden">
-            <PartPhotoBox part={pickedPart} status={status} imageUrl={imageUrl} placeholderIcon={Icon} className="h-full" />
+            <PartPhotoBox part={pickedPart} status={status} imageUrl={imageUrl} placeholderIcon={Icon} className="h-28" />
           </div>
         )}
 
