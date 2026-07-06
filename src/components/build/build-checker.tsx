@@ -33,18 +33,20 @@ function TopSummaryPanel() {
 export function BuildChecker({
   parts,
   initialSelections,
+  onLogoClick,
 }: {
   parts: PartsData;
   initialSelections?: Selections;
+  onLogoClick?: () => void;
 }) {
   return (
     <BuildProvider parts={parts} initialSelections={initialSelections}>
-      <BuildCheckerShell parts={parts} />
+      <BuildCheckerShell parts={parts} onLogoClick={onLogoClick} />
     </BuildProvider>
   );
 }
 
-function BuildCheckerShell({ parts }: { parts: PartsData }) {
+function BuildCheckerShell({ parts, onLogoClick }: { parts: PartsData; onLogoClick?: () => void }) {
   const { isMikuBuild } = useBuild();
 
   return (
@@ -60,8 +62,10 @@ function BuildCheckerShell({ parts }: { parts: PartsData }) {
           실시간 하드웨어 호환성 체크
         </div>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/trifit_animation.gif" alt="TriFIT" className="h-8 w-auto select-none lg:h-11" />
+          <button type="button" onClick={onLogoClick} className="shrink-0" aria-label="처음 화면으로">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/trifit_animation.gif" alt="TriFIT" className="h-8 w-auto select-none lg:h-11" />
+          </button>
           <p className="text-[11px] tracking-wide text-[#9CA3AF] lg:text-sm">
             부품을 고르면 즉시 소켓·전원·크기 호환성을 확인합니다.
           </p>

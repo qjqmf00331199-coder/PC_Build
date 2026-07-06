@@ -23,17 +23,14 @@ export function LandingGate({ parts }: { parts: PartsData }) {
     return (
       <div className="relative">
         <AdSlots />
-        <button
-          type="button"
-          onClick={() => {
+        <BuildChecker
+          parts={parts}
+          initialSelections={initialSelections}
+          onLogoClick={() => {
             setInitialSelections(undefined);
             setView("landing");
           }}
-          className="fixed right-3 top-3 z-50 rounded-full border border-[#27272A] bg-[#151517] px-3 py-1.5 text-xs text-[#9CA3AF] transition-colors hover:text-[var(--accent)] lg:right-4 lg:top-4"
-        >
-          ← 처음으로
-        </button>
-        <BuildChecker parts={parts} initialSelections={initialSelections} />
+        />
       </div>
     );
   }
