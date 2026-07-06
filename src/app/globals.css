@@ -5,6 +5,44 @@
   --background: #0a0a0b;
   --foreground: #e4e4e7;
   --font-pretendard: "Pretendard", sans-serif;
+  --accent: #6366f1;
+}
+
+/* Hatsune Miku edition easter egg: full build made of 미쿠 에디션 parts recolors the accent */
+.miku-theme {
+  --accent: #39c5bb;
+}
+
+@keyframes miku-walk {
+  0% {
+    left: -10%;
+    transform: scaleX(-1);
+  }
+  49% {
+    transform: scaleX(-1);
+  }
+  50% {
+    left: 106%;
+    transform: scaleX(1);
+  }
+  99% {
+    transform: scaleX(1);
+  }
+  100% {
+    left: -10%;
+    transform: scaleX(-1);
+  }
+}
+
+@keyframes miku-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @theme inline {
@@ -21,7 +59,7 @@ body {
 }
 
 ::selection {
-  background: #6366f1;
+  background: var(--accent);
   color: #fff;
 }
 

@@ -57,7 +57,7 @@ function CategoryCard<K extends PartCategory>({
       className={cn(
         "flex flex-col gap-3 rounded-lg border-2 bg-[#151517] p-5 text-left transition-colors duration-150",
         selected
-          ? "border-[#6366F1] bg-[#6366F1]/5"
+          ? "border-[var(--accent)] bg-[var(--accent)]/5"
           : "border-[#27272A] hover:border-[#3F3F46]"
       )}
     >

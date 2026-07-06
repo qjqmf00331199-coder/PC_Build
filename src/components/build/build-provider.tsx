@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 import type { CompatIssue, CompatLevel, Part, PartCategory, PartMap, Selections } from "@/lib/types";
+import type { PartsData } from "@/lib/supabase/fetch-parts";
 import {
   CATEGORY_ORDER,
   computeCategoryStatus,
@@ -9,6 +10,7 @@ import {
   estimateTotalPowerW,
   evaluateIssues,
 } from "@/lib/compatibility";
+import { isFullMikuBuild } from "@/lib/miku";
 
 interface BuildContextValue {
   selections: Selections;
@@ -26,11 +28,12 @@ interface BuildContextValue {
   openCategory: (category: PartCategory) => void;
   closeCategory: () => void;
   previewPick: (part: Part | undefined) => void;
+  isMikuBuild: boolean;
 }
 
 const BuildContext = createContext<BuildContextValue | null>(null);
 
-export function BuildProvider({ children }: { children: ReactNode }) {
+export function BuildProvider({ children, parts }: { children: ReactNode; parts: PartsData }) {
   const [selections, setSelections] = useState<Selections>({});
   const [activeCategory, setActiveCategory] = useState<PartCategory | null>(null);
   const [preview, setPreview] = useState<Part | undefined>(undefined);
@@ -68,6 +71,7 @@ export function BuildProvider({ children }: { children: ReactNode }) {
   const totalPowerW = useMemo(() => estimateTotalPowerW(effectiveSelections), [effectiveSelections]);
   const psuMarginPct = useMemo(() => computePsuMarginPct(effectiveSelections), [effectiveSelections]);
   const selectedCount = CATEGORY_ORDER.filter((c) => effectiveSelections[c]).length;
+  const isMikuBuild = useMemo(() => isFullMikuBuild(effectiveSelections, parts), [effectiveSelections, parts]);
 
   const issuesFor = (category: PartCategory) =>
     issues.filter((issue) => issue.categories.includes(category));
@@ -96,6 +100,7 @@ export function BuildProvider({ children }: { children: ReactNode }) {
           setActiveCategory(null);
         },
         previewPick: setPreview,
+        isMikuBuild,
       }}
     >
       {children}

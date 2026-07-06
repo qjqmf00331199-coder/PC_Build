@@ -47,7 +47,7 @@ export function SummaryPanel({ compact = false }: { compact?: boolean }) {
 
       <div className={cn("h-1.5 w-full overflow-hidden rounded-full bg-[#27272A]", compact ? "mb-3" : "mb-4")}>
         <div
-          className="h-full rounded-full bg-[#6366F1] transition-[width] duration-300 ease-in-out"
+          className="h-full rounded-full bg-[var(--accent)] transition-[width] duration-300 ease-in-out"
           style={{ width: `${(selectedCount / totalCategories) * 100}%` }}
         />
       </div>

@@ -106,7 +106,7 @@ export function CategoryDetail<K extends PartCategory>({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="제품명 검색"
-            className="w-full rounded-md border border-[#27272A] bg-[#0A0A0B] py-1.5 pl-8 pr-3 text-sm text-[#E4E4E7] placeholder-[#71717A] outline-none transition-colors duration-150 focus:border-[#6366F1]"
+            className="w-full rounded-md border border-[#27272A] bg-[#0A0A0B] py-1.5 pl-8 pr-3 text-sm text-[#E4E4E7] placeholder-[#71717A] outline-none transition-colors duration-150 focus:border-[var(--accent)]"
           />
         </div>
         <StatusBadge level={status} />
@@ -252,7 +252,7 @@ function DetailPanel({
           <h3 className="text-sm font-semibold text-[#E4E4E7] lg:text-base">{partTitle(part)}</h3>
         </div>
         {committed && (
-          <span className="shrink-0 rounded-full bg-[#6366F1]/15 px-2 py-0.5 text-[10px] font-medium text-[#6366F1]">
+          <span className="shrink-0 rounded-full bg-[var(--accent)]/15 px-2 py-0.5 text-[10px] font-medium text-[var(--accent)]">
             선택됨
           </span>
         )}
@@ -275,7 +275,7 @@ function DetailPanel({
       <button
         type="button"
         onClick={onConfirm}
-        className="mt-3 w-full rounded-lg bg-[#6366F1] py-2 text-xs font-medium text-white transition-colors duration-150 hover:bg-[#6366F1]/90 lg:mt-5 lg:py-2.5 lg:text-sm"
+        className="mt-3 w-full rounded-lg bg-[var(--accent)] py-2 text-xs font-medium text-white transition-colors duration-150 hover:opacity-90 lg:mt-5 lg:py-2.5 lg:text-sm"
       >
         이 제품 선택하기
       </button>

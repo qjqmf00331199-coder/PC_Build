@@ -24,14 +24,14 @@ export function PartOptionCard({
       className={cn(
         "flex flex-col items-start gap-1 rounded-lg border-2 bg-[#151517] px-4 py-3 text-left transition-colors duration-150",
         selected
-          ? "border-[#6366F1] bg-[#6366F1]/5"
+          ? "border-[var(--accent)] bg-[var(--accent)]/5"
           : "border-[#27272A] hover:border-[#3F3F46]"
       )}
     >
       <div className="flex w-full items-center justify-between gap-2">
         <span className="text-xs text-[#9CA3AF]">{metaLabel ?? " "}</span>
         {selected && (
-          <span className="rounded-full bg-[#6366F1]/15 px-2 py-0.5 text-[10px] font-medium text-[#6366F1]">
+          <span className="rounded-full bg-[var(--accent)]/15 px-2 py-0.5 text-[10px] font-medium text-[var(--accent)]">
             선택됨
           </span>
         )}

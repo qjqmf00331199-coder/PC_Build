@@ -19,22 +19,41 @@ function splitTokens(value: string | null | undefined, delimiters: RegExp): stri
     .filter(Boolean);
 }
 
-function parseRadiatorSizes(pcCase: {
+const STANDARD_RADIATOR_SIZES_MM = [120, 140, 240, 280, 360, 420];
+
+// a case spec field for one mounting position (top/front/side) is either:
+//   - "불가" / null: no radiator fits there
+//   - a single number ("420"): the verified max for that position — mounting
+//     holes for smaller standard sizes share the same column, so anything
+//     up to that max fits too
+//   - a slash list ("280/360"): only those exact sizes were verified by the
+//     manufacturer, so we don't assume smaller unlisted sizes also fit
+function isRadiatorCompatible(caseSpec: string | number | null, radiatorSize: number): boolean {
+  if (caseSpec === null) return false;
+  const field = String(caseSpec).trim();
+  if (!field || field.includes("불가")) return false;
+
+  const listed = field
+    .split("/")
+    .map((token) => parseInt(token.replace(/\([^)]*\)/g, "").trim(), 10))
+    .filter((n) => !Number.isNaN(n));
+  if (listed.length === 0) return false;
+  if (listed.includes(radiatorSize)) return true;
+  if (listed.length === 1) {
+    return STANDARD_RADIATOR_SIZES_MM.includes(radiatorSize) && radiatorSize <= listed[0];
+  }
+  return false;
+}
+
+function radiatorSupportLabel(pcCase: {
   radiator_top_mm: string | number | null;
   radiator_front_mm: string | number | null;
   radiator_side_mm: string | number | null;
-}): number[] {
-  const sizes = new Set<number>();
-  for (const raw of [pcCase.radiator_top_mm, pcCase.radiator_front_mm, pcCase.radiator_side_mm]) {
-    if (raw === null) continue;
-    const field = String(raw);
-    if (field.includes("불가")) continue;
-    for (const token of field.split("/")) {
-      const n = parseInt(token.trim(), 10);
-      if (!Number.isNaN(n)) sizes.add(n);
-    }
-  }
-  return [...sizes];
+}): string {
+  return [pcCase.radiator_top_mm, pcCase.radiator_front_mm, pcCase.radiator_side_mm]
+    .filter((v): v is string | number => v !== null && !String(v).includes("불가"))
+    .map(String)
+    .join(", ");
 }
 
 function psuFormFactorToken(value: string): "ATX" | "SFX" | null {
@@ -137,13 +156,17 @@ export function evaluateIssues(sel: Selections): CompatIssue[] {
 
   // Cooler(aqua) <-> Case
   if (cooler && pcCase && cooler.type === "aqua" && cooler.radiator_size_mm !== null) {
-    const supported = parseRadiatorSizes(pcCase);
-    if (!supported.includes(cooler.radiator_size_mm)) {
+    const radiatorSize = cooler.radiator_size_mm;
+    const supported = [pcCase.radiator_top_mm, pcCase.radiator_front_mm, pcCase.radiator_side_mm].some(
+      (spec) => isRadiatorCompatible(spec, radiatorSize)
+    );
+    if (!supported) {
+      const label = radiatorSupportLabel(pcCase);
       issues.push({
         id: "cooler-case-radiator",
         level: "danger",
         categories: ["cooler", "case"],
-        message: `수랭 라디에이터(${cooler.radiator_size_mm}mm)를 케이스가 지원하지 않습니다${supported.length ? ` (지원: ${supported.join("/")}mm)` : ""}.`,
+        message: `수랭 라디에이터(${radiatorSize}mm)를 케이스가 지원하지 않습니다${label ? ` (지원: ${label}mm)` : ""}.`,
       });
     }
   }
