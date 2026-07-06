@@ -1,4 +1,4 @@
--- PC 부품 호환성 체커 v2 -- 실제 부품 스펙 DB (parts_db_merged.xlsx 기반)
+-- 트라이핏 (TriFit) v2 -- 실제 부품 스펙 DB (parts_db_merged.xlsx 기반)
 -- 기존 목데이터 테이블(cpus/motherboards/... 복수형, 가상 가격 포함) 정리 후
 -- 엑셀 원본 데이터로 새 테이블(단수형)을 만든다. 가격 필드 없음.
 

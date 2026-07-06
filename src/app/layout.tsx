@@ -13,7 +13,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PC 부품 호환성 체커",
+  title: "트라이핏 (TriFit) | PC 부품 호환성 체커",
   description: "CPU·메인보드·RAM·GPU 등 PC 부품 선택 시 실시간으로 호환성을 확인하는 도구",
 };
 

@@ -48,8 +48,15 @@ function BuildCheckerShell({ parts }: { parts: PartsData }) {
       )}
     >
       <header className="relative mb-6 shrink-0">
-        <h1 className="text-xl font-semibold text-[#E4E4E7] lg:text-2xl">PC 부품 호환성 체커</h1>
-        <p className="mt-1 text-sm text-[#9CA3AF]">
+        <div className="mb-2 flex items-center gap-2 text-[10px] tracking-[0.2em] text-[var(--accent)] lg:text-xs">
+          <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
+          실시간 하드웨어 호환성 체크
+        </div>
+        <h1 className="text-2xl font-extrabold tracking-tight lg:text-4xl">
+          <span className="text-[#E4E4E7]">Tri</span>
+          <span className="text-[var(--accent)]">FIT</span>
+        </h1>
+        <p className="mt-1 text-sm tracking-wide text-[#9CA3AF]">
           부품을 고르면 즉시 소켓·전원·크기 호환성을 확인합니다.
         </p>
         {isMikuBuild && (
