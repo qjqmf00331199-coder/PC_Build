@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import type { CompatIssue, CompatLevel, Part, PartCategory, PartMap, Selections } from "@/lib/types";
 import type { PartsData } from "@/lib/supabase/fetch-parts";
 import {
@@ -48,17 +48,45 @@ export function BuildProvider({
   const [activeCategory, setActiveCategory] = useState<PartCategory | null>(null);
   const [preview, setPreview] = useState<Part | undefined>(undefined);
 
+  // refs so commitPreview (called from event handlers set up once, or from the
+  // popstate listener) always reads the latest in-progress pick, not a stale closure
+  const activeCategoryRef = useRef(activeCategory);
+  activeCategoryRef.current = activeCategory;
+  const previewRef = useRef(preview);
+  previewRef.current = preview;
+
+  // a card click only updates `preview` (so browsing options can live-preview
+  // compat/power stats without committing); leaving the category in ANY way
+  // (back arrow, browser/mobile back, jumping straight to another category from
+  // the sidebar) must save that pending pick first, or it silently vanishes
+  const commitPreview = useCallback(() => {
+    const category = activeCategoryRef.current;
+    if (!category) return;
+    const part = previewRef.current;
+    setSelections((prev) => {
+      if (!part) {
+        if (!(category in prev)) return prev;
+        const next = { ...prev };
+        delete next[category];
+        return next;
+      }
+      if (prev[category]?.id === part.id) return prev;
+      return { ...prev, [category]: part } as Selections;
+    });
+  }, []);
+
   // opening a category pushes a history entry (see openCategory below) so the
   // mobile/browser back button closes the detail view instead of leaving the site
   useEffect(() => {
     const onPopState = (e: PopStateEvent) => {
+      commitPreview();
       const category = (e.state as { trifitCategory?: PartCategory } | null)?.trifitCategory ?? null;
       setActiveCategory(category);
       setPreview(category ? selections[category] : undefined);
     };
     window.addEventListener("popstate", onPopState);
     return () => window.removeEventListener("popstate", onPopState);
-  }, [selections]);
+  }, [selections, commitPreview]);
 
   const selectPart = <K extends PartCategory>(category: K, part: PartMap[K]) => {
     setSelections((prev) => {
@@ -142,6 +170,9 @@ export function BuildProvider({
         activeCategory,
         preview,
         openCategory: (category) => {
+          // jumping straight from one category's detail into another (e.g. via the
+          // sidebar's selected-parts list) skips closeCategory, so commit here too
+          commitPreview();
           const base = (window.history.state as { depth?: number } | null) ?? {};
           window.history.pushState({ ...base, trifitCategory: category, depth: (base.depth ?? 0) + 1 }, "");
           setPreview(selections[category]);
