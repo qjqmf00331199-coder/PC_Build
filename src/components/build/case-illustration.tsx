@@ -24,7 +24,7 @@ function statusText(
 }
 
 export function CaseIllustration({ compact = false }: { compact?: boolean }) {
-  const { categoryStatus, issues, selectedCount } = useBuild();
+  const { categoryStatus, issues, selectedCount, resetSelections } = useBuild();
   const text = statusText(selectedCount, issues);
   const overallDanger = issues.some((i) => i.level === "danger");
   const overallWarning = !overallDanger && issues.some((i) => i.level === "warning");
@@ -190,6 +190,15 @@ export function CaseIllustration({ compact = false }: { compact?: boolean }) {
             <Legend color={FILL.warning} label="주의" />
             <Legend color={FILL.danger} label="불가" />
           </div>
+          {selectedCount > 0 && (
+            <button
+              type="button"
+              onClick={resetSelections}
+              className="text-xs font-medium text-[#9CA3AF] transition-colors duration-150 hover:text-[#EF4444]"
+            >
+              전체 선택 해제
+            </button>
+          )}
         </div>
       )}
 

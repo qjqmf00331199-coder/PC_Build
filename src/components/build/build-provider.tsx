@@ -22,6 +22,7 @@ interface BuildContextValue {
   selectedCount: number;
   totalCategories: number;
   selectPart: <K extends PartCategory>(category: K, part: PartMap[K]) => void;
+  resetSelections: () => void;
   issuesFor: (category: PartCategory) => CompatIssue[];
   levelForOption: (category: PartCategory, part: Part) => CompatLevel;
   activeCategory: PartCategory | null;
@@ -74,6 +75,12 @@ export function BuildProvider({ children, parts }: { children: ReactNode; parts:
   const selectedCount = CATEGORY_ORDER.filter((c) => effectiveSelections[c]).length;
   const isMikuBuild = useMemo(() => isFullMikuBuild(effectiveSelections, parts), [effectiveSelections, parts]);
 
+  const resetSelections = () => {
+    setSelections({});
+    setPreview(undefined);
+    setActiveCategory(null);
+  };
+
   const issuesFor = (category: PartCategory) =>
     issues.filter((issue) => issue.categories.includes(category));
 
@@ -109,6 +116,7 @@ export function BuildProvider({ children, parts }: { children: ReactNode; parts:
         selectedCount,
         totalCategories: CATEGORY_ORDER.length,
         selectPart,
+        resetSelections,
         issuesFor,
         levelForOption,
         activeCategory,
