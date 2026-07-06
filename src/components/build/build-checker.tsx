@@ -7,6 +7,7 @@ import { MikuEasterEgg } from "./miku-easter-egg";
 import { SelectedPartsList } from "./selected-parts-list";
 import { SummaryPanel } from "./summary-panel";
 import type { PartsData } from "@/lib/supabase/fetch-parts";
+import type { Selections } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 function MobileCompactBar() {
@@ -29,9 +30,15 @@ function TopSummaryPanel() {
   );
 }
 
-export function BuildChecker({ parts }: { parts: PartsData }) {
+export function BuildChecker({
+  parts,
+  initialSelections,
+}: {
+  parts: PartsData;
+  initialSelections?: Selections;
+}) {
   return (
-    <BuildProvider parts={parts}>
+    <BuildProvider parts={parts} initialSelections={initialSelections}>
       <BuildCheckerShell parts={parts} />
     </BuildProvider>
   );
@@ -43,7 +50,7 @@ function BuildCheckerShell({ parts }: { parts: PartsData }) {
   return (
     <div
       className={cn(
-        "relative mx-auto flex h-dvh max-w-6xl flex-col overflow-hidden px-3 pb-[72px] pt-3 sm:px-4 sm:pt-4 lg:px-6 lg:pb-6 lg:pt-4",
+        "relative mx-auto flex h-dvh max-w-6xl flex-col overflow-hidden px-3 pb-14 pt-3 sm:px-4 sm:pt-4 lg:px-6 lg:pb-6 lg:pt-4",
         isMikuBuild && "miku-theme"
       )}
     >

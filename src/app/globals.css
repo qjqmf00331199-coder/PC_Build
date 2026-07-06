@@ -45,6 +45,37 @@
   }
 }
 
+/* AI 추천 위저드: 다음 질문은 오른쪽에서, 이전 질문으로 돌아갈 땐 왼쪽에서 들어온다 */
+@keyframes step-slide-in-forward {
+  from {
+    opacity: 0;
+    transform: translateX(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes step-slide-in-backward {
+  from {
+    opacity: 0;
+    transform: translateX(-40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.step-slide-in-forward {
+  animation: step-slide-in-forward 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.step-slide-in-backward {
+  animation: step-slide-in-backward 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);

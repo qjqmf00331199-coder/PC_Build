@@ -35,8 +35,16 @@ interface BuildContextValue {
 
 const BuildContext = createContext<BuildContextValue | null>(null);
 
-export function BuildProvider({ children, parts }: { children: ReactNode; parts: PartsData }) {
-  const [selections, setSelections] = useState<Selections>({});
+export function BuildProvider({
+  children,
+  parts,
+  initialSelections,
+}: {
+  children: ReactNode;
+  parts: PartsData;
+  initialSelections?: Selections;
+}) {
+  const [selections, setSelections] = useState<Selections>(initialSelections ?? {});
   const [activeCategory, setActiveCategory] = useState<PartCategory | null>(null);
   const [preview, setPreview] = useState<Part | undefined>(undefined);
 

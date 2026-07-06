@@ -23,15 +23,12 @@ export function AdSlots() {
         />
       </div>
 
-      {/* mobile: 320x50 bar pinned to the bottom of the viewport */}
-      <div className="fixed inset-x-0 bottom-0 z-[60] flex justify-center border-t border-[#27272A] bg-[#0A0A0B] py-1 lg:hidden">
-        <Image
-          src="/ad-mobile.png"
-          alt="광고"
-          width={320}
-          height={50}
-          className="max-w-full rounded bg-[#151517] object-contain"
-        />
+      {/* mobile: bar pinned to the bottom of the viewport, fixed 56px height so
+          the app above can reserve exactly enough space and never overlap it */}
+      <div className="fixed inset-x-0 bottom-0 z-[60] flex h-14 items-center justify-center border-t border-[#27272A] bg-[#0A0A0B] lg:hidden">
+        <div className="relative h-full w-[320px] max-w-full">
+          <Image src="/ad-mobile.png" alt="광고" fill sizes="320px" className="rounded bg-[#151517] object-contain" />
+        </div>
       </div>
     </>
   );

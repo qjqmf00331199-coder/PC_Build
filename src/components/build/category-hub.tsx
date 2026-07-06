@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 import type { PartCategory, PartMap } from "@/lib/types";
 import { CATEGORY_LABEL, CATEGORY_ORDER } from "@/lib/compatibility";
 import { CATEGORY_ICON } from "@/lib/category-icons";
@@ -11,11 +11,21 @@ import type { PartsData } from "@/lib/supabase/fetch-parts";
 import { cn } from "@/lib/utils";
 
 export function CategoryHub({ parts }: { parts: PartsData }) {
-  const { selections, categoryStatus, issuesFor, openCategory } = useBuild();
+  const { selections, categoryStatus, issuesFor, openCategory, resetSelections } = useBuild();
 
   return (
     <div className="h-full overflow-y-auto pr-1">
-      <h2 className="mb-3 text-sm font-semibold text-[#E4E4E7]">카테고리 선택</h2>
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-sm font-semibold text-[#E4E4E7]">카테고리 선택</h2>
+        <button
+          type="button"
+          onClick={resetSelections}
+          className="flex items-center gap-1.5 rounded-full border border-[#27272A] px-3 py-1.5 text-xs text-[#9CA3AF] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
+        >
+          <RefreshCw className="h-3.5 w-3.5" strokeWidth={2} />
+          새로고침
+        </button>
+      </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {CATEGORY_ORDER.map((category) => (
           <CategoryCard

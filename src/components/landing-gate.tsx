@@ -1,6 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { BuildChecker } from "@/components/build/build-checker";
+import { AiRecommendWizard } from "@/components/ai-recommend/ai-recommend-wizard";
+import type { PartsData } from "@/lib/supabase/fetch-parts";
+import type { Selections } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const FEATURES = [
@@ -8,21 +12,39 @@ const FEATURES = [
   { title: "한눈에 보는 견적", desc: "선택한 부품과 예상 총액을 사이드에서 바로 확인" },
 ];
 
-export function LandingGate({ children }: { children: React.ReactNode }) {
-  const [entered, setEntered] = useState(false);
+type View = "landing" | "ai" | "build";
 
-  if (entered) {
+export function LandingGate({ parts }: { parts: PartsData }) {
+  const [view, setView] = useState<View>("landing");
+  const [initialSelections, setInitialSelections] = useState<Selections | undefined>(undefined);
+
+  if (view === "build") {
     return (
       <div className="relative">
         <button
           type="button"
-          onClick={() => setEntered(false)}
+          onClick={() => {
+            setInitialSelections(undefined);
+            setView("landing");
+          }}
           className="fixed right-3 top-3 z-50 rounded-full border border-[#27272A] bg-[#151517] px-3 py-1.5 text-xs text-[#9CA3AF] transition-colors hover:text-[var(--accent)] lg:right-4 lg:top-4"
         >
           ← 처음으로
         </button>
-        {children}
+        <BuildChecker parts={parts} initialSelections={initialSelections} />
       </div>
+    );
+  }
+
+  if (view === "ai") {
+    return (
+      <AiRecommendWizard
+        onCancel={() => setView("landing")}
+        onApply={(selections) => {
+          setInitialSelections(selections);
+          setView("build");
+        }}
+      />
     );
   }
 
@@ -54,16 +76,28 @@ export function LandingGate({ children }: { children: React.ReactNode }) {
         ))}
       </div>
 
-      <button
-        type="button"
-        onClick={() => setEntered(true)}
-        className={cn(
-          "mt-12 rounded-full bg-[var(--accent)] px-8 py-3.5 text-sm font-bold text-[#0a0a0b]",
-          "transition-transform hover:scale-[1.03] active:scale-[0.98]"
-        )}
-      >
-        PC 부품 골라보기 →
-      </button>
+      <div className="mt-12 flex flex-col items-center gap-3 sm:flex-row">
+        <button
+          type="button"
+          onClick={() => setView("ai")}
+          className={cn(
+            "rounded-full border border-[var(--accent)] px-8 py-3.5 text-sm font-bold text-[var(--accent)]",
+            "transition-transform hover:scale-[1.03] active:scale-[0.98]"
+          )}
+        >
+          AI에게 추천받기 ✨
+        </button>
+        <button
+          type="button"
+          onClick={() => setView("build")}
+          className={cn(
+            "rounded-full bg-[var(--accent)] px-8 py-3.5 text-sm font-bold text-[#0a0a0b]",
+            "transition-transform hover:scale-[1.03] active:scale-[0.98]"
+          )}
+        >
+          PC 부품 골라보기 →
+        </button>
+      </div>
     </div>
   );
 }
