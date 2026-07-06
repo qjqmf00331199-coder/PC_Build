@@ -69,10 +69,18 @@ export function MikuEasterEgg({ active }: { active: boolean }) {
 }
 
 function MikuRunner() {
+  const [done, setDone] = useState(false);
+
+  if (done) return null;
+
   return (
-    // own layer above the ad slots (z-[60]) so the sprite walks over the bottom ad bar instead of under it
-    <div className="pointer-events-none fixed inset-x-0 bottom-2 z-[70] overflow-hidden">
-      <div className="relative w-40" style={{ animation: "miku-walk 16s linear infinite" }}>
+    // sits above the mobile ad bar (h-14) instead of overlapping it
+    <div className="pointer-events-none fixed inset-x-0 bottom-16 z-[70] overflow-hidden">
+      <div
+        className="relative w-40"
+        style={{ animation: "miku-walk 16s linear 1 forwards" }}
+        onAnimationEnd={() => setDone(true)}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/miku-walk.gif" alt="" className="w-full" />
       </div>
