@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { AdSlots } from "@/components/ad-slots";
 import { BuildChecker } from "@/components/build/build-checker";
 import { AiRecommendWizard } from "@/components/ai-recommend/ai-recommend-wizard";
@@ -140,6 +141,19 @@ export function LandingGate({ parts }: { parts: PartsData }) {
           PC 부품 골라보기 →
         </button>
       </div>
+
+      <footer className="mt-16 flex flex-col items-center gap-2 text-[11px] text-[#71717A]">
+        <p>부품 스펙·가격 데이터 출처: 다나와 · 제품 이미지: 네이버쇼핑 API / 각 제조사</p>
+        <div className="flex items-center gap-3">
+          <Link href="/privacy" className="hover:text-[#9CA3AF]">
+            개인정보처리방침
+          </Link>
+          <span className="text-[#27272A]">|</span>
+          <Link href="/terms" className="hover:text-[#9CA3AF]">
+            이용약관
+          </Link>
+        </div>
+      </footer>
     </div>
   );
 }
