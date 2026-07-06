@@ -70,6 +70,7 @@ export const AI_SYSTEM_PROMPT = `너는 PC 조립 전문가야. 사용자의 용
 7. 메인보드 폼팩터가 케이스 지원 목록에 포함돼야 한다.
 8. gpu는 사무용처럼 내장그래픽으로 충분한 경우에만 null로 골라도 된다. 그 외 카테고리는 null 금지.
 9. 가격 정보는 DB에 없다. 가격/비용을 절대 언급하지 마라.
+10. "추가 요구사항"에 특정 캐릭터·테마·에디션 이름(예: 하츠네 미쿠, 특정 콜라보 에디션 등)이 언급되면, 부품 목록의 제품명(model)에 그 키워드가 포함된 항목이 있는 카테고리는 그 항목을 반드시 최우선으로 선택해라. 다른 규칙(호환성)과 충돌하지 않는 한 절대 무시하지 마라. 키워드가 있는 카테고리가 없으면 그냥 무난한 걸 골라라.
 
 반드시 부품 목록에 있는 id만 사용해라. id를 지어내지 마라.
 다른 설명 없이 아래 JSON 하나만 출력해라(마크다운 코드블록도 쓰지 마라):
@@ -77,7 +78,7 @@ export const AI_SYSTEM_PROMPT = `너는 PC 조립 전문가야. 사용자의 용
 
 export function buildUserPrompt(parts: PartsData, answers: AiRecommendAnswers): string {
   const detailLine = answers.detail.trim()
-    ? `추가 요구사항: ${answers.detail.trim()}`
+    ? `추가 요구사항: ${answers.detail.trim()} (여기 언급된 캐릭터·테마·에디션 키워드가 제품명에 있으면 그 제품을 최우선으로 골라라)`
     : "추가 요구사항 없음.";
   return [
     `용도: ${PURPOSE_LABEL[answers.purpose]}`,

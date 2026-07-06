@@ -1,10 +1,19 @@
 @import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css");
 @import "tailwindcss";
 
+@font-face {
+  font-family: "MaruMinya";
+  src: url("/fonts/x12y12pxMaruMinyaHangul.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background: #0a0a0b;
   --foreground: #e4e4e7;
   --font-pretendard: "Pretendard", sans-serif;
+  --font-maru-minya: "MaruMinya", var(--font-pretendard);
   --accent: #b6f13b;
 }
 
@@ -136,7 +145,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-inter), var(--font-pretendard), system-ui, sans-serif;
+  --font-sans: "MaruMinya", var(--font-inter), var(--font-pretendard), system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 }
 
@@ -148,7 +157,7 @@ body {
     var(--background);
   background-size: auto, 32px 32px, 32px 32px, auto;
   color: var(--foreground);
-  font-family: var(--font-inter), var(--font-pretendard), system-ui, sans-serif;
+  font-family: "MaruMinya", var(--font-inter), var(--font-pretendard), system-ui, sans-serif;
 }
 
 ::selection {
