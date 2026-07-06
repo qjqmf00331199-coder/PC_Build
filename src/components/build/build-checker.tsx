@@ -1,17 +1,38 @@
 "use client";
 
-import { BuildProvider } from "./build-provider";
+import { BuildProvider, useBuild } from "./build-provider";
 import { CaseIllustration } from "./case-illustration";
 import { CategoryStage } from "./category-stage";
 import { SelectedPartsList } from "./selected-parts-list";
 import { SummaryPanel } from "./summary-panel";
 import type { PartsData } from "@/lib/supabase/fetch-parts";
+import { cn } from "@/lib/utils";
+
+function MobileCompactBar() {
+  const { activeCategory } = useBuild();
+  if (activeCategory !== null) return null;
+
+  return (
+    <div className="mb-5 shrink-0 rounded-lg border border-[#27272A] bg-[#151517] p-4 lg:hidden">
+      <CaseIllustration compact />
+    </div>
+  );
+}
+
+function TopSummaryPanel() {
+  const { activeCategory } = useBuild();
+  return (
+    <div className={cn(activeCategory !== null && "hidden lg:block")}>
+      <SummaryPanel />
+    </div>
+  );
+}
 
 export function BuildChecker({ parts }: { parts: PartsData }) {
   return (
     <BuildProvider>
-      <div className="mx-auto max-w-6xl px-4 pb-24 pt-6 lg:flex lg:h-screen lg:flex-col lg:overflow-hidden lg:px-6 lg:pb-6 lg:pt-6">
-        <header className="mb-6 shrink-0 lg:mb-6">
+      <div className="mx-auto flex h-dvh max-w-6xl flex-col overflow-hidden px-4 pb-4 pt-6 lg:px-6 lg:pb-6 lg:pt-6">
+        <header className="mb-6 shrink-0">
           <h1 className="text-xl font-semibold text-[#E4E4E7] lg:text-2xl">
             PC 부품 호환성 체커
           </h1>
@@ -20,12 +41,10 @@ export function BuildChecker({ parts }: { parts: PartsData }) {
           </p>
         </header>
 
-        {/* mobile compact top bar */}
-        <div className="mb-5 rounded-lg border border-[#27272A] bg-[#151517] p-4 lg:hidden sticky top-3 z-20 backdrop-blur supports-[backdrop-filter]:bg-[#151517]/90">
-          <CaseIllustration compact />
-        </div>
+        {/* mobile compact top bar: only on category hub, not inside a category's product list */}
+        <MobileCompactBar />
 
-        <div className="lg:grid lg:min-h-0 lg:flex-1 lg:grid-cols-[300px_1fr] lg:items-stretch lg:gap-8">
+        <div className="grid min-h-0 flex-1 grid-cols-1 items-stretch gap-4 lg:grid-cols-[300px_1fr] lg:gap-8">
           {/* left illustration panel (desktop): fixed in place, own scroll if it ever overflows */}
           <aside className="hidden lg:block lg:h-full lg:overflow-y-auto lg:rounded-lg lg:border lg:border-[#27272A] lg:bg-[#151517] lg:p-6">
             <CaseIllustration />
@@ -33,9 +52,9 @@ export function BuildChecker({ parts }: { parts: PartsData }) {
           </aside>
 
           {/* right column */}
-          <div className="flex flex-col gap-4 lg:h-full lg:min-h-0 lg:overflow-hidden">
-            <SummaryPanel />
-            <div className="lg:min-h-0 lg:flex-1 lg:overflow-hidden">
+          <div className="flex h-full min-h-0 flex-col gap-4 overflow-hidden">
+            <TopSummaryPanel />
+            <div className="min-h-0 flex-1 overflow-hidden">
               <CategoryStage parts={parts} />
             </div>
           </div>

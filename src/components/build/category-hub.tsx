@@ -14,7 +14,7 @@ export function CategoryHub({ parts }: { parts: PartsData }) {
   const { selections, categoryStatus, issuesFor, openCategory } = useBuild();
 
   return (
-    <div className="lg:h-full lg:overflow-y-auto lg:pr-1">
+    <div className="h-full overflow-y-auto pr-1">
       <h2 className="mb-3 text-sm font-semibold text-[#E4E4E7]">카테고리 선택</h2>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {CATEGORY_ORDER.map((category) => (

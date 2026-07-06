@@ -4,7 +4,7 @@ import { Gauge } from "lucide-react";
 import { useBuild } from "./build-provider";
 import { cn } from "@/lib/utils";
 
-export function SummaryPanel() {
+export function SummaryPanel({ compact = false }: { compact?: boolean }) {
   const { selectedCount, totalCategories, totalPowerW, psuMarginPct, effectiveSelections } = useBuild();
 
   const marginColor =
@@ -30,39 +30,48 @@ export function SummaryPanel() {
     : 0;
 
   return (
-    <div className="rounded-lg border border-[#27272A] bg-[#151517] p-5">
-      <div className="mb-4 flex items-center justify-between">
-        <span className="text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">
+    <div className={cn("rounded-lg border border-[#27272A] bg-[#151517]", compact ? "p-3" : "p-5")}>
+      <div className={cn("flex items-center justify-between", compact ? "mb-2" : "mb-4")}>
+        <span
+          className={cn(
+            "font-medium uppercase tracking-wide text-[#9CA3AF]",
+            compact ? "text-[10px]" : "text-xs"
+          )}
+        >
           빌드 진행 상황
         </span>
-        <span className="font-mono text-sm font-semibold text-[#E4E4E7]">
+        <span className={cn("font-mono font-semibold text-[#E4E4E7]", compact ? "text-xs" : "text-sm")}>
           {selectedCount} / {totalCategories}
         </span>
       </div>
 
-      <div className="mb-4 h-1.5 w-full overflow-hidden rounded-full bg-[#27272A]">
+      <div className={cn("h-1.5 w-full overflow-hidden rounded-full bg-[#27272A]", compact ? "mb-3" : "mb-4")}>
         <div
           className="h-full rounded-full bg-[#6366F1] transition-[width] duration-300 ease-in-out"
           style={{ width: `${(selectedCount / totalCategories) * 100}%` }}
         />
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className={cn("grid gap-4", compact ? "grid-cols-1 gap-2" : "grid-cols-2")}>
         <div>
-          <span className="block text-xs text-[#9CA3AF]">예상 총 소비전력</span>
-          <span className="font-mono text-lg font-semibold text-[#E4E4E7]">{totalPowerW}W</span>
+          <span className={cn("block text-[#9CA3AF]", compact ? "text-[10px]" : "text-xs")}>
+            예상 총 소비전력
+          </span>
+          <span className={cn("font-mono font-semibold text-[#E4E4E7]", compact ? "text-sm" : "text-lg")}>
+            {totalPowerW}W
+          </span>
         </div>
         <div>
-          <span className="flex items-center gap-1 text-xs text-[#9CA3AF]">
+          <span className={cn("flex items-center gap-1 text-[#9CA3AF]", compact ? "text-[10px]" : "text-xs")}>
             <Gauge className="h-3 w-3" /> PSU 여유율
           </span>
-          <span className={cn("font-mono text-lg font-semibold", marginColor)}>
+          <span className={cn("font-mono font-semibold", compact ? "text-sm" : "text-lg", marginColor)}>
             {psuMarginPct === null ? "-" : `${psuMarginPct}%`}
           </span>
         </div>
       </div>
 
-      {effectiveSelections.psu && (
+      {!compact && effectiveSelections.psu && (
         <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#27272A]">
           <div
             className={cn("h-full rounded-full transition-[width] duration-300 ease-in-out", barColor)}

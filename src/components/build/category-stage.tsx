@@ -28,7 +28,7 @@ export function CategoryStage({ parts }: { parts: PartsData }) {
   return (
     <div
       className={cn(
-        "transition-opacity ease-in-out lg:h-full",
+        "h-full transition-opacity ease-in-out",
         fading ? "opacity-0 duration-150" : "opacity-100 duration-200"
       )}
     >

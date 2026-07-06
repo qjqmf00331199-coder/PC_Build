@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ArrowLeft, AlertTriangle, ImageOff, XCircle } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowLeft, AlertTriangle, ImageOff, Search, XCircle } from "lucide-react";
 import type { Part, PartCategory, PartMap } from "@/lib/types";
 import { CATEGORY_LABEL } from "@/lib/compatibility";
 import { CATEGORY_ICON } from "@/lib/category-icons";
@@ -9,6 +9,7 @@ import { partFullSpecs, partImageQuery, partMeta, partNote, partTitle } from "@/
 import { useBuild } from "./build-provider";
 import { PartOptionCard } from "./part-option-card";
 import { StatusBadge } from "./status-badge";
+import { SummaryPanel } from "./summary-panel";
 import { cn } from "@/lib/utils";
 
 const STATUS_COLOR: Record<"success" | "warning" | "danger" | "idle", string> = {
@@ -72,8 +73,18 @@ export function CategoryDetail<K extends PartCategory>({
 
   const pickedPart = preview as PartMap[K] | undefined;
 
+  const [search, setSearch] = useState("");
+  useEffect(() => {
+    setSearch("");
+  }, [category]);
+  const filteredOptions = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) return options;
+    return options.filter((part) => partTitle(part).toLowerCase().includes(q));
+  }, [options, search]);
+
   return (
-    <div className="lg:flex lg:h-full lg:flex-col">
+    <div className="flex h-full flex-col">
       <button
         type="button"
         onClick={closeCategory}
@@ -83,17 +94,32 @@ export function CategoryDetail<K extends PartCategory>({
         전체 카테고리
       </button>
 
-      <div className="mb-4 flex shrink-0 items-center justify-between">
-        <div className="flex items-center gap-2.5">
+      <div className="mb-4 flex shrink-0 items-center justify-between gap-3">
+        <div className="flex shrink-0 items-center gap-2.5">
           <Icon className="h-5 w-5 text-[#9CA3AF]" strokeWidth={1.75} />
           <h2 className="text-base font-semibold text-[#E4E4E7]">{CATEGORY_LABEL[category]}</h2>
+        </div>
+        <div className="relative min-w-0 flex-1">
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#71717A]" strokeWidth={2} />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="제품명 검색"
+            className="w-full rounded-md border border-[#27272A] bg-[#0A0A0B] py-1.5 pl-8 pr-3 text-sm text-[#E4E4E7] placeholder-[#71717A] outline-none transition-colors duration-150 focus:border-[#6366F1]"
+          />
         </div>
         <StatusBadge level={status} />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:min-h-0 lg:flex-1 lg:grid-cols-2">
-        {/* photo + detailed spec panel: shown first on mobile, right column on desktop */}
-        <div className="order-1 lg:order-2 lg:h-full lg:overflow-y-auto lg:pr-1">
+      <div className="grid min-h-0 flex-1 grid-cols-2 grid-rows-[auto_minmax(0,1fr)] gap-3 lg:grid-rows-none lg:gap-4">
+        {/* build progress: shares the top row with the detail panel on mobile; desktop keeps its own full-width copy above */}
+        <div className="col-start-1 row-start-1 lg:hidden">
+          <SummaryPanel compact />
+        </div>
+
+        {/* photo + detailed spec panel: always fully shown, no clipping/scrolling on mobile */}
+        <div className="col-start-2 row-start-1 lg:h-full lg:overflow-y-auto lg:pr-1">
           {options.length > 0 ? (
             <DetailPanel
               part={pickedPart}
@@ -136,8 +162,13 @@ export function CategoryDetail<K extends PartCategory>({
         </div>
 
         {/* product list: own scroll container so scrolling it never moves the rest of the page */}
-        <div className="order-2 lg:order-1 flex max-h-[60vh] flex-col gap-2.5 overflow-y-auto pr-1 lg:h-full lg:max-h-none">
-          {options.map((part) => (
+        <div className="col-span-2 row-start-2 flex min-h-0 flex-col gap-2.5 overflow-y-auto pr-1 lg:col-span-1 lg:col-start-1 lg:row-start-1 lg:h-full">
+          {filteredOptions.length === 0 && (
+            <div className="rounded-lg border border-[#27272A] bg-[#151517] p-6 text-sm text-[#9CA3AF]">
+              검색 결과가 없습니다.
+            </div>
+          )}
+          {filteredOptions.map((part) => (
             <PartOptionCard
               key={part.id}
               part={part}
@@ -176,17 +207,17 @@ function DetailPanel({
 
   if (!part) {
     return (
-      <div className="rounded-lg border border-[#27272A] bg-[#151517] p-5">
-        <div className="mb-4 flex h-40 w-full items-center justify-center rounded-lg border border-[#27272A] bg-white/[0.02]">
-          <PlaceholderIcon className="h-14 w-14 text-[#3F3F46]" strokeWidth={1.25} />
+      <div className="rounded-lg border border-[#27272A] bg-[#151517] p-3 lg:p-5">
+        <div className="mb-3 flex h-24 w-full items-center justify-center rounded-lg border border-[#27272A] bg-white/[0.02] lg:mb-4 lg:h-40">
+          <PlaceholderIcon className="h-10 w-10 text-[#3F3F46] lg:h-14 lg:w-14" strokeWidth={1.25} />
         </div>
-        <p className="text-sm text-[#9CA3AF]">
+        <p className="text-xs text-[#9CA3AF] lg:text-sm">
           왼쪽 목록에서 제품을 선택하면 사진과 상세 스펙이 여기에 표시됩니다.
         </p>
         <button
           type="button"
           disabled
-          className="mt-5 w-full cursor-not-allowed rounded-lg border border-[#27272A] py-2.5 text-sm font-medium text-[#9CA3AF]/50"
+          className="mt-3 w-full cursor-not-allowed rounded-lg border border-[#27272A] py-2 text-xs font-medium text-[#9CA3AF]/50 lg:mt-5 lg:py-2.5 lg:text-sm"
         >
           제품을 선택하세요
         </button>
@@ -199,9 +230,9 @@ function DetailPanel({
   const specs = partFullSpecs(part);
 
   return (
-    <div className="rounded-lg border border-[#27272A] bg-[#151517] p-5">
+    <div className="rounded-lg border border-[#27272A] bg-[#151517] p-3 lg:p-5">
       <div
-        className="mb-4 flex h-40 w-full items-center justify-center overflow-hidden rounded-lg border transition-colors duration-300 ease-in-out"
+        className="mb-3 flex h-24 w-full items-center justify-center overflow-hidden rounded-lg border transition-colors duration-300 ease-in-out lg:mb-4 lg:h-40"
         style={{
           borderColor: STATUS_COLOR[status],
           backgroundColor: `${STATUS_COLOR[status]}0F`,
@@ -211,14 +242,14 @@ function DetailPanel({
           // eslint-disable-next-line @next/next/no-img-element
           <img src={imageUrl} alt={partTitle(part)} className="h-full w-full object-contain" />
         ) : (
-          <PlaceholderIcon className="h-14 w-14" strokeWidth={1.25} style={{ color: STATUS_COLOR[status] }} />
+          <PlaceholderIcon className="h-10 w-10 lg:h-14 lg:w-14" strokeWidth={1.25} style={{ color: STATUS_COLOR[status] }} />
         )}
       </div>
 
       <div className="flex items-start justify-between gap-2">
         <div>
-          {metaLabel && <p className="text-xs text-[#9CA3AF]">{metaLabel}</p>}
-          <h3 className="text-base font-semibold text-[#E4E4E7]">{partTitle(part)}</h3>
+          {metaLabel && <p className="text-[11px] text-[#9CA3AF] lg:text-xs">{metaLabel}</p>}
+          <h3 className="text-sm font-semibold text-[#E4E4E7] lg:text-base">{partTitle(part)}</h3>
         </div>
         {committed && (
           <span className="shrink-0 rounded-full bg-[#6366F1]/15 px-2 py-0.5 text-[10px] font-medium text-[#6366F1]">
@@ -227,13 +258,16 @@ function DetailPanel({
         )}
       </div>
 
-      {note && <p className="mt-1 text-xs italic text-[#F59E0B]/80">{note}</p>}
+      {note && <p className="mt-1 text-[11px] italic text-[#F59E0B]/80 lg:text-xs">{note}</p>}
 
-      <dl className="mt-4 space-y-2 border-t border-[#27272A] pt-4">
+      <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 border-t border-[#27272A] pt-3 lg:mt-4 lg:block lg:space-y-2 lg:pt-4">
         {specs.map((row) => (
-          <div key={row.label} className="flex items-start justify-between gap-3 text-xs">
+          <div
+            key={row.label}
+            className="flex flex-col gap-0.5 text-[11px] lg:flex-row lg:items-start lg:justify-between lg:gap-3 lg:text-xs"
+          >
             <dt className="text-[#9CA3AF]">{row.label}</dt>
-            <dd className="font-mono text-right text-[#E4E4E7]">{row.value}</dd>
+            <dd className="font-mono text-[#E4E4E7] lg:text-right">{row.value}</dd>
           </div>
         ))}
       </dl>
@@ -241,7 +275,7 @@ function DetailPanel({
       <button
         type="button"
         onClick={onConfirm}
-        className="mt-5 w-full rounded-lg bg-[#6366F1] py-2.5 text-sm font-medium text-white transition-colors duration-150 hover:bg-[#6366F1]/90"
+        className="mt-3 w-full rounded-lg bg-[#6366F1] py-2 text-xs font-medium text-white transition-colors duration-150 hover:bg-[#6366F1]/90 lg:mt-5 lg:py-2.5 lg:text-sm"
       >
         이 제품 선택하기
       </button>
