@@ -44,6 +44,8 @@ create table if not exists motherboard (
   pcie_x16_usable_slots int not null,
   pcie_x16_total_slots int,
   memory_type text not null,
+  m2_pcie_top text not null,
+  m2_pcie_verified boolean not null default false,
   extra jsonb
 );
 
@@ -601,8 +603,8 @@ ON CONFLICT (id) DO UPDATE SET
 
 
 -- mb-01: ASUS PRIME B650M-A II
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-01', 'ASUS PRIME B650M-A II', 'AM5', 'B650', 'M-ATX', 244, 244, 1, 3, 'DDR5', null)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-01', 'ASUS PRIME B650M-A II', 'AM5', 'B650', 'M-ATX', 244, 244, 1, 3, 'DDR5', null, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -613,11 +615,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-02: ASUS TUF GAMING B650-PLUS
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-02', 'ASUS TUF GAMING B650-PLUS', 'AM5', 'B650', 'ATX', 305, 244, 2, 2, 'DDR5', '{"pcie_x1_slots": 2}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-02', 'ASUS TUF GAMING B650-PLUS', 'AM5', 'B650', 'ATX', 305, 244, 2, 2, 'DDR5', '{"pcie_x1_slots": 2}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -628,11 +631,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-03: ASUS ROG STRIX X870E-E GAMING WIFI
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-03', 'ASUS ROG STRIX X870E-E GAMING WIFI', 'AM5', 'X870E', 'ATX', 305, 244, 2, null, 'DDR5', null)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-03', 'ASUS ROG STRIX X870E-E GAMING WIFI', 'AM5', 'X870E', 'ATX', 305, 244, 2, null, 'DDR5', null, 'PCIe5.0x4', true)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -643,11 +647,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-04: GIGABYTE B650M AORUS ELITE
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-04', 'GIGABYTE B650M AORUS ELITE', 'AM5', 'B650', 'M-ATX', 244, 244, 1, 3, 'DDR5', null)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-04', 'GIGABYTE B650M AORUS ELITE', 'AM5', 'B650', 'M-ATX', 244, 244, 1, 3, 'DDR5', null, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -658,11 +663,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-05: GIGABYTE X870 AORUS ELITE WIFI7
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-05', 'GIGABYTE X870 AORUS ELITE WIFI7', 'AM5', 'X870', 'ATX', 305, 244, 3, null, 'DDR5', null)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-05', 'GIGABYTE X870 AORUS ELITE WIFI7', 'AM5', 'X870', 'ATX', 305, 244, 3, null, 'DDR5', null, 'PCIe5.0x4', true)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -673,11 +679,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-06: GIGABYTE B760M AORUS ELITE D4 Gen5
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-06', 'GIGABYTE B760M AORUS ELITE D4 Gen5', 'LGA1700', 'B760', 'M-ATX', 244, 244, 2, null, 'DDR4', null)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-06', 'GIGABYTE B760M AORUS ELITE D4 Gen5', 'LGA1700', 'B760', 'M-ATX', 244, 244, 2, null, 'DDR4', null, 'PCIe4.0x4', true)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -688,11 +695,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-07: GIGABYTE Z890 AORUS ELITE WIFI7
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-07', 'GIGABYTE Z890 AORUS ELITE WIFI7', 'LGA1851', 'Z890', 'ATX', 305, 244, 2, null, 'DDR5', '{"pcie_note": "자료마다 표기 다름, 재확인 필요"}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-07', 'GIGABYTE Z890 AORUS ELITE WIFI7', 'LGA1851', 'Z890', 'ATX', 305, 244, 2, null, 'DDR5', '{"pcie_note": "자료마다 표기 다름, 재확인 필요"}'::jsonb, 'PCIe5.0x4', true)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -703,11 +711,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-08: MSI MAG B650M 박격포 WIFI
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-08', 'MSI MAG B650M 박격포 WIFI', 'AM5', 'B650', 'M-ATX', 244, 244, 1, 2, 'DDR5', '{"pcie_x1_slots": 1}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-08', 'MSI MAG B650M 박격포 WIFI', 'AM5', 'B650', 'M-ATX', 244, 244, 1, 2, 'DDR5', '{"pcie_x1_slots": 1}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -718,11 +727,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-09: MSI PRO B650M-A WIFI
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-09', 'MSI PRO B650M-A WIFI', 'AM5', 'B650', 'M-ATX', 244, 244, 1, 2, 'DDR5', '{"pcie_x1_slots": 1}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-09', 'MSI PRO B650M-A WIFI', 'AM5', 'B650', 'M-ATX', 244, 244, 1, 2, 'DDR5', '{"pcie_x1_slots": 1}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -733,11 +743,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-10: MSI MPG X870E 엣지 TI WIFI
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-10', 'MSI MPG X870E 엣지 TI WIFI', 'AM5', 'X870E', 'ATX', 305, 244, 3, null, 'DDR5', null)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-10', 'MSI MPG X870E 엣지 TI WIFI', 'AM5', 'X870E', 'ATX', 305, 244, 3, null, 'DDR5', null, 'PCIe5.0x4', true)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -748,11 +759,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-11: MSI MAG B760M 박격포 II
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-11', 'MSI MAG B760M 박격포 II', 'LGA1700', 'B760', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_x4_slots": 1}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-11', 'MSI MAG B760M 박격포 II', 'LGA1700', 'B760', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_x4_slots": 1}'::jsonb, 'PCIe4.0x4', true)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -763,11 +775,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-12: MSI PRO B760M-A DDR4 II
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-12', 'MSI PRO B760M-A DDR4 II', 'LGA1700', 'B760', 'M-ATX', 244, 244, 1, 2, 'DDR4', '{"pcie_x1_slots": 1}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-12', 'MSI PRO B760M-A DDR4 II', 'LGA1700', 'B760', 'M-ATX', 244, 244, 1, 2, 'DDR4', '{"pcie_x1_slots": 1}'::jsonb, 'PCIe4.0x4', true)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -778,11 +791,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-13: ASRock B650M PRO RS/X3D
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-13', 'ASRock B650M PRO RS/X3D', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_x4_slots": 1}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-13', 'ASRock B650M PRO RS/X3D', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_x4_slots": 1}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -793,11 +807,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-14: ASRock B650E PG-ITX/WiFi
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-14', 'ASRock B650E PG-ITX/WiFi', 'AM5', 'B650E', 'Mini-ITX', 170, 170, 1, 1, 'DDR5', '{"note": "확장슬롯 1개뿐, 추가 확장카드 불가"}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-14', 'ASRock B650E PG-ITX/WiFi', 'AM5', 'B650E', 'Mini-ITX', 170, 170, 1, 1, 'DDR5', '{"note": "확장슬롯 1개뿐, 추가 확장카드 불가"}'::jsonb, 'PCIe5.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -808,11 +823,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-15: ASRock B760M Steel Legend
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-15', 'ASRock B760M Steel Legend', 'LGA1700', 'B760', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_x1_slots": 1}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-15', 'ASRock B760M Steel Legend', 'LGA1700', 'B760', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_x1_slots": 1}'::jsonb, 'PCIe4.0x4', true)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -823,11 +839,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-16: ASRock Z890 PRO-A WiFi
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-16', 'ASRock Z890 PRO-A WiFi', 'LGA1851', 'Z890', 'ATX', 305, 244, 1, null, 'DDR5', '{"pcie_x4_slots": 2, "pcie_x1_slots": 1}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-16', 'ASRock Z890 PRO-A WiFi', 'LGA1851', 'Z890', 'ATX', 305, 244, 1, null, 'DDR5', '{"pcie_x4_slots": 2, "pcie_x1_slots": 1}'::jsonb, 'PCIe5.0x4', true)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -838,7 +855,8 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 
 -- ============ ram 원본 데이터 ============
@@ -2135,8 +2153,8 @@ ON CONFLICT (id) DO UPDATE SET
 
 
 -- ============ motherboard AM4 추가 ============
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-17', 'ASUS TUF Gaming B550M-PLUS', 'AM4', 'B550', 'M-ATX', 244, 244, 1, 2.0, 'DDR4', '{"pcie_x1_slots": 1, "pcie_x4_slots": 1}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-17', 'ASUS TUF Gaming B550M-PLUS', 'AM4', 'B550', 'M-ATX', 244, 244, 1, 2.0, 'DDR4', '{"pcie_x1_slots": 1, "pcie_x4_slots": 1}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2147,9 +2165,10 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-18', 'GIGABYTE B550M AORUS ELITE', 'AM4', 'B550', 'M-ATX', 244, 244, 2, 2.0, 'DDR4', '{"pcie_x1_slots": 1, "note": "2번째 PCIex16 전기적 대역폭 재확인 필요"}'::jsonb)
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-18', 'GIGABYTE B550M AORUS ELITE', 'AM4', 'B550', 'M-ATX', 244, 244, 2, 2.0, 'DDR4', '{"pcie_x1_slots": 1, "note": "2번째 PCIex16 전기적 대역폭 재확인 필요"}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2160,9 +2179,10 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-19', 'ASRock B550M 스틸레전드', 'AM4', 'B550', 'M-ATX', 244, 244, 2, 2.0, 'DDR4', '{"pcie_x1_slots": 1, "note": "CrossFireX 지원, 2번째 슬롯 대역폭 재확인 필요"}'::jsonb)
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-19', 'ASRock B550M 스틸레전드', 'AM4', 'B550', 'M-ATX', 244, 244, 2, 2.0, 'DDR4', '{"pcie_x1_slots": 1, "note": "CrossFireX 지원, 2번째 슬롯 대역폭 재확인 필요"}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2173,9 +2193,10 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-20', 'ASUS PRIME A520M-A II', 'AM4', 'A520', 'M-ATX', 244, 244, 1, 1.0, 'DDR4', '{"pcie_x1_slots": 2}'::jsonb)
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-20', 'ASUS PRIME A520M-A II', 'AM4', 'A520', 'M-ATX', 244, 244, 1, 1.0, 'DDR4', '{"pcie_x1_slots": 2}'::jsonb, 'PCIe3.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2186,9 +2207,10 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-21', 'GIGABYTE A520M K V2', 'AM4', 'A520', 'M-ATX', 233, 198, 1, 1.0, 'DDR4', '{"pcie_x1_slots": 1}'::jsonb)
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-21', 'GIGABYTE A520M K V2', 'AM4', 'A520', 'M-ATX', 233, 198, 1, 1.0, 'DDR4', '{"pcie_x1_slots": 1}'::jsonb, 'PCIe3.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2199,14 +2221,15 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 
 -- ============ motherboard 추가 (danawa, AM4 5개는 별도 반영됨) ============
 
 -- mb-22: GIGABYTE B650M K 피씨디렉트
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-22', 'GIGABYTE B650M K 피씨디렉트', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe4.0, PCIe3.0"}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-22', 'GIGABYTE B650M K 피씨디렉트', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe4.0, PCIe3.0"}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2217,11 +2240,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-23: GIGABYTE B650M K 제이씨현
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-23', 'GIGABYTE B650M K 제이씨현', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe4.0, PCIe3.0"}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-23', 'GIGABYTE B650M K 제이씨현', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe4.0, PCIe3.0"}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2232,11 +2256,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-24: ASUS TUF Gaming B650EM-E WIFI 대원씨티에스
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-24', 'ASUS TUF Gaming B650EM-E WIFI 대원씨티에스', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe5.0, PCIe4.0"}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-24', 'ASUS TUF Gaming B650EM-E WIFI 대원씨티에스', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe5.0, PCIe4.0"}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2247,11 +2272,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-25: MSI MAG B650 토마호크 WIFI
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-25', 'MSI MAG B650 토마호크 WIFI', 'AM5', 'B650', 'ATX', 305, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe4.0, PCIe3.0"}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-25', 'MSI MAG B650 토마호크 WIFI', 'AM5', 'B650', 'ATX', 305, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe4.0, PCIe3.0"}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2262,11 +2288,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-26: ASRock B650M Pro X3D 대원씨티에스
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-26', 'ASRock B650M Pro X3D 대원씨티에스', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe5.0, PCIe4.0"}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-26', 'ASRock B650M Pro X3D 대원씨티에스', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe5.0, PCIe4.0"}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2277,11 +2304,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-27: ASUS PRIME B650EM-A 대원씨티에스
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-27', 'ASUS PRIME B650EM-A 대원씨티에스', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe5.0, PCIe4.0"}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-27', 'ASUS PRIME B650EM-A 대원씨티에스', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe5.0, PCIe4.0"}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2292,11 +2320,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-28: ASUS TUF Gaming B650EM-E WIFI STCOM
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-28', 'ASUS TUF Gaming B650EM-E WIFI STCOM', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe5.0, PCIe4.0"}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-28', 'ASUS TUF Gaming B650EM-E WIFI STCOM', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe5.0, PCIe4.0"}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2307,11 +2336,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-29: GIGABYTE B650E AORUS ELITE X AX ICE 피씨디렉트
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-29', 'GIGABYTE B650E AORUS ELITE X AX ICE 피씨디렉트', 'AM5', 'B650E', 'ATX', 305, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe5.0, PCIe3.0"}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-29', 'GIGABYTE B650E AORUS ELITE X AX ICE 피씨디렉트', 'AM5', 'B650E', 'ATX', 305, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe5.0, PCIe3.0"}'::jsonb, 'PCIe5.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2322,11 +2352,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-30: ASRock B650M PG Lightning 에즈윈
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-30', 'ASRock B650M PG Lightning 에즈윈', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe4.0, PCIe3.0"}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-30', 'ASRock B650M PG Lightning 에즈윈', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe4.0, PCIe3.0"}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2337,11 +2368,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-31: ASRock B650M Pro X3D 에즈윈
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-31', 'ASRock B650M Pro X3D 에즈윈', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe5.0, PCIe4.0"}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-31', 'ASRock B650M Pro X3D 에즈윈', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe5.0, PCIe4.0"}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2352,11 +2384,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-32: COLORFUL BATTLE-AX B650M-PLUS V14 STCOM
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-32', 'COLORFUL BATTLE-AX B650M-PLUS V14 STCOM', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe5.0, PCIe4.0"}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-32', 'COLORFUL BATTLE-AX B650M-PLUS V14 STCOM', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe5.0, PCIe4.0"}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2367,11 +2400,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-33: MSI PRO B650M-P
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-33', 'MSI PRO B650M-P', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe4.0, PCIe3.0(x1 슬롯 2개), PCIex16 개수 스펙 미기재라 VGA연결단자 기준 1개로 추정"}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-33', 'MSI PRO B650M-P', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe4.0, PCIe3.0(x1 슬롯 2개), PCIex16 개수 스펙 미기재라 VGA연결단자 기준 1개로 추정"}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2382,11 +2416,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-34: ASRock B650M PG Lightning 디앤디컴
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-34', 'ASRock B650M PG Lightning 디앤디컴', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe4.0, PCIe3.0"}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-34', 'ASRock B650M PG Lightning 디앤디컴', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe4.0, PCIe3.0"}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2397,11 +2432,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-35: ASRock B650M Pro X3D 디앤디컴
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-35', 'ASRock B650M Pro X3D 디앤디컴', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe5.0, PCIe4.0"}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-35', 'ASRock B650M Pro X3D 디앤디컴', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe5.0, PCIe4.0"}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2412,11 +2448,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-36: ASRock B650M PG Lightning 대원씨티에스
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-36', 'ASRock B650M PG Lightning 대원씨티에스', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe4.0, PCIe3.0"}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-36', 'ASRock B650M PG Lightning 대원씨티에스', 'AM5', 'B650', 'M-ATX', 244, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe4.0, PCIe3.0"}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2427,11 +2464,12 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-37: GIGABYTE B650 AORUS ELITE AX V2 피씨디렉트
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
-VALUES ('mb-37', 'GIGABYTE B650 AORUS ELITE AX V2 피씨디렉트', 'AM5', 'B650', 'ATX', 305, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe4.0, PCIe3.0"}'::jsonb)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-37', 'GIGABYTE B650 AORUS ELITE AX V2 피씨디렉트', 'AM5', 'B650', 'ATX', 305, 244, 1, null, 'DDR5', '{"pcie_note": "PCIe4.0, PCIe3.0"}'::jsonb, 'PCIe4.0x4', false)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   socket = EXCLUDED.socket,
@@ -2442,7 +2480,8 @@ ON CONFLICT (id) DO UPDATE SET
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots,
   pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
   memory_type = EXCLUDED.memory_type,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 
 -- ============ ram 추가 (danawa) ============
@@ -3811,14 +3850,15 @@ ON CONFLICT (id) DO UPDATE SET
 -- 재검증 완료. 원본 초안과 달라진 값은 각 줄 옆에 표시함.
 
 -- 메인보드
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
 VALUES ('mb-38', 'ASUS ROG Strix X870E-H Gaming WiFi7 하츠네 미쿠 에디션', 'AM5', 'X870E', 'ATX', 305, 244, 1, 2, 'DDR5',
-  '{"power_stages": "16+2+1", "m2_slots": 4, "wifi": "WiFi7(MediaTek MT7925)", "usb4_ports": 2, "note": "물리 PCIe x16 슬롯 총 2개: 1번=PCIe5.0x16(라이젠9000/7000 x16모드, 8000시리즈는 PCIe4.0 x8/x4), 2번=PCIe4.0x16 규격(전기적 x4). 초안의 total_slots=3은 오검증, 공식스펙+Newegg 확인 결과 2개로 정정.", "edition": "hatsune_miku", "source": "rog.asus.com,newegg,danawa"}'::jsonb)
+  '{"power_stages": "16+2+1", "m2_slots": 4, "wifi": "WiFi7(MediaTek MT7925)", "usb4_ports": 2, "note": "물리 PCIe x16 슬롯 총 2개: 1번=PCIe5.0x16(라이젠9000/7000 x16모드, 8000시리즈는 PCIe4.0 x8/x4), 2번=PCIe4.0x16 규격(전기적 x4). 초안의 total_slots=3은 오검증, 공식스펙+Newegg 확인 결과 2개로 정정.", "edition": "hatsune_miku", "source": "rog.asus.com,newegg,danawa"}'::jsonb, 'PCIe5.0x4', true)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model, socket = EXCLUDED.socket, chipset = EXCLUDED.chipset,
   form_factor = EXCLUDED.form_factor, width_mm = EXCLUDED.width_mm, depth_mm = EXCLUDED.depth_mm,
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots, pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
-  memory_type = EXCLUDED.memory_type, extra = EXCLUDED.extra;
+  memory_type = EXCLUDED.memory_type, extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- 그래픽카드 (TDP 360W: ROG 공식 스펙 페이지에 명시 확인 -- 초안의 "미공개" 표기는 오류, 정정)
 INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
@@ -3882,57 +3922,128 @@ ON CONFLICT (id) DO UPDATE SET
 
 -- ---- 메인보드: Intel 칩셋 신규 4종 (mb-39 ~ mb-42) ----
 -- mb-39: LGA1700/Z790/ATX/DDR4 -- ASUS 공식 techspec 확인
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
 VALUES ('mb-39', 'ASUS TUF GAMING Z790-PLUS WIFI D4', 'LGA1700', 'Z790', 'ATX', 305, 244, 1, 2, 'DDR4',
-  '{"power_stages": "16+1", "m2_slots": 4, "wifi": "WiFi6", "note": "슬롯구성 1xPCIe5.0x16 + 1xPCIe4.0x16(전기적x4) + 별도 PCIe4.0x4/PCIe3.0x1 -- x16 총슬롯 2개만 카운트", "source": "asus.com,walmart"}'::jsonb)
+  '{"power_stages": "16+1", "m2_slots": 4, "wifi": "WiFi6", "note": "슬롯구성 1xPCIe5.0x16 + 1xPCIe4.0x16(전기적x4) + 별도 PCIe4.0x4/PCIe3.0x1 -- x16 총슬롯 2개만 카운트", "source": "asus.com,walmart"}'::jsonb, 'PCIe4.0x4', true)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model, socket = EXCLUDED.socket, chipset = EXCLUDED.chipset,
   form_factor = EXCLUDED.form_factor, width_mm = EXCLUDED.width_mm, depth_mm = EXCLUDED.depth_mm,
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots, pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
-  memory_type = EXCLUDED.memory_type, extra = EXCLUDED.extra;
+  memory_type = EXCLUDED.memory_type, extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-40: LGA1851/B860/M-ATX/DDR5 -- ASRock 공식 스펙 확인 (2025년 신규 칩셋)
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
 VALUES ('mb-40', 'ASRock B860M Pro RS WiFi', 'LGA1851', 'B860', 'M-ATX', 244, 244, 1, 1, 'DDR5',
-  '{"power_stages": "10+1+1+1+1 Dr.MOS", "wifi": "WiFi6E", "note": "PCIe5.0x16 물리슬롯 1개 + 별도 PCIe4.0x4(짧은 슬롯, x16 총슬롯 카운트에서 제외)", "source": "asrock.com,newegg,amazon"}'::jsonb)
+  '{"power_stages": "10+1+1+1+1 Dr.MOS", "wifi": "WiFi6E", "note": "PCIe5.0x16 물리슬롯 1개 + 별도 PCIe4.0x4(짧은 슬롯, x16 총슬롯 카운트에서 제외)", "source": "asrock.com,newegg,amazon"}'::jsonb, 'PCIe5.0x4', true)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model, socket = EXCLUDED.socket, chipset = EXCLUDED.chipset,
   form_factor = EXCLUDED.form_factor, width_mm = EXCLUDED.width_mm, depth_mm = EXCLUDED.depth_mm,
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots, pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
-  memory_type = EXCLUDED.memory_type, extra = EXCLUDED.extra;
+  memory_type = EXCLUDED.memory_type, extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-41: LGA1851/H810/M-ATX/DDR5 -- 보급형, ASRock 공식/Amazon 확인 (2025년 신규 칩셋)
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
 VALUES ('mb-41', 'ASRock H810M-X', 'LGA1851', 'H810', 'M-ATX', 244, 244, 1, 1, 'DDR5',
-  '{"note": "보급형 보드, PCIe4.0 x16 슬롯 1개, WiFi 미탑재", "source": "asrock.com,amazon"}'::jsonb)
+  '{"note": "보급형 보드, PCIe4.0 x16 슬롯 1개, WiFi 미탑재", "source": "asrock.com,amazon"}'::jsonb, 'PCIe4.0x4', true)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model, socket = EXCLUDED.socket, chipset = EXCLUDED.chipset,
   form_factor = EXCLUDED.form_factor, width_mm = EXCLUDED.width_mm, depth_mm = EXCLUDED.depth_mm,
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots, pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
-  memory_type = EXCLUDED.memory_type, extra = EXCLUDED.extra;
+  memory_type = EXCLUDED.memory_type, extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- mb-42: LGA1700/B760/ATX/DDR4 -- GIGABYTE 공식(DDR4 버전 별도 존재 확인)
-INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra)
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
 VALUES ('mb-42', 'GIGABYTE B760 GAMING X AX DDR4', 'LGA1700', 'B760', 'ATX', 305, 244, 1, 3, 'DDR4',
-  '{"power_stages": "8+1+1 Hybrid", "wifi": "WiFi6E", "note": "물리 PCIe x16 슬롯 3개(1번만 전체 대역폭), DDR5 버전(B760 GAMING X AX)과 별도 모델", "source": "gigabyte.com,amazon"}'::jsonb)
+  '{"power_stages": "8+1+1 Hybrid", "wifi": "WiFi6E", "note": "물리 PCIe x16 슬롯 3개(1번만 전체 대역폭), DDR5 버전(B760 GAMING X AX)과 별도 모델", "source": "gigabyte.com,amazon"}'::jsonb, 'PCIe4.0x4', true)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model, socket = EXCLUDED.socket, chipset = EXCLUDED.chipset,
   form_factor = EXCLUDED.form_factor, width_mm = EXCLUDED.width_mm, depth_mm = EXCLUDED.depth_mm,
   pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots, pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
-  memory_type = EXCLUDED.memory_type, extra = EXCLUDED.extra;
+  memory_type = EXCLUDED.memory_type, extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- ---- RAM: DDR4 신규 6종 (ram-28 ~ ram-33) ----
 -- ram-28, ram-29: 높이/전압 Corsair·G.SKILL 공식 확인
-INSERT INTO ram (id, type, model, speed_mhz, heatsink_height_mm, voltage_v, extra) VALUES
-  ('ram-28', 'DDR4', 'Corsair Vengeance LPX DDR4-3200 CL16 (16GB)', 3200, 31, 1.35, null),
-  ('ram-29', 'DDR4', 'G.SKILL Ripjaws V DDR4-3200 CL16 (16GB)', 3200, 42, 1.35, null),
-  ('ram-30', 'DDR4', 'Kingston FURY Beast DDR4-3200 (16GB)', 3200, 34, 1.35, '{"note": "높이는 제조사 유통채널 공통 표기치(소수점 단위 공식 datasheet 미확인)"}'::jsonb),
-  ('ram-31', 'DDR4', 'ADATA XPG GAMMIX D30 DDR4-3200 (8GB)', 3200, 34, 1.35, '{"note": "높이는 제조사 유통채널 공통 표기치(소수점 단위 공식 datasheet 미확인)"}'::jsonb),
-  ('ram-32', 'DDR4', 'TeamGroup T-Create Classic DDR4-3200 (16GB)', 3200, 34, 1.2, '{"note": "JEDEC 표준전압 저프로파일 모델(XMP 오버클럭 아님)"}'::jsonb),
-  ('ram-33', 'DDR4', 'Micron Crucial DDR4-3200 (16GB) 벌크', 3200, null, 1.2, null)
+INSERT INTO ram (id, type, model, speed_mhz, heatsink_height_mm, voltage_v, extra) VALUES ('ram-28', 'DDR4', 'Corsair Vengeance LPX DDR4-3200 CL16 (16GB)', 3200, 31, 1.35, null)
 ON CONFLICT (id) DO UPDATE SET
   type = EXCLUDED.type, model = EXCLUDED.model, speed_mhz = EXCLUDED.speed_mhz,
   heatsink_height_mm = EXCLUDED.heatsink_height_mm, voltage_v = EXCLUDED.voltage_v, extra = EXCLUDED.extra;
+
+INSERT INTO ram (id, type, model, speed_mhz, heatsink_height_mm, voltage_v, extra) VALUES ('ram-29', 'DDR4', 'G.SKILL Ripjaws V DDR4-3200 CL16 (16GB)', 3200, 42, 1.35, null)
+ON CONFLICT (id) DO UPDATE SET
+  type = EXCLUDED.type, model = EXCLUDED.model, speed_mhz = EXCLUDED.speed_mhz,
+  heatsink_height_mm = EXCLUDED.heatsink_height_mm, voltage_v = EXCLUDED.voltage_v, extra = EXCLUDED.extra;
+
+INSERT INTO ram (id, type, model, speed_mhz, heatsink_height_mm, voltage_v, extra) VALUES ('ram-30', 'DDR4', 'Kingston FURY Beast DDR4-3200 (16GB)', 3200, 34, 1.35, '{"note": "높이는 제조사 유통채널 공통 표기치(소수점 단위 공식 datasheet 미확인)"}'::jsonb)
+ON CONFLICT (id) DO UPDATE SET
+  type = EXCLUDED.type, model = EXCLUDED.model, speed_mhz = EXCLUDED.speed_mhz,
+  heatsink_height_mm = EXCLUDED.heatsink_height_mm, voltage_v = EXCLUDED.voltage_v, extra = EXCLUDED.extra;
+
+INSERT INTO ram (id, type, model, speed_mhz, heatsink_height_mm, voltage_v, extra) VALUES ('ram-31', 'DDR4', 'ADATA XPG GAMMIX D30 DDR4-3200 (8GB)', 3200, 34, 1.35, '{"note": "높이는 제조사 유통채널 공통 표기치(소수점 단위 공식 datasheet 미확인)"}'::jsonb)
+ON CONFLICT (id) DO UPDATE SET
+  type = EXCLUDED.type, model = EXCLUDED.model, speed_mhz = EXCLUDED.speed_mhz,
+  heatsink_height_mm = EXCLUDED.heatsink_height_mm, voltage_v = EXCLUDED.voltage_v, extra = EXCLUDED.extra;
+
+INSERT INTO ram (id, type, model, speed_mhz, heatsink_height_mm, voltage_v, extra) VALUES ('ram-32', 'DDR4', 'TeamGroup T-Create Classic DDR4-3200 (16GB)', 3200, 34, 1.2, '{"note": "JEDEC 표준전압 저프로파일 모델(XMP 오버클럭 아님)"}'::jsonb)
+ON CONFLICT (id) DO UPDATE SET
+  type = EXCLUDED.type, model = EXCLUDED.model, speed_mhz = EXCLUDED.speed_mhz,
+  heatsink_height_mm = EXCLUDED.heatsink_height_mm, voltage_v = EXCLUDED.voltage_v, extra = EXCLUDED.extra;
+
+INSERT INTO ram (id, type, model, speed_mhz, heatsink_height_mm, voltage_v, extra) VALUES ('ram-33', 'DDR4', 'Micron Crucial DDR4-3200 (16GB) 벌크', 3200, null, 1.2, null)
+ON CONFLICT (id) DO UPDATE SET
+  type = EXCLUDED.type, model = EXCLUDED.model, speed_mhz = EXCLUDED.speed_mhz,
+  heatsink_height_mm = EXCLUDED.heatsink_height_mm, voltage_v = EXCLUDED.voltage_v, extra = EXCLUDED.extra;
+
+-- ---- 메인보드: Intel 칩셋 추가 4종 (mb-43 ~ mb-46) -- 전부 공식 스펙/판매처 페이지로 실존+M.2 세대 확인됨 ----
+-- 참고: "MSI MAG H770 TOMAHAWK WIFI", "GIGABYTE B860 GAMING X WIFI7"는 검색으로 실존 확인 안 돼서 후보 폐기함(모델명 조작 방지)
+
+-- mb-43: LGA1700/H610/M-ATX/DDR4 -- 보급형, ASUS 공식 확인
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-43', 'ASUS PRIME H610M-K D4', 'LGA1700', 'H610', 'M-ATX', 244, 244, 1, 1, 'DDR4',
+  '{"note": "DIMM 2슬롯(최대128GB 아님, 실제 64GB), M.2 슬롯 1개뿐(SATA6G_4와 대역폭 공유)", "source": "asus.com,amazon"}'::jsonb, 'PCIe3.0x4', true)
+ON CONFLICT (id) DO UPDATE SET
+  model = EXCLUDED.model, socket = EXCLUDED.socket, chipset = EXCLUDED.chipset,
+  form_factor = EXCLUDED.form_factor, width_mm = EXCLUDED.width_mm, depth_mm = EXCLUDED.depth_mm,
+  pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots, pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
+  memory_type = EXCLUDED.memory_type, extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
+
+-- mb-44: LGA1851/Z890/ATX/DDR5 -- MSI 공식/Newegg 확인
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-44', 'MSI PRO Z890-A WIFI', 'LGA1851', 'Z890', 'ATX', 305, 244, 1, 2, 'DDR5',
+  '{"power_stages": "90A SPS VRM", "wifi": "WiFi7", "note": "슬롯구성 1xPCIe5.0x16 + 1xPCIe4.0x16", "source": "msi.com,newegg,amazon"}'::jsonb, 'PCIe5.0x4', true)
+ON CONFLICT (id) DO UPDATE SET
+  model = EXCLUDED.model, socket = EXCLUDED.socket, chipset = EXCLUDED.chipset,
+  form_factor = EXCLUDED.form_factor, width_mm = EXCLUDED.width_mm, depth_mm = EXCLUDED.depth_mm,
+  pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots, pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
+  memory_type = EXCLUDED.memory_type, extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
+
+-- mb-45: LGA1700/Z790/ATX/DDR4 -- ASUS 공식/Amazon 확인
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-45', 'ASUS PRIME Z790-P WIFI D4', 'LGA1700', 'Z790', 'ATX', 305, 244, 1, 4, 'DDR4',
+  '{"power_stages": "14+1 DrMOS", "wifi": "WiFi6", "m2_slots": 3, "note": "M.2 3개 전부 PCIe4.0x4 (M.2_3은 SATA겸용). x16 물리슬롯 4개 중 1개만 전체대역폭", "source": "asus.com,amazon"}'::jsonb, 'PCIe4.0x4', true)
+ON CONFLICT (id) DO UPDATE SET
+  model = EXCLUDED.model, socket = EXCLUDED.socket, chipset = EXCLUDED.chipset,
+  form_factor = EXCLUDED.form_factor, width_mm = EXCLUDED.width_mm, depth_mm = EXCLUDED.depth_mm,
+  pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots, pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
+  memory_type = EXCLUDED.memory_type, extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
+
+-- mb-46: LGA1851/B860/ATX/DDR5 -- GIGABYTE 공식/Amazon 확인
+INSERT INTO motherboard (id, model, socket, chipset, form_factor, width_mm, depth_mm, pcie_x16_usable_slots, pcie_x16_total_slots, memory_type, extra, m2_pcie_top, m2_pcie_verified)
+VALUES ('mb-46', 'GIGABYTE B860 GAMING X WIFI6E', 'LGA1851', 'B860', 'ATX', 305, 244, 1, 1,'DDR5',
+  '{"power_stages": "12+1+2+1 Phases", "wifi": "WiFi6E", "m2_slots": 3, "note": "M.2 구성 1xPCIe5.0 + 2xPCIe4.0. x16 총슬롯 수는 공식 자료에 명확히 안 나와서 1개(안전값)로 표기, 재확인 권장", "source": "gigabyte.com,amazon"}'::jsonb, 'PCIe5.0x4', true)
+ON CONFLICT (id) DO UPDATE SET
+  model = EXCLUDED.model, socket = EXCLUDED.socket, chipset = EXCLUDED.chipset,
+  form_factor = EXCLUDED.form_factor, width_mm = EXCLUDED.width_mm, depth_mm = EXCLUDED.depth_mm,
+  pcie_x16_usable_slots = EXCLUDED.pcie_x16_usable_slots, pcie_x16_total_slots = EXCLUDED.pcie_x16_total_slots,
+  memory_type = EXCLUDED.memory_type, extra = EXCLUDED.extra,
+  m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
+
 -- 공개 읽기 정책: 로그인 없는 v1 특성상 anon(publishable key)에 SELECT만 허용
 do $$
 declare
