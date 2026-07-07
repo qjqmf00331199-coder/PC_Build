@@ -112,11 +112,7 @@ export function BottleneckModal({
         "fixed inset-0 z-[70] flex items-end justify-center bg-black/60 p-0 transition-opacity duration-300 sm:items-center sm:p-4",
         open ? "opacity-100" : "pointer-events-none opacity-0"
       )}
-      onClick={() => {
-        // 데스크탑(sm 이상)에서는 바깥 클릭으로 안 닫고 X 버튼만 닫게 함, 모바일은 바깥 탭하면 닫힘
-        if (typeof window !== "undefined" && window.matchMedia("(min-width: 640px)").matches) return;
-        onClose();
-      }}
+      onClick={onClose}
     >
       <div
         className={cn(
