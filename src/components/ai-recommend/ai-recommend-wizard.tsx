@@ -6,6 +6,7 @@ import { CATEGORY_LABEL, CATEGORY_ORDER } from "@/lib/compatibility";
 import { partSpecLine, partTitle } from "@/lib/part-specs";
 import { formatPriceKrw, useProductInfo } from "@/lib/use-product-info";
 import { cn } from "@/lib/utils";
+import { PopupAd } from "@/components/popup-ad";
 
 type StepId = "purpose" | "priority" | "brand" | "preference" | "detail";
 
@@ -113,6 +114,7 @@ export function AiRecommendWizard({
   const [result, setResult] = useState<AiRecommendResult | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
   const [loadingMessage, setLoadingMessage] = useState(DEFAULT_LOADING_MESSAGE);
+  const [showPopupAd, setShowPopupAd] = useState(false);
 
   useEffect(() => {
     if (phase !== "loading") {
@@ -123,6 +125,12 @@ export function AiRecommendWizard({
       setTimeout(() => setLoadingMessage(message), delay)
     );
     return () => timers.forEach(clearTimeout);
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== "loading") return;
+    const popupTimer = setTimeout(() => setShowPopupAd(true), 1000);
+    return () => clearTimeout(popupTimer);
   }, [phase]);
 
   const step = STEPS[stepIndex];
@@ -194,6 +202,7 @@ export function AiRecommendWizard({
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-2xl flex-col justify-center px-6 py-16">
+      {showPopupAd && <PopupAd onClose={() => setShowPopupAd(false)} />}
       <button
         type="button"
         onClick={onCancel}
