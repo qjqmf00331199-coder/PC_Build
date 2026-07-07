@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import type { PartsData } from "@/lib/supabase/fetch-parts";
 import { useBuild } from "./build-provider";
@@ -19,6 +20,52 @@ const variants: Variants = {
   exit: (direction: 1 | -1) => ({ x: direction === 1 ? "-100%" : "100%", opacity: 0 }),
 };
 
+// pointerEvents can't be animated, and framer-motion's own timing hooks for
+// non-animatable values (transition delay, transitionEnd) turned out not to
+// actually wait for the slide to finish in testing — the incoming screen
+// stayed clickable (or, with transitionEnd, stayed permanently unclickable)
+// regardless of its real on-screen position. So this is driven by plain React
+// state instead: not interactive until settle fires, with a timer as a backstop
+// in case onAnimationComplete doesn't fire (e.g. the very first, non-animated mount).
+function AnimatedScreen({
+  animKey,
+  direction,
+  children,
+}: {
+  animKey: string;
+  direction: 1 | -1;
+  children: React.ReactNode;
+}) {
+  const [settled, setSettled] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setSettled(true), DURATION * 1000 + 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <motion.div
+      key={animKey}
+      custom={direction}
+      variants={variants}
+      initial="enter"
+      animate="center"
+      exit="exit"
+      transition={{ duration: DURATION, ease: EASE }}
+      onAnimationComplete={(target) => {
+        if (target === "center") setSettled(true);
+      }}
+      style={{ pointerEvents: settled ? "auto" : "none" }}
+      // absolute so the exiting and entering screens overlap in place
+      // instead of shoving the flex layout around mid-transition — only
+      // transform/opacity animate, so this stays on the GPU compositor
+      className="absolute inset-0 h-full"
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 export function CategoryStage({ parts }: { parts: PartsData }) {
   const { activeCategory } = useBuild();
   const direction: 1 | -1 = activeCategory === null ? -1 : 1;
@@ -26,25 +73,13 @@ export function CategoryStage({ parts }: { parts: PartsData }) {
   return (
     <div className="relative h-full overflow-hidden">
       <AnimatePresence initial={false} custom={direction}>
-        <motion.div
-          key={activeCategory ?? "hub"}
-          custom={direction}
-          variants={variants}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          transition={{ duration: DURATION, ease: EASE }}
-          // absolute so the exiting and entering screens overlap in place
-          // instead of shoving the flex layout around mid-transition — only
-          // transform/opacity animate, so this stays on the GPU compositor
-          className="absolute inset-0 h-full"
-        >
+        <AnimatedScreen key={activeCategory ?? "hub"} animKey={activeCategory ?? "hub"} direction={direction}>
           {activeCategory === null ? (
             <CategoryHub parts={parts} />
           ) : (
             <CategoryDetail category={activeCategory} options={parts[activeCategory]} />
           )}
-        </motion.div>
+        </AnimatedScreen>
       </AnimatePresence>
     </div>
   );

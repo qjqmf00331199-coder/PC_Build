@@ -35,6 +35,40 @@ const variants: Variants = {
   exit: (dir: Direction) => ({ x: dir === "left" ? "-100%" : "100%", opacity: 0 }),
 };
 
+// pointerEvents can't be animated, and framer-motion's own timing hooks for
+// non-animatable values (transition delay, transitionEnd) turned out not to
+// actually wait for the slide to finish in testing — the incoming screen
+// stayed clickable (or, with transitionEnd, stayed permanently unclickable)
+// regardless of its real on-screen position. So this is driven by plain React
+// state instead: not interactive until settle fires, with a timer as a backstop
+// in case onAnimationComplete doesn't fire (e.g. the very first, non-animated mount).
+function AnimatedScreen({ direction, children }: { direction: Direction; children: React.ReactNode }) {
+  const [settled, setSettled] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setSettled(true), DURATION * 1000 + 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <motion.div
+      custom={direction}
+      variants={variants}
+      initial="enter"
+      animate="center"
+      exit="exit"
+      transition={{ duration: DURATION, ease: EASE }}
+      onAnimationComplete={(target) => {
+        if (target === "center") setSettled(true);
+      }}
+      style={{ pointerEvents: settled ? "auto" : "none" }}
+      className="absolute inset-0"
+    >
+      {children}
+    </motion.div>
+  );
+}
+
 export function LandingGate({ parts }: { parts: PartsData }) {
   const [view, setView] = useState<View>("landing");
   const [direction, setDirection] = useState<Direction>("left");
@@ -102,16 +136,7 @@ export function LandingGate({ parts }: { parts: PartsData }) {
   return (
     <div className="relative min-h-dvh overflow-hidden">
       <AnimatePresence initial={false} custom={direction}>
-        <motion.div
-          key={view}
-          custom={direction}
-          variants={variants}
-          initial="enter"
-          animate="center"
-          exit="exit"
-          transition={{ duration: DURATION, ease: EASE }}
-          className="absolute inset-0"
-        >
+        <AnimatedScreen key={view} direction={direction}>
           {view === "build" && (
             <div className="relative">
               <AdSlots />
@@ -209,7 +234,7 @@ export function LandingGate({ parts }: { parts: PartsData }) {
               </footer>
             </div>
           )}
-        </motion.div>
+        </AnimatedScreen>
       </AnimatePresence>
     </div>
   );
