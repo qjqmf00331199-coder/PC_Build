@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { getAllParts } from "@/lib/supabase/fetch-parts";
 import { evaluateIssues } from "@/lib/compatibility";
+import { evaluateAllBottlenecks, worstLevel } from "@/lib/bottleneck";
 import {
   AI_SYSTEM_PROMPT,
   buildRetryPrompt,
@@ -60,7 +61,7 @@ async function callNim(apiKey: string, messages: NimMessage[], timeoutMs: number
         model: NIM_MODEL,
         messages,
         temperature: 0.3,
-        max_tokens: 600,
+        max_tokens: 400,
       }),
       signal: controller.signal,
     });
@@ -139,10 +140,12 @@ export async function POST(req: NextRequest) {
 
       const missing = missingRequiredCategories(selections);
       const dangerMessages = dangerIssueMessages(selections);
+      const bottleneckLevel = worstLevel(evaluateAllBottlenecks(selections));
+      const hasBottleneckDanger = bottleneckLevel === "danger";
 
-      // 위험(danger)급 비호환 조합은 절대 사용자에게 노출하지 않는다 — 문제가 있으면
-      // AI에게 무엇이 잘못됐는지 알려주고 같은 대화 안에서 다시 고르게 한다.
-      if (missing.length === 0 && dangerMessages.length === 0) {
+      // 위험(danger)급 비호환 조합·심한 성능 병목 조합은 절대 사용자에게 노출하지 않는다 —
+      // 문제가 있으면 AI에게 무엇이 잘못됐는지 알려주고 같은 대화 안에서 다시 고르게 한다.
+      if (missing.length === 0 && dangerMessages.length === 0 && !hasBottleneckDanger) {
         return Response.json({
           selections,
           reason: lastReason || "AI가 조합을 추천했어요.",
@@ -154,6 +157,7 @@ export async function POST(req: NextRequest) {
       const problems = [
         ...missing.map((c) => `${CATEGORY_LABEL[c]} 항목이 빠졌습니다.`),
         ...dangerMessages,
+        ...(hasBottleneckDanger ? ["CPU와 GPU 성능 격차가 너무 커서 병목이 심합니다. CPU와 GPU 성능을 서로 비슷한 등급으로 맞춰 다시 골라주세요."] : []),
       ];
       messages.push({ role: "assistant", content: raw });
       messages.push({ role: "user", content: buildRetryPrompt(problems) });
