@@ -240,6 +240,10 @@ export function PurchaseReceipt() {
                   link={compareRow.info.link}
                   loading={compareRow.info.price === null && compareRow.info.link === null}
                 />
+                <p className="pt-1 text-center text-[10px] leading-relaxed text-[#71717A]">
+                  본 서비스는 비상업적 학습 목적이며 실제 구매·결제를 중개하지 않습니다. 위 링크는 각
+                  판매처로 이동할 뿐입니다.
+                </p>
               </div>
             </>
           )}
