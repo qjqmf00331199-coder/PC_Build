@@ -93,7 +93,7 @@ export function BuildProvider({
     return () => window.removeEventListener("popstate", onPopState);
   }, [selections, commitPreview]);
 
-  const selectPart = <K extends PartCategory>(category: K, part: PartMap[K]) => {
+  const selectPart = useCallback(<K extends PartCategory>(category: K, part: PartMap[K]) => {
     setSelections((prev) => {
       const current = prev[category] as PartMap[K] | undefined;
       if (current && current.id === part.id) {
@@ -103,7 +103,7 @@ export function BuildProvider({
       }
       return { ...prev, [category]: part };
     });
-  };
+  }, []);
 
   // while browsing a category, overlay the not-yet-committed pick so the
   // sidebar/illustration/power stats preview it live without saving it
@@ -130,28 +130,45 @@ export function BuildProvider({
 
   // fixed set of 8 categories called in a stable order every render, so calling
   // the price-fetch hook once per category (instead of in a loop) stays rules-of-hooks safe
-  const partInfo: Record<PartCategory, ProductInfo> = {
-    cpu: useProductInfo(effectiveSelections.cpu ?? null),
-    motherboard: useProductInfo(effectiveSelections.motherboard ?? null),
-    ram: useProductInfo(effectiveSelections.ram ?? null),
-    ssd: useProductInfo(effectiveSelections.ssd ?? null),
-    gpu: useProductInfo(effectiveSelections.gpu ?? null),
-    psu: useProductInfo(effectiveSelections.psu ?? null),
-    case: useProductInfo(effectiveSelections.case ?? null),
-    cooler: useProductInfo(effectiveSelections.cooler ?? null),
-  };
+  const cpuInfo = useProductInfo(effectiveSelections.cpu ?? null);
+  const motherboardInfo = useProductInfo(effectiveSelections.motherboard ?? null);
+  const ramInfo = useProductInfo(effectiveSelections.ram ?? null);
+  const ssdInfo = useProductInfo(effectiveSelections.ssd ?? null);
+  const gpuInfo = useProductInfo(effectiveSelections.gpu ?? null);
+  const psuInfo = useProductInfo(effectiveSelections.psu ?? null);
+  const caseInfo = useProductInfo(effectiveSelections.case ?? null);
+  const coolerInfo = useProductInfo(effectiveSelections.cooler ?? null);
+  // each useProductInfo result is a referentially stable object when its data
+  // hasn't changed, so wrapping the lookup itself in useMemo (keyed off those
+  // same references) keeps `partInfo` stable too — without this, a brand new
+  // object here would bust the context value memo below on every render
+  const partInfo: Record<PartCategory, ProductInfo> = useMemo(
+    () => ({
+      cpu: cpuInfo,
+      motherboard: motherboardInfo,
+      ram: ramInfo,
+      ssd: ssdInfo,
+      gpu: gpuInfo,
+      psu: psuInfo,
+      case: caseInfo,
+      cooler: coolerInfo,
+    }),
+    [cpuInfo, motherboardInfo, ramInfo, ssdInfo, gpuInfo, psuInfo, caseInfo, coolerInfo]
+  );
   const selectedPrices = CATEGORY_ORDER.filter((c) => effectiveSelections[c]).map((c) => partInfo[c].price);
   const totalPrice = selectedPrices.reduce((sum: number, p) => sum + (p ?? 0), 0);
   const totalPriceLoading = selectedPrices.some((p) => p === null);
 
-  const resetSelections = () => {
+  const resetSelections = useCallback(() => {
     setSelections({});
     setPreview(undefined);
     setActiveCategory(null);
-  };
+  }, []);
 
-  const issuesFor = (category: PartCategory) =>
-    issues.filter((issue) => issue.categories.includes(category));
+  const issuesFor = useCallback(
+    (category: PartCategory) => issues.filter((issue) => issue.categories.includes(category)),
+    [issues]
+  );
 
   // per-option preview: how would this candidate part fare against the OTHER
   // already-committed categories (not the in-progress preview of this same category)
@@ -173,46 +190,78 @@ export function BuildProvider({
     [selections]
   );
 
-  return (
-    <BuildContext.Provider
-      value={{
-        selections,
-        effectiveSelections,
-        issues,
-        categoryStatus,
-        totalPowerW,
-        psuMarginPct,
-        selectedCount,
-        totalCategories: CATEGORY_ORDER.length,
-        partInfo,
-        totalPrice,
-        totalPriceLoading,
-        selectPart,
-        resetSelections,
-        issuesFor,
-        levelForOption,
-        activeCategory,
-        preview,
-        openCategory: (category) => {
-          // jumping straight from one category's detail into another (e.g. via the
-          // sidebar's selected-parts list) skips closeCategory, so commit here too
-          commitPreview();
-          const base = (window.history.state as { depth?: number } | null) ?? {};
-          window.history.pushState({ ...base, trifitCategory: category, depth: (base.depth ?? 0) + 1 }, "");
-          setPreview(selections[category]);
-          setActiveCategory(category);
-        },
-        closeCategory: () => {
-          if (activeCategory === null) return;
-          window.history.back();
-        },
-        previewPick: setPreview,
-        isMikuBuild,
-      }}
-    >
-      {children}
-    </BuildContext.Provider>
+  const openCategory = useCallback(
+    (category: PartCategory) => {
+      // jumping straight from one category's detail into another (e.g. via the
+      // sidebar's selected-parts list) skips closeCategory, so commit here too
+      commitPreview();
+      const base = (window.history.state as { depth?: number } | null) ?? {};
+      window.history.pushState({ ...base, trifitCategory: category, depth: (base.depth ?? 0) + 1 }, "");
+      setPreview(selections[category]);
+      setActiveCategory(category);
+    },
+    [commitPreview, selections]
   );
+
+  const closeCategory = useCallback(() => {
+    if (activeCategory === null) return;
+    window.history.back();
+  }, [activeCategory]);
+
+  // stable unless something a consumer actually reads changes — otherwise every
+  // BuildProvider render (e.g. from openCategory's setPreview/setActiveCategory,
+  // which fires right as CategoryStage starts its transition) would hand out a
+  // brand new context value and force every consumer (sidebar, summary panel,
+  // case illustration, all 8 category cards, etc.) to re-render at the same time,
+  // stacking on top of the detail view's own mount cost and showing up as jank
+  const value = useMemo<BuildContextValue>(
+    () => ({
+      selections,
+      effectiveSelections,
+      issues,
+      categoryStatus,
+      totalPowerW,
+      psuMarginPct,
+      selectedCount,
+      totalCategories: CATEGORY_ORDER.length,
+      partInfo,
+      totalPrice,
+      totalPriceLoading,
+      selectPart,
+      resetSelections,
+      issuesFor,
+      levelForOption,
+      activeCategory,
+      preview,
+      openCategory,
+      closeCategory,
+      previewPick: setPreview,
+      isMikuBuild,
+    }),
+    [
+      selections,
+      effectiveSelections,
+      issues,
+      categoryStatus,
+      totalPowerW,
+      psuMarginPct,
+      selectedCount,
+      partInfo,
+      totalPrice,
+      totalPriceLoading,
+      selectPart,
+      resetSelections,
+      issuesFor,
+      levelForOption,
+      activeCategory,
+      preview,
+      openCategory,
+      closeCategory,
+      isMikuBuild,
+    ]
+  );
+
+  return <BuildContext.Provider value={value}>{children}</BuildContext.Provider>;
 }
 
 export function useBuild() {
