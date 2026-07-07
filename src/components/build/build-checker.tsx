@@ -98,7 +98,7 @@ function TopSummaryPanel() {
                 {BOTTLENECK_LEVEL_CONFIG[bottleneckLevel].label}
               </span>
             </div>
-            <p className="text-xs text-[#9CA3AF]">진단 항목 {bottleneckEntries.length}개 · 클릭하면 자세히 볼 수 있어요.</p>
+            <p className="text-xs text-[#9CA3AF]">클릭하면 자세히 볼 수 있어요.</p>
           </button>
         )}
       </div>
