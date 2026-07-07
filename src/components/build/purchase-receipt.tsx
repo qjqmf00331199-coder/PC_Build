@@ -12,6 +12,12 @@ import type { PartCategory } from "@/lib/types";
 import { useBuild } from "./build-provider";
 import { cn } from "@/lib/utils";
 
+type ReceiptNavState = {
+  ptbReceiptOpen?: boolean;
+  ptbCompareCategory?: PartCategory | null;
+  depth?: number;
+};
+
 export function PurchaseReceipt() {
   const { selections, partInfo, selectedCount, totalPrice, totalPriceLoading } = useBuild();
   const [open, setOpen] = useState(false);
@@ -40,12 +46,45 @@ export function PurchaseReceipt() {
 
   const compareRow = compareCategory ? rows.find((r) => r.category === compareCategory) : null;
 
+  // landing-gate/build-provider와 같은 방식: window.history.state에 필드 얹어서 depth 공유.
+  // 뒤로가기 한 번 = history 한 칸 = 레이어 하나 닫힘 (compare 먼저, 그다음 receipt).
+  useEffect(() => {
+    const onPopState = (e: PopStateEvent) => {
+      const state = (e.state as ReceiptNavState | null) ?? {};
+      setOpen(!!state.ptbReceiptOpen);
+      setCompareCategory(state.ptbCompareCategory ?? null);
+    };
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
+
+  const openReceipt = () => {
+    const base = (window.history.state as ReceiptNavState | null) ?? {};
+    window.history.pushState({ ...base, ptbReceiptOpen: true, depth: (base.depth ?? 0) + 1 }, "");
+    setOpen(true);
+  };
+
+  const openCompare = (category: PartCategory) => {
+    const base = (window.history.state as ReceiptNavState | null) ?? {};
+    window.history.pushState({ ...base, ptbCompareCategory: category, depth: (base.depth ?? 0) + 1 }, "");
+    setCompareCategory(category);
+  };
+
+  const closeCompare = () => {
+    if (compareCategory !== null) window.history.back();
+  };
+
+  const closeReceipt = () => {
+    const steps = (compareCategory !== null ? 1 : 0) + (open ? 1 : 0);
+    if (steps > 0) window.history.go(-steps);
+  };
+
   return (
     <div className="mt-4 border-t border-[#27272A] pt-4">
       <button
         type="button"
         disabled={selectedCount === 0}
-        onClick={() => setOpen(true)}
+        onClick={openReceipt}
         className="flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--accent)] py-3 text-sm font-semibold text-black transition-opacity duration-150 hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-40"
       >
         <ShoppingCart className="h-4 w-4" strokeWidth={2.25} />
@@ -59,10 +98,10 @@ export function PurchaseReceipt() {
         )}
         onClick={() => {
           if (compareCategory) {
-            setCompareCategory(null);
+            closeCompare();
             return;
           }
-          setOpen(false);
+          closeReceipt();
         }}
       >
         <div
@@ -79,10 +118,7 @@ export function PurchaseReceipt() {
             </div>
             <button
               type="button"
-              onClick={() => {
-                setOpen(false);
-                setCompareCategory(null);
-              }}
+              onClick={closeReceipt}
               aria-label="닫기"
               className="rounded-md p-1 text-[#9CA3AF] hover:text-[#E4E4E7]"
             >
@@ -113,9 +149,13 @@ export function PurchaseReceipt() {
                   {part && (
                     <button
                       type="button"
-                      onClick={() =>
-                        setCompareCategory((prev) => (prev === category ? null : category))
-                      }
+                      onClick={() => {
+                        if (compareCategory === category) {
+                          closeCompare();
+                        } else {
+                          openCompare(category);
+                        }
+                      }}
                       aria-pressed={compareCategory === category}
                       className={cn(
                         "flex shrink-0 items-center gap-1 rounded-full border px-2 py-1 text-[10px] transition-colors",
@@ -146,6 +186,18 @@ export function PurchaseReceipt() {
           </div>
         </div>
 
+        {/* 사이드박스 전용 백드롭: 영수증 패널 위를 덮어서 바깥 탭하면 사이드박스만 닫히게 함 */}
+        <div
+          className={cn(
+            "fixed inset-0 z-[55] bg-black/40 transition-opacity duration-300",
+            compareRow ? "opacity-100" : "pointer-events-none opacity-0"
+          )}
+          onClick={(e) => {
+            e.stopPropagation();
+            closeCompare();
+          }}
+        />
+
         {/* price-compare side drawer: slides in from the right, sits above the receipt modal */}
         <div
           className={cn(
@@ -167,7 +219,7 @@ export function PurchaseReceipt() {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setCompareCategory(null)}
+                  onClick={closeCompare}
                   aria-label="닫기"
                   className="shrink-0 rounded-md p-1 text-[#9CA3AF] hover:text-[#E4E4E7]"
                 >
