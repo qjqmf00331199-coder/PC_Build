@@ -22,6 +22,9 @@ import type { Selections } from "@/lib/types";
 const NIM_ENDPOINT = "https://integrate.api.nvidia.com/v1/chat/completions";
 const NIM_MODEL = "meta/llama-3.1-70b-instruct";
 const MAX_ATTEMPTS = 3;
+const NIM_TIMEOUT_MS = 9000;
+
+export const maxDuration = 45;
 
 function isPurpose(value: unknown): value is Purpose {
   return value === "office" || value === "gaming" || value === "editing";
@@ -42,22 +45,34 @@ interface NimMessage {
 }
 
 async function callNim(apiKey: string, messages: NimMessage[]): Promise<string> {
-  const res = await fetch(NIM_ENDPOINT, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: NIM_MODEL,
-      messages,
-      temperature: 0.3,
-      max_tokens: 600,
-    }),
-  });
-  if (!res.ok) throw new Error(`NIM API 응답 오류: ${res.status}`);
-  const data = await res.json();
-  return data.choices?.[0]?.message?.content ?? "";
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), NIM_TIMEOUT_MS);
+  try {
+    const res = await fetch(NIM_ENDPOINT, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: NIM_MODEL,
+        messages,
+        temperature: 0.3,
+        max_tokens: 600,
+      }),
+      signal: controller.signal,
+    });
+    if (!res.ok) throw new Error(`NIM API 응답 오류: ${res.status}`);
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content ?? "";
+  } catch (err) {
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new Error(`NIM API 응답 지연 (${NIM_TIMEOUT_MS}ms 초과)`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export async function POST(req: NextRequest) {

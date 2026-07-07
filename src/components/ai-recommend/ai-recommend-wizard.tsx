@@ -79,6 +79,8 @@ interface AiRecommendResult {
 
 type Phase = "quiz" | "loading" | "result" | "error";
 
+const REQUEST_TIMEOUT_MS = 40000;
+
 const DEFAULT_LOADING_MESSAGE = "AI가 답변을 바탕으로 부품 조합을 고르고 있어요...";
 const LOADING_MESSAGE_SCHEDULE: { delay: number; message: string }[] = [
   { delay: 3000, message: "고객님의 니즈에 맞춰 찾는중이예요 잠시만 기다려 주세요!!" },
@@ -141,19 +143,31 @@ export function AiRecommendWizard({
 
   const submit = async () => {
     setPhase("loading");
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
     try {
       const res = await fetch("/api/ai-recommend", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(answers),
+        signal: controller.signal,
       });
       if (!res.ok) throw new Error(`요청 실패 (${res.status})`);
       const data = (await res.json()) as AiRecommendResult;
       setResult(data);
       setPhase("result");
     } catch (err) {
-      setErrorMessage(err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.");
+      const isTimeout = err instanceof Error && err.name === "AbortError";
+      setErrorMessage(
+        isTimeout
+          ? "응답이 너무 오래 걸려요. 잠시 후 다시 시도해주세요."
+          : err instanceof Error
+            ? err.message
+            : "알 수 없는 오류가 발생했습니다."
+      );
       setPhase("error");
+    } finally {
+      clearTimeout(timer);
     }
   };
 
