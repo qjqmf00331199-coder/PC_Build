@@ -58,8 +58,11 @@ export function PurchaseReceipt() {
           open ? "opacity-100" : "pointer-events-none opacity-0"
         )}
         onClick={() => {
+          if (compareCategory) {
+            setCompareCategory(null);
+            return;
+          }
           setOpen(false);
-          setCompareCategory(null);
         }}
       >
         <div
