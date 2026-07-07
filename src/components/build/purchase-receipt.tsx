@@ -110,8 +110,16 @@ export function PurchaseReceipt() {
                   {part && (
                     <button
                       type="button"
-                      onClick={() => setCompareCategory(category)}
-                      className="flex shrink-0 items-center gap-1 rounded-full border border-[#27272A] px-2 py-1 text-[10px] text-[#9CA3AF] transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
+                      onClick={() =>
+                        setCompareCategory((prev) => (prev === category ? null : category))
+                      }
+                      aria-pressed={compareCategory === category}
+                      className={cn(
+                        "flex shrink-0 items-center gap-1 rounded-full border px-2 py-1 text-[10px] transition-colors",
+                        compareCategory === category
+                          ? "border-[var(--accent)] bg-[var(--accent)]/15 text-[var(--accent)]"
+                          : "border-[#27272A] text-[#9CA3AF] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+                      )}
                     >
                       <Scale className="h-3 w-3" strokeWidth={2} />
                       가격 비교

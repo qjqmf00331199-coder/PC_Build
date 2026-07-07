@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { CompatIssue, PartCategory, Selections } from "@/lib/types";
 import { CATEGORY_LABEL, CATEGORY_ORDER } from "@/lib/compatibility";
 import { partSpecLine, partTitle } from "@/lib/part-specs";
@@ -79,6 +79,13 @@ interface AiRecommendResult {
 
 type Phase = "quiz" | "loading" | "result" | "error";
 
+const DEFAULT_LOADING_MESSAGE = "AI가 답변을 바탕으로 부품 조합을 고르고 있어요...";
+const LOADING_MESSAGE_SCHEDULE: { delay: number; message: string }[] = [
+  { delay: 3000, message: "고객님의 니즈에 맞춰 찾는중이예요 잠시만 기다려 주세요!!" },
+  { delay: 5000, message: "열심히 찾아오고 있어요 잠시만 기다려 주세요!!" },
+  { delay: 8000, message: "다 찾았어요!! 잠시만 기다려 주세요!!" },
+];
+
 export function AiRecommendWizard({
   onApply,
   onCancel,
@@ -98,6 +105,18 @@ export function AiRecommendWizard({
   const [phase, setPhase] = useState<Phase>("quiz");
   const [result, setResult] = useState<AiRecommendResult | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [loadingMessage, setLoadingMessage] = useState(DEFAULT_LOADING_MESSAGE);
+
+  useEffect(() => {
+    if (phase !== "loading") {
+      setLoadingMessage(DEFAULT_LOADING_MESSAGE);
+      return;
+    }
+    const timers = LOADING_MESSAGE_SCHEDULE.map(({ delay, message }) =>
+      setTimeout(() => setLoadingMessage(message), delay)
+    );
+    return () => timers.forEach(clearTimeout);
+  }, [phase]);
 
   const step = STEPS[stepIndex];
   const isLastStep = stepIndex === STEPS.length - 1;
@@ -259,7 +278,7 @@ export function AiRecommendWizard({
               </span>
             </span>
           </div>
-          <p className="text-sm text-[#9CA3AF]">AI가 답변을 바탕으로 부품 조합을 고르고 있어요...</p>
+          <p className="text-sm text-[#9CA3AF]">{loadingMessage}</p>
         </div>
       )}
 
