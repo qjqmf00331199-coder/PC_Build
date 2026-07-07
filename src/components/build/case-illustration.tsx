@@ -2,6 +2,7 @@
 
 import { useBuild } from "./build-provider";
 import type { CompatLevel } from "@/lib/types";
+import { formatPriceKrw } from "@/lib/use-product-info";
 import { cn } from "@/lib/utils";
 
 const FILL: Record<CompatLevel, string> = {
@@ -24,10 +25,12 @@ function statusText(
 }
 
 export function CaseIllustration({ compact = false }: { compact?: boolean }) {
-  const { categoryStatus, issues, selectedCount } = useBuild();
+  const { categoryStatus, issues, selectedCount, totalPrice, totalPriceLoading } = useBuild();
   const text = statusText(selectedCount, issues);
   const overallDanger = issues.some((i) => i.level === "danger");
   const overallWarning = !overallDanger && issues.some((i) => i.level === "warning");
+  const priceLabel =
+    selectedCount === 0 ? null : totalPriceLoading ? "가격 조회중..." : `${formatPriceKrw(totalPrice)}`;
 
   return (
     <div className={cn("flex flex-col gap-4", compact && "flex-row items-center gap-4")}>
@@ -190,20 +193,33 @@ export function CaseIllustration({ compact = false }: { compact?: boolean }) {
             <Legend color={FILL.warning} label="주의" />
             <Legend color={FILL.danger} label="불가" />
           </div>
+          {priceLabel && (
+            <div className="border-t border-[#27272A] pt-3 text-center">
+              <span className="block text-[10px] uppercase tracking-wide text-[#9CA3AF]">총 견적 가격</span>
+              <span className="font-mono text-lg font-bold text-[var(--accent)]">{priceLabel}</span>
+            </div>
+          )}
         </div>
       )}
 
       {compact && (
-        <p
-          className={cn(
-            "min-w-0 flex-1 line-clamp-2 text-xs font-medium leading-snug",
-            overallDanger && "text-[#EF4444]",
-            overallWarning && "text-[#F59E0B]",
-            !overallDanger && !overallWarning && "text-[#E4E4E7]"
+        <div className="min-w-0 flex-1">
+          <p
+            className={cn(
+              "line-clamp-2 text-xs font-medium leading-snug",
+              overallDanger && "text-[#EF4444]",
+              overallWarning && "text-[#F59E0B]",
+              !overallDanger && !overallWarning && "text-[#E4E4E7]"
+            )}
+          >
+            {text}
+          </p>
+          {priceLabel && (
+            <p className="mt-1 font-mono text-sm font-bold text-[var(--accent)]">
+              총 견적 {priceLabel}
+            </p>
           )}
-        >
-          {text}
-        </p>
+        </div>
       )}
     </div>
   );

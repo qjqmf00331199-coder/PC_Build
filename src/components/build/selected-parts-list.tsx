@@ -3,6 +3,7 @@
 import { CATEGORY_LABEL, CATEGORY_ORDER } from "@/lib/compatibility";
 import { CATEGORY_ICON } from "@/lib/category-icons";
 import { partTitle } from "@/lib/part-specs";
+import { formatPriceKrw } from "@/lib/use-product-info";
 import { useBuild } from "./build-provider";
 import { cn } from "@/lib/utils";
 
@@ -14,7 +15,7 @@ const DOT_COLOR: Record<"success" | "warning" | "danger" | "idle", string> = {
 };
 
 export function SelectedPartsList() {
-  const { effectiveSelections, categoryStatus, openCategory } = useBuild();
+  const { effectiveSelections, categoryStatus, openCategory, partInfo } = useBuild();
 
   return (
     <div className="mt-5 border-t border-[#27272A] pt-4">
@@ -26,6 +27,7 @@ export function SelectedPartsList() {
           const Icon = CATEGORY_ICON[category];
           const part = effectiveSelections[category];
           const status = categoryStatus[category];
+          const price = part ? partInfo[category].price : null;
           return (
             <li key={category}>
               <button
@@ -41,13 +43,20 @@ export function SelectedPartsList() {
                 <span className="min-w-0 flex-1 truncate text-xs text-[#9CA3AF]">
                   {CATEGORY_LABEL[category]}
                 </span>
-                <span
-                  className={cn(
-                    "min-w-0 max-w-[45%] truncate text-xs",
-                    part ? "text-[#E4E4E7]" : "text-[#9CA3AF]/60"
+                <span className="flex min-w-0 max-w-[50%] flex-col items-end">
+                  <span
+                    className={cn(
+                      "w-full truncate text-right text-xs",
+                      part ? "text-[#E4E4E7]" : "text-[#9CA3AF]/60"
+                    )}
+                  >
+                    {part ? partTitle(part) : "미선택"}
+                  </span>
+                  {part && (
+                    <span className="font-mono text-[10px] text-[var(--accent)]">
+                      {price !== null ? formatPriceKrw(price) : "조회중"}
+                    </span>
                   )}
-                >
-                  {part ? partTitle(part) : "미선택"}
                 </span>
               </button>
             </li>

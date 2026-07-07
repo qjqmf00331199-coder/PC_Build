@@ -5,8 +5,8 @@ import { ArrowLeft, AlertTriangle, ImageOff, Search, XCircle } from "lucide-reac
 import type { Part, PartCategory, PartMap } from "@/lib/types";
 import { CATEGORY_LABEL } from "@/lib/compatibility";
 import { CATEGORY_ICON } from "@/lib/category-icons";
-import { partFullSpecs, partImageQuery, partMeta, partNote, partTitle } from "@/lib/part-specs";
-import { localImageOverride } from "@/lib/local-images";
+import { partFullSpecs, partMeta, partNote, partTitle } from "@/lib/part-specs";
+import { formatPriceKrw, useProductInfo } from "@/lib/use-product-info";
 import { useBuild } from "./build-provider";
 import { PartOptionCard } from "./part-option-card";
 import { StatusBadge } from "./status-badge";
@@ -19,46 +19,6 @@ const STATUS_COLOR: Record<"success" | "warning" | "danger" | "idle", string> = 
   warning: "#F59E0B",
   danger: "#EF4444",
 };
-
-const imageCache = new Map<string, string | null>();
-
-function useProductImage(part: Part | null): string | null {
-  const override = part ? localImageOverride(part) : null;
-  const query = part && !override ? partImageQuery(part) : null;
-  const [image, setImage] = useState<string | null>(query ? imageCache.get(query) ?? null : null);
-
-  useEffect(() => {
-    if (!query) {
-      setImage(null);
-      return;
-    }
-
-    const cached = imageCache.get(query);
-    if (cached !== undefined) {
-      setImage(cached);
-      return;
-    }
-
-    let active = true;
-    setImage(null);
-
-    fetch(`/api/product-image?q=${encodeURIComponent(query)}`)
-      .then((res) => res.json())
-      .then((data: { image: string | null }) => {
-        imageCache.set(query, data.image ?? null);
-        if (active) setImage(data.image ?? null);
-      })
-      .catch(() => {
-        if (active) setImage(null);
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [query]);
-
-  return override ?? image;
-}
 
 export function CategoryDetail<K extends PartCategory>({
   category,
@@ -83,7 +43,7 @@ export function CategoryDetail<K extends PartCategory>({
   const relevantIssues = issuesFor(category);
 
   const pickedPart = preview as PartMap[K] | undefined;
-  const imageUrl = useProductImage(pickedPart ?? null);
+  const { image: imageUrl, price } = useProductInfo(pickedPart ?? null);
 
   const [search, setSearch] = useState("");
   useEffect(() => {
@@ -146,6 +106,7 @@ export function CategoryDetail<K extends PartCategory>({
               </div>
               <PartSpecsBox
                 part={pickedPart}
+                price={price}
                 committed={pickedPart?.id === selected?.id}
                 onConfirm={() => {
                   if (!pickedPart) return;
@@ -249,10 +210,12 @@ function PartPhotoBox({
 
 function PartSpecsBox({
   part,
+  price,
   committed,
   onConfirm,
 }: {
   part: Part | undefined;
+  price: number | null;
   committed: boolean;
   onConfirm: () => void;
 }) {
@@ -290,11 +253,16 @@ function PartSpecsBox({
             {metaLabel && <p className="text-[11px] text-[#9CA3AF] lg:text-xs">{metaLabel}</p>}
             <h3 className="text-sm font-semibold text-[#E4E4E7] lg:text-base">{partTitle(part)}</h3>
           </div>
-          {committed && (
-            <span className="shrink-0 rounded-full bg-[var(--accent)]/15 px-2 py-0.5 text-[10px] font-medium text-[var(--accent)]">
-              선택됨
+          <div className="flex shrink-0 flex-col items-end gap-1">
+            {committed && (
+              <span className="rounded-full bg-[var(--accent)]/15 px-2 py-0.5 text-[10px] font-medium text-[var(--accent)]">
+                선택됨
+              </span>
+            )}
+            <span className="font-mono text-xs font-semibold text-[#E4E4E7] lg:text-sm">
+              {price !== null ? formatPriceKrw(price) : "가격 조회중"}
             </span>
-          )}
+          </div>
         </div>
 
         {note && <p className="mt-1 text-[11px] italic text-[#F59E0B]/80 lg:text-xs">{note}</p>}

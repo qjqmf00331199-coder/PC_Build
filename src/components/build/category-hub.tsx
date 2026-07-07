@@ -5,13 +5,15 @@ import type { PartCategory, PartMap } from "@/lib/types";
 import { CATEGORY_LABEL, CATEGORY_ORDER } from "@/lib/compatibility";
 import { CATEGORY_ICON } from "@/lib/category-icons";
 import { partTitle } from "@/lib/part-specs";
+import { formatPriceKrw } from "@/lib/use-product-info";
 import { useBuild } from "./build-provider";
 import { StatusBadge } from "./status-badge";
+import { PurchaseReceipt } from "./purchase-receipt";
 import type { PartsData } from "@/lib/supabase/fetch-parts";
 import { cn } from "@/lib/utils";
 
 export function CategoryHub({ parts }: { parts: PartsData }) {
-  const { selections, categoryStatus, issuesFor, openCategory, resetSelections } = useBuild();
+  const { selections, categoryStatus, issuesFor, openCategory, resetSelections, partInfo } = useBuild();
 
   return (
     <div className="h-full overflow-y-auto pr-1">
@@ -35,10 +37,13 @@ export function CategoryHub({ parts }: { parts: PartsData }) {
             selected={selections[category]}
             status={categoryStatus[category]}
             issueCount={issuesFor(category).length}
+            price={selections[category] ? partInfo[category].price : null}
             onOpen={() => openCategory(category)}
           />
         ))}
       </div>
+
+      <PurchaseReceipt />
     </div>
   );
 }
@@ -49,6 +54,7 @@ function CategoryCard<K extends PartCategory>({
   selected,
   status,
   issueCount,
+  price,
   onOpen,
 }: {
   category: K;
@@ -56,6 +62,7 @@ function CategoryCard<K extends PartCategory>({
   selected: PartMap[K] | undefined;
   status: "success" | "warning" | "danger" | "idle";
   issueCount: number;
+  price: number | null;
   onOpen: () => void;
 }) {
   const Icon = CATEGORY_ICON[category as PartCategory];
@@ -79,11 +86,18 @@ function CategoryCard<K extends PartCategory>({
         <StatusBadge level={status} />
       </div>
 
-      <div>
-        <p className={cn("text-sm", selected ? "text-[#E4E4E7]" : "text-[#9CA3AF]")}>
-          {selected ? partTitle(selected) : "미선택"}
-        </p>
-        <p className="mt-0.5 text-xs text-[#9CA3AF]">{options.length}개 옵션</p>
+      <div className="flex items-end justify-between gap-2">
+        <div className="min-w-0">
+          <p className={cn("truncate text-sm", selected ? "text-[#E4E4E7]" : "text-[#9CA3AF]")}>
+            {selected ? partTitle(selected) : "미선택"}
+          </p>
+          <p className="mt-0.5 text-xs text-[#9CA3AF]">{options.length}개 옵션</p>
+        </div>
+        {selected && (
+          <span className="shrink-0 font-mono text-sm font-semibold text-[var(--accent)]">
+            {price !== null ? formatPriceKrw(price) : "조회중"}
+          </span>
+        )}
       </div>
 
       {issueCount > 0 && (

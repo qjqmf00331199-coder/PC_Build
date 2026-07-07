@@ -11,6 +11,8 @@ import {
   evaluateIssues,
 } from "@/lib/compatibility";
 import { isFullMikuBuild } from "@/lib/miku";
+import type { ProductInfo } from "@/app/api/product-image/route";
+import { useProductInfo } from "@/lib/use-product-info";
 
 interface BuildContextValue {
   selections: Selections;
@@ -21,6 +23,9 @@ interface BuildContextValue {
   psuMarginPct: number | null;
   selectedCount: number;
   totalCategories: number;
+  partInfo: Record<PartCategory, ProductInfo>;
+  totalPrice: number;
+  totalPriceLoading: boolean;
   selectPart: <K extends PartCategory>(category: K, part: PartMap[K]) => void;
   resetSelections: () => void;
   issuesFor: (category: PartCategory) => CompatIssue[];
@@ -123,6 +128,22 @@ export function BuildProvider({
   const selectedCount = CATEGORY_ORDER.filter((c) => effectiveSelections[c]).length;
   const isMikuBuild = useMemo(() => isFullMikuBuild(effectiveSelections, parts), [effectiveSelections, parts]);
 
+  // fixed set of 8 categories called in a stable order every render, so calling
+  // the price-fetch hook once per category (instead of in a loop) stays rules-of-hooks safe
+  const partInfo: Record<PartCategory, ProductInfo> = {
+    cpu: useProductInfo(effectiveSelections.cpu ?? null),
+    motherboard: useProductInfo(effectiveSelections.motherboard ?? null),
+    ram: useProductInfo(effectiveSelections.ram ?? null),
+    ssd: useProductInfo(effectiveSelections.ssd ?? null),
+    gpu: useProductInfo(effectiveSelections.gpu ?? null),
+    psu: useProductInfo(effectiveSelections.psu ?? null),
+    case: useProductInfo(effectiveSelections.case ?? null),
+    cooler: useProductInfo(effectiveSelections.cooler ?? null),
+  };
+  const selectedPrices = CATEGORY_ORDER.filter((c) => effectiveSelections[c]).map((c) => partInfo[c].price);
+  const totalPrice = selectedPrices.reduce((sum: number, p) => sum + (p ?? 0), 0);
+  const totalPriceLoading = selectedPrices.some((p) => p === null);
+
   const resetSelections = () => {
     setSelections({});
     setPreview(undefined);
@@ -163,6 +184,9 @@ export function BuildProvider({
         psuMarginPct,
         selectedCount,
         totalCategories: CATEGORY_ORDER.length,
+        partInfo,
+        totalPrice,
+        totalPriceLoading,
         selectPart,
         resetSelections,
         issuesFor,
