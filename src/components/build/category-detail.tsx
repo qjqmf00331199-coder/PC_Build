@@ -7,6 +7,7 @@ import { CATEGORY_LABEL } from "@/lib/compatibility";
 import { CATEGORY_ICON } from "@/lib/category-icons";
 import { partFullSpecs, partMeta, partNote, partTitle } from "@/lib/part-specs";
 import { formatPriceKrw, useProductInfo } from "@/lib/use-product-info";
+import { localImageOverride } from "@/lib/local-images";
 import { useBuild } from "./build-provider";
 import { PartOptionCard } from "./part-option-card";
 import { StatusBadge } from "./status-badge";
@@ -93,7 +94,7 @@ export function CategoryDetail<K extends PartCategory>({
         {/* photo: sits next to build progress on mobile, stretched to match its height; folded into the detail column on desktop */}
         {options.length > 0 && (
           <div className="col-start-2 row-start-1 lg:hidden">
-            <PartPhotoBox part={pickedPart} status={status} imageUrl={imageUrl} placeholderIcon={Icon} className="h-28" />
+            <PartPhotoBox part={pickedPart} status={status} imageUrl={imageUrl} placeholderIcon={Icon} className="h-28" showAttribution={false} />
           </div>
         )}
 
@@ -102,7 +103,7 @@ export function CategoryDetail<K extends PartCategory>({
           {options.length > 0 ? (
             <>
               <div className="mb-3 hidden lg:block lg:mb-4">
-                <PartPhotoBox part={pickedPart} status={status} imageUrl={imageUrl} placeholderIcon={Icon} className="h-40" />
+                <PartPhotoBox part={pickedPart} status={status} imageUrl={imageUrl} placeholderIcon={Icon} className="h-40" showAttribution />
               </div>
               <PartSpecsBox
                 part={pickedPart}
@@ -180,29 +181,49 @@ function PartPhotoBox({
   imageUrl,
   placeholderIcon: PlaceholderIcon,
   className,
+  showAttribution = false,
 }: {
   part: Part | undefined;
   status: "success" | "warning" | "danger" | "idle";
   imageUrl: string | null;
   placeholderIcon: typeof ImageOff;
   className?: string;
+  showAttribution?: boolean;
 }) {
+  // imageUrl changes per part, so a load failure on one product must not stick
+  // around once the user picks a different one — key the error flag to the url itself
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const loadFailed = imageUrl !== null && imageUrl === failedUrl;
+  const isLocalOverride = part ? localImageOverride(part) === imageUrl : false;
+
   return (
-    <div
-      className={cn(
-        "flex w-full items-center justify-center overflow-hidden rounded-lg border transition-colors duration-300 ease-in-out",
-        className
-      )}
-      style={{
-        borderColor: STATUS_COLOR[status],
-        backgroundColor: `${STATUS_COLOR[status]}0F`,
-      }}
-    >
-      {part && imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={imageUrl} alt={partTitle(part)} className="h-full w-full object-contain" />
-      ) : (
-        <PlaceholderIcon className="h-10 w-10 lg:h-14 lg:w-14" strokeWidth={1.25} style={{ color: STATUS_COLOR[status] }} />
+    <div className="flex w-full flex-col gap-1">
+      <div
+        className={cn(
+          "flex w-full items-center justify-center overflow-hidden rounded-lg border transition-colors duration-300 ease-in-out",
+          className
+        )}
+        style={{
+          borderColor: STATUS_COLOR[status],
+          backgroundColor: `${STATUS_COLOR[status]}0F`,
+        }}
+      >
+        {part && imageUrl && !loadFailed ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={imageUrl}
+            alt={partTitle(part)}
+            className="h-full w-full object-contain"
+            onError={() => setFailedUrl(imageUrl)}
+          />
+        ) : (
+          <PlaceholderIcon className="h-10 w-10 lg:h-14 lg:w-14" strokeWidth={1.25} style={{ color: STATUS_COLOR[status] }} />
+        )}
+      </div>
+      {showAttribution && part && imageUrl && !loadFailed && (
+        <p className="text-[10px] text-[#71717A]">
+          이미지 출처: {isLocalOverride ? "제조사 제공 (자동 검색 결과 보정용 저장 이미지)" : "네이버쇼핑 API"}
+        </p>
       )}
     </div>
   );
