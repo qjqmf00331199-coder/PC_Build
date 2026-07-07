@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { CompatIssue, PartCategory, Selections } from "@/lib/types";
 import { CATEGORY_LABEL, CATEGORY_ORDER } from "@/lib/compatibility";
 import { partSpecLine, partTitle } from "@/lib/part-specs";
+import { formatPriceKrw, useProductInfo } from "@/lib/use-product-info";
 import { cn } from "@/lib/utils";
 
 type StepId = "purpose" | "priority" | "brand" | "preference" | "detail";
@@ -101,6 +102,23 @@ export function AiRecommendWizard({
   const step = STEPS[stepIndex];
   const isLastStep = stepIndex === STEPS.length - 1;
   const canAdvance = step.type === "text" || Boolean(answers[step.id]);
+
+  // fixed set of 8 categories called in a stable order every render, so calling
+  // the price-fetch hook once per category (instead of in a loop) stays rules-of-hooks safe
+  const sel = result?.selections;
+  const partPrice: Record<PartCategory, number | null> = {
+    cpu: useProductInfo(sel?.cpu ?? null).price,
+    motherboard: useProductInfo(sel?.motherboard ?? null).price,
+    ram: useProductInfo(sel?.ram ?? null).price,
+    ssd: useProductInfo(sel?.ssd ?? null).price,
+    gpu: useProductInfo(sel?.gpu ?? null).price,
+    psu: useProductInfo(sel?.psu ?? null).price,
+    case: useProductInfo(sel?.case ?? null).price,
+    cooler: useProductInfo(sel?.cooler ?? null).price,
+  };
+  const selectedCategories = sel ? CATEGORY_ORDER.filter((c) => sel[c]) : [];
+  const totalPrice = selectedCategories.reduce((sum, c) => sum + (partPrice[c] ?? 0), 0);
+  const totalPriceLoading = selectedCategories.some((c) => partPrice[c] === null);
 
   const submit = async () => {
     setPhase("loading");
@@ -290,6 +308,7 @@ export function AiRecommendWizard({
           <ul className="divide-y divide-[#27272A]">
             {CATEGORY_ORDER.map((category: PartCategory) => {
               const part = result.selections[category];
+              const price = partPrice[category];
               return (
                 <li key={category} className="flex items-center justify-between py-2.5 text-sm">
                   <div className="flex flex-col">
@@ -299,11 +318,20 @@ export function AiRecommendWizard({
                     <span className="text-[#E4E4E7]">{part ? partTitle(part) : "미선택"}</span>
                     {part && <span className="text-xs text-[#9CA3AF]">{partSpecLine(part)}</span>}
                   </div>
-                  <span className="shrink-0 text-xs text-[#9CA3AF]">가격 정보 준비중</span>
+                  <span className="shrink-0 font-mono text-xs font-semibold text-[#E4E4E7]">
+                    {!part ? "-" : price !== null ? formatPriceKrw(price) : "조회중"}
+                  </span>
                 </li>
               );
             })}
           </ul>
+
+          <div className="mt-3 flex items-center justify-between border-t border-[#27272A] pt-3">
+            <span className="text-sm font-medium text-[#9CA3AF]">총 견적 가격</span>
+            <span className="font-mono text-lg font-bold text-[var(--accent)]">
+              {totalPriceLoading ? "가격 조회중..." : formatPriceKrw(totalPrice)}
+            </span>
+          </div>
 
           <button
             type="button"
