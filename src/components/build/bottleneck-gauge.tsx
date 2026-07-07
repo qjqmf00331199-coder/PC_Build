@@ -1,10 +1,15 @@
 "use client";
 
-import { Cpu, Gpu, Gauge, CheckCircle2, AlertTriangle, X } from "lucide-react";
-import type { PerformanceTier, BottleneckEntry, BottleneckLevel } from "@/lib/bottleneck";
+import { Cpu, Gpu, Gauge, CheckCircle2, AlertTriangle, Clock, X } from "lucide-react";
+import type { PerformanceTier, BottleneckEntry, EntryLevel } from "@/lib/bottleneck";
 import { cn } from "@/lib/utils";
 
-export const BOTTLENECK_LEVEL_CONFIG: Record<BottleneckLevel, { label: string; classes: string; barColor: string }> = {
+export const BOTTLENECK_LEVEL_CONFIG: Record<EntryLevel, { label: string; classes: string; barColor: string }> = {
+  pending: {
+    label: "진단 대기중",
+    classes: "text-[#9CA3AF] bg-[#9CA3AF]/10 border-[#9CA3AF]/30",
+    barColor: "bg-[#9CA3AF]",
+  },
   success: {
     label: "이상 없음",
     classes: "text-[#22C55E] bg-[#22C55E]/10 border-[#22C55E]/30",
@@ -66,7 +71,13 @@ function DiagnosisRow({ entry }: { entry: BottleneckEntry }) {
       <div className="mb-2 flex items-center justify-between gap-2">
         <span className="text-xs font-medium text-[#E4E4E7]">{entry.label}</span>
         <span className={cn("inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium", classes)}>
-          {entry.level === "success" ? <CheckCircle2 className="h-3 w-3" /> : <AlertTriangle className="h-3 w-3" />}
+          {entry.level === "pending" ? (
+            <Clock className="h-3 w-3" />
+          ) : entry.level === "success" ? (
+            <CheckCircle2 className="h-3 w-3" />
+          ) : (
+            <AlertTriangle className="h-3 w-3" />
+          )}
           {BOTTLENECK_LEVEL_CONFIG[entry.level].label}
         </span>
       </div>

@@ -11,6 +11,9 @@ import { describeGpuPcieGap, describeSsdPcieGap, gpuPcieBottleneck, ssdPcieBottl
 
 export type PerformanceTier = "S" | "A" | "B" | "C" | "D";
 export type BottleneckLevel = Exclude<CompatLevel, "idle">;
+// 진단 대상 부품이 한쪽만 선택된 상태 — 아직 비교할 상대가 없어서 결과는 없지만,
+// 어떤 부품을 더 고르면 진단이 가능한지 미리 알려주기 위한 레벨.
+export type EntryLevel = BottleneckLevel | "pending";
 export type BottleneckDirection = "cpu" | "gpu" | "balanced";
 
 export interface BottleneckResult {
@@ -136,7 +139,7 @@ function buildMessage(direction: BottleneckDirection, level: BottleneckLevel, ga
 export interface BottleneckEntry {
   id: "cpu-gpu" | "mobo-gpu-pcie" | "mobo-ssd-pcie";
   label: string;
-  level: BottleneckLevel;
+  level: EntryLevel;
   message: string;
   scores?: {
     cpuScore: number;
@@ -147,10 +150,11 @@ export interface BottleneckEntry {
   };
 }
 
-const LEVEL_RANK: Record<BottleneckLevel, number> = { success: 0, warning: 1, danger: 2 };
+const LEVEL_RANK: Record<EntryLevel, number> = { pending: -1, success: 0, warning: 1, danger: 2 };
 
-// 선택된 부품 조합에서 진단 가능한 병목 항목들을 전부 모은다. 각 항목은 관련 부품이
-// 둘 다 선택돼야만 등장하므로, 결과가 1개 이상이면 곧 "병목 진단 대상 부품 2개 이상 선택됨"과 같다.
+// 선택된 부품 조합에서 진단 가능한 병목 항목들을 전부 모은다. 짝이 되는 부품이 둘 다
+// 있으면 실제 진단 결과를, 한쪽만 있으면 "이 부품을 더 고르면 확인 가능"이라는 pending
+// 항목을 넣는다 — 그래서 관련 부품이 하나라도 선택되면 진단 패널이 뜬다.
 export function evaluateAllBottlenecks(sel: Selections): BottleneckEntry[] {
   const { cpu, gpu, motherboard, ssd } = sel;
   const entries: BottleneckEntry[] = [];
@@ -164,6 +168,13 @@ export function evaluateAllBottlenecks(sel: Selections): BottleneckEntry[] {
       message: r.message,
       scores: { cpuScore: r.cpuScore, gpuScore: r.gpuScore, cpuTier: r.cpuTier, gpuTier: r.gpuTier, direction: r.direction },
     });
+  } else if (cpu || gpu) {
+    entries.push({
+      id: "cpu-gpu",
+      label: "CPU-GPU 성능 밸런스",
+      level: "pending",
+      message: cpu ? "그래픽카드를 고르면 CPU와 성능 밸런스를 확인할 수 있어요." : "CPU를 고르면 GPU와 성능 밸런스를 확인할 수 있어요.",
+    });
   }
 
   if (motherboard && gpu) {
@@ -173,6 +184,13 @@ export function evaluateAllBottlenecks(sel: Selections): BottleneckEntry[] {
       label: "메인보드-GPU PCIe 대역폭",
       level: gap ? "warning" : "success",
       message: gap ? describeGpuPcieGap(gap) : "메인보드와 GPU의 PCIe 세대가 맞아 대역폭 손실 없이 쓸 수 있어요.",
+    });
+  } else if (motherboard || gpu) {
+    entries.push({
+      id: "mobo-gpu-pcie",
+      label: "메인보드-GPU PCIe 대역폭",
+      level: "pending",
+      message: motherboard ? "그래픽카드를 고르면 PCIe 대역폭을 확인할 수 있어요." : "메인보드를 고르면 PCIe 대역폭을 확인할 수 있어요.",
     });
   }
 
@@ -184,14 +202,21 @@ export function evaluateAllBottlenecks(sel: Selections): BottleneckEntry[] {
       level: gap ? "warning" : "success",
       message: gap ? describeSsdPcieGap(gap) : "메인보드와 SSD의 PCIe 세대가 맞아 대역폭 손실 없이 쓸 수 있어요.",
     });
+  } else if (motherboard || ssd) {
+    entries.push({
+      id: "mobo-ssd-pcie",
+      label: "메인보드-SSD PCIe 대역폭",
+      level: "pending",
+      message: motherboard ? "SSD를 고르면 PCIe 대역폭을 확인할 수 있어요." : "메인보드를 고르면 PCIe 대역폭을 확인할 수 있어요.",
+    });
   }
 
   return entries;
 }
 
-export function worstLevel(entries: BottleneckEntry[]): BottleneckLevel | null {
+export function worstLevel(entries: BottleneckEntry[]): EntryLevel | null {
   if (entries.length === 0) return null;
-  return entries.reduce<BottleneckLevel>((worst, e) => (LEVEL_RANK[e.level] > LEVEL_RANK[worst] ? e.level : worst), "success");
+  return entries.reduce<EntryLevel>((worst, e) => (LEVEL_RANK[e.level] > LEVEL_RANK[worst] ? e.level : worst), entries[0].level);
 }
 
 export function evaluateBottleneck(cpu: CPU, gpu: GPU): BottleneckResult {
