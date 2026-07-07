@@ -79,13 +79,18 @@ interface AiRecommendResult {
 
 type Phase = "quiz" | "loading" | "result" | "error";
 
-const REQUEST_TIMEOUT_MS = 40000;
+// 백엔드 예산(OVERALL_BUDGET_MS, route.ts)이 최장 1분이라 프론트도 여유를 두고 65초로 잡는다.
+const REQUEST_TIMEOUT_MS = 65000;
 
 const DEFAULT_LOADING_MESSAGE = "AI가 답변을 바탕으로 부품 조합을 고르고 있어요...";
+// 최장 1분을 5분기(12초 간격)로 나눠 분기마다 멘트를 바꾼다. 기존 멘트 3개 그대로 쓰고
+// 앞뒤로 시작 멘트(기존 DEFAULT)와 마무리 멘트(신규)를 붙여 5개를 채운다.
 const LOADING_MESSAGE_SCHEDULE: { delay: number; message: string }[] = [
-  { delay: 3000, message: "고객님의 니즈에 맞춰 찾는중이예요 잠시만 기다려 주세요!!" },
-  { delay: 5000, message: "열심히 찾아오고 있어요 잠시만 기다려 주세요!!" },
-  { delay: 8000, message: "다 찾았어요!! 잠시만 기다려 주세요!!" },
+  { delay: 0, message: DEFAULT_LOADING_MESSAGE },
+  { delay: 12000, message: "고객님의 니즈에 맞춰 찾는중이예요 잠시만 기다려 주세요!!" },
+  { delay: 24000, message: "열심히 찾아오고 있어요 잠시만 기다려 주세요!!" },
+  { delay: 36000, message: "다 찾았어요!! 잠시만 기다려 주세요!!" },
+  { delay: 48000, message: "완벽한 조합인지 마지막으로 검증하고 있어요!!" },
 ];
 
 export function AiRecommendWizard({

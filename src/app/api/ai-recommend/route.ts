@@ -22,9 +22,11 @@ import type { Selections } from "@/lib/types";
 const NIM_ENDPOINT = "https://integrate.api.nvidia.com/v1/chat/completions";
 const NIM_MODEL = "meta/llama-3.1-70b-instruct";
 const MAX_ATTEMPTS = 3;
-const NIM_TIMEOUT_MS = 9000;
+// 전체 요청 최장 1분 예산 — 개별 NIM 호출 타임아웃은 남은 예산에 맞춰 매 시도마다 재계산한다.
+const OVERALL_BUDGET_MS = 58_000;
+const MIN_ATTEMPT_TIMEOUT_MS = 3_000;
 
-export const maxDuration = 45;
+export const maxDuration = 65;
 
 function isPurpose(value: unknown): value is Purpose {
   return value === "office" || value === "gaming" || value === "editing";
@@ -44,9 +46,9 @@ interface NimMessage {
   content: string;
 }
 
-async function callNim(apiKey: string, messages: NimMessage[]): Promise<string> {
+async function callNim(apiKey: string, messages: NimMessage[], timeoutMs: number): Promise<string> {
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), NIM_TIMEOUT_MS);
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
     const res = await fetch(NIM_ENDPOINT, {
       method: "POST",
@@ -67,7 +69,7 @@ async function callNim(apiKey: string, messages: NimMessage[]): Promise<string> 
     return data.choices?.[0]?.message?.content ?? "";
   } catch (err) {
     if (err instanceof Error && err.name === "AbortError") {
-      throw new Error(`NIM API 응답 지연 (${NIM_TIMEOUT_MS}ms 초과)`);
+      throw new Error(`NIM API 응답 지연 (${timeoutMs}ms 초과)`);
     }
     throw err;
   } finally {
@@ -107,12 +109,20 @@ export async function POST(req: NextRequest) {
     { role: "user", content: buildUserPrompt(parts, answers) },
   ];
 
+  const deadline = Date.now() + OVERALL_BUDGET_MS;
+
   try {
     let lastReason = "";
     let lastSelections: Selections = {};
 
     for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-      const raw = await callNim(apiKey, messages);
+      const remaining = deadline - Date.now();
+      if (remaining < MIN_ATTEMPT_TIMEOUT_MS) {
+        console.warn("[ai-recommend] 1분 예산 소진, 안전 조합으로 대체");
+        return safeguard("AI 추천이 1분 내에 끝나지 않아 검증된 기본 조합으로 대체했습니다.");
+      }
+
+      const raw = await callNim(apiKey, messages, remaining);
       const picked = parseAiPicks(raw);
       if (!picked) {
         messages.push({ role: "assistant", content: raw });
