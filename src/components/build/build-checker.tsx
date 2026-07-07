@@ -1,15 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
-import { BottleneckGauge, BOTTLENECK_LEVEL_CONFIG } from "./bottleneck-gauge";
+import { ChevronDown, Gauge } from "lucide-react";
+import { BottleneckModal, BOTTLENECK_LEVEL_CONFIG } from "./bottleneck-gauge";
 import { BuildProvider, useBuild } from "./build-provider";
 import { CaseIllustration } from "./case-illustration";
 import { CategoryStage } from "./category-stage";
 import { MikuEasterEgg } from "./miku-easter-egg";
 import { SelectedPartsList } from "./selected-parts-list";
 import { SummaryPanel } from "./summary-panel";
-import { evaluateBottleneck } from "@/lib/bottleneck";
+import { evaluateAllBottlenecks, worstLevel } from "@/lib/bottleneck";
 import type { PartsData } from "@/lib/supabase/fetch-parts";
 import type { Selections } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -25,23 +25,17 @@ function MobileCompactBar() {
   );
 }
 
-// 병목 진단 카드는 CPU/GPU가 둘 다 선택됐을 때만 뜨는데, sm 이상에서는 진행 상황
-// 카드와 나란히 배치해서 자리를 지켜준다. 화면이 더 좁은 모바일에서는 두 카드를
-// 펼쳐두면 카테고리 목록 볼 공간이 없어지므로, 기본은 한 줄 요약만 보이고
-// 탭해야 펼쳐지는 아코디언으로 접어둔다.
+// 병목 진단은 팝업으로 뜬다 — 진단 대상 부품(CPU/GPU/메인보드/SSD 등)이 2개 이상
+// 선택돼서 진단 항목이 하나라도 있으면, 배지를 눌러 모달로 자세히 볼 수 있게 한다.
+// 모바일은 한 줄 요약만 보이고 탭해야 펼쳐지는 아코디언(진행 상황 카드용)이라
+// 배지 클릭은 별도로 stopPropagation해서 아코디언 토글과 겹치지 않게 한다.
 function TopSummaryPanel() {
   const { activeCategory, effectiveSelections, selectedCount, totalCategories, totalPowerW } = useBuild();
-  const { cpu, gpu } = effectiveSelections;
-  const showBottleneck = Boolean(cpu && gpu);
-  const bottleneckLevel = cpu && gpu ? evaluateBottleneck(cpu, gpu).level : null;
+  const bottleneckEntries = evaluateAllBottlenecks(effectiveSelections);
+  const showBottleneck = bottleneckEntries.length > 0;
+  const bottleneckLevel = worstLevel(bottleneckEntries);
   const [expanded, setExpanded] = useState(false);
-
-  const panels = (
-    <>
-      <SummaryPanel />
-      {showBottleneck && cpu && gpu && <BottleneckGauge cpu={cpu} gpu={gpu} />}
-    </>
-  );
+  const [bottleneckOpen, setBottleneckOpen] = useState(false);
 
   return (
     <div className={cn(activeCategory !== null && "hidden lg:block")}>
@@ -59,6 +53,12 @@ function TopSummaryPanel() {
           <span className="flex items-center gap-2">
             {bottleneckLevel && (
               <span
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setBottleneckOpen(true);
+                }}
                 className={cn(
                   "rounded-full border px-2 py-0.5 font-medium",
                   BOTTLENECK_LEVEL_CONFIG[bottleneckLevel].classes
@@ -72,11 +72,38 @@ function TopSummaryPanel() {
             />
           </span>
         </button>
-        {expanded && <div className="mt-4 flex flex-col gap-4">{panels}</div>}
+        {expanded && <div className="mt-4"><SummaryPanel /></div>}
       </div>
 
-      {/* sm 이상: 항상 펼쳐진 상태, 병목 카드 있으면 나란히 배치 */}
-      <div className={cn("hidden gap-4 sm:grid", showBottleneck && "sm:grid-cols-2")}>{panels}</div>
+      {/* sm 이상: 항상 펼쳐진 상태, 병목 진단 있으면 진행 상황 카드 옆에 트리거 버튼 배치 */}
+      <div className={cn("hidden gap-4 sm:grid", showBottleneck && "sm:grid-cols-2")}>
+        <SummaryPanel />
+        {showBottleneck && bottleneckLevel && (
+          <button
+            type="button"
+            onClick={() => setBottleneckOpen(true)}
+            className="rounded-lg border border-[#27272A] bg-[#151517] p-5 text-left transition-colors hover:border-[var(--accent)]"
+          >
+            <div className="mb-4 flex items-center justify-between">
+              <span className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wide text-[#9CA3AF]">
+                <Gauge className="h-3.5 w-3.5" />
+                성능 병목 진단
+              </span>
+              <span
+                className={cn(
+                  "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
+                  BOTTLENECK_LEVEL_CONFIG[bottleneckLevel].classes
+                )}
+              >
+                {BOTTLENECK_LEVEL_CONFIG[bottleneckLevel].label}
+              </span>
+            </div>
+            <p className="text-xs text-[#9CA3AF]">진단 항목 {bottleneckEntries.length}개 · 클릭하면 자세히 볼 수 있어요.</p>
+          </button>
+        )}
+      </div>
+
+      <BottleneckModal entries={bottleneckEntries} open={bottleneckOpen} onClose={() => setBottleneckOpen(false)} />
     </div>
   );
 }

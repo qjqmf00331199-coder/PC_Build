@@ -1,8 +1,7 @@
 "use client";
 
-import { Cpu, Gpu, Gauge } from "lucide-react";
-import type { CPU, GPU } from "@/lib/types";
-import { evaluateBottleneck, type BottleneckLevel } from "@/lib/bottleneck";
+import { Cpu, Gpu, Gauge, CheckCircle2, AlertTriangle, X } from "lucide-react";
+import type { PerformanceTier, BottleneckEntry, BottleneckLevel } from "@/lib/bottleneck";
 import { cn } from "@/lib/utils";
 
 export const BOTTLENECK_LEVEL_CONFIG: Record<BottleneckLevel, { label: string; classes: string; barColor: string }> = {
@@ -34,7 +33,7 @@ function ScoreBar({
   icon: typeof Cpu;
   label: string;
   score: number;
-  tier: string;
+  tier: PerformanceTier;
   barColor: string;
   weaker: boolean;
 }) {
@@ -59,52 +58,94 @@ function ScoreBar({
   );
 }
 
-export function BottleneckGauge({ cpu, gpu, compact = false }: { cpu: CPU; gpu: GPU; compact?: boolean }) {
-  const result = evaluateBottleneck(cpu, gpu);
-  const { label, classes, barColor } = BOTTLENECK_LEVEL_CONFIG[result.level];
+function DiagnosisRow({ entry }: { entry: BottleneckEntry }) {
+  const { classes, barColor } = BOTTLENECK_LEVEL_CONFIG[entry.level];
 
   return (
-    <div className={cn("rounded-lg border border-[#27272A] bg-[#151517]", compact ? "p-3" : "p-5")}>
-      <div className={cn("flex items-center justify-between", compact ? "mb-2" : "mb-4")}>
-        <span
-          className={cn(
-            "flex items-center gap-1.5 font-medium uppercase tracking-wide text-[#9CA3AF]",
-            compact ? "text-[10px]" : "text-xs"
-          )}
-        >
-          <Gauge className="h-3.5 w-3.5" />
-          성능 병목 진단
-        </span>
-        <span
-          className={cn(
-            "inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium",
-            classes
-          )}
-        >
-          {label}
+    <div className="rounded-md border border-[#27272A] bg-black/20 p-3">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <span className="text-xs font-medium text-[#E4E4E7]">{entry.label}</span>
+        <span className={cn("inline-flex shrink-0 items-center gap-1 rounded-full border px-2 py-0.5 text-[10px] font-medium", classes)}>
+          {entry.level === "success" ? <CheckCircle2 className="h-3 w-3" /> : <AlertTriangle className="h-3 w-3" />}
+          {BOTTLENECK_LEVEL_CONFIG[entry.level].label}
         </span>
       </div>
 
-      <div className="space-y-3">
-        <ScoreBar
-          icon={Cpu}
-          label="CPU"
-          score={result.cpuScore}
-          tier={result.cpuTier}
-          barColor={barColor}
-          weaker={result.direction === "cpu"}
-        />
-        <ScoreBar
-          icon={Gpu}
-          label="GPU"
-          score={result.gpuScore}
-          tier={result.gpuTier}
-          barColor={barColor}
-          weaker={result.direction === "gpu"}
-        />
-      </div>
+      {entry.scores && (
+        <div className="mb-2 space-y-2">
+          <ScoreBar
+            icon={Cpu}
+            label="CPU"
+            score={entry.scores.cpuScore}
+            tier={entry.scores.cpuTier}
+            barColor={barColor}
+            weaker={entry.scores.direction === "cpu"}
+          />
+          <ScoreBar
+            icon={Gpu}
+            label="GPU"
+            score={entry.scores.gpuScore}
+            tier={entry.scores.gpuTier}
+            barColor={barColor}
+            weaker={entry.scores.direction === "gpu"}
+          />
+        </div>
+      )}
 
-      {!compact && <p className="mt-4 text-xs leading-snug text-[#9CA3AF]">{result.message}</p>}
+      <p className="text-xs leading-snug text-[#9CA3AF]">{entry.message}</p>
+    </div>
+  );
+}
+
+export function BottleneckModal({
+  entries,
+  open,
+  onClose,
+}: {
+  entries: BottleneckEntry[];
+  open: boolean;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className={cn(
+        "fixed inset-0 z-[70] flex items-end justify-center bg-black/60 p-0 transition-opacity duration-300 sm:items-center sm:p-4",
+        open ? "opacity-100" : "pointer-events-none opacity-0"
+      )}
+      onClick={() => {
+        // 데스크탑(sm 이상)에서는 바깥 클릭으로 안 닫고 X 버튼만 닫게 함, 모바일은 바깥 탭하면 닫힘
+        if (typeof window !== "undefined" && window.matchMedia("(min-width: 640px)").matches) return;
+        onClose();
+      }}
+    >
+      <div
+        className={cn(
+          "flex max-h-[85vh] w-full max-w-md flex-col rounded-t-xl border border-[#27272A] bg-[#151517] transition-transform duration-300 ease-out sm:rounded-xl",
+          open ? "translate-y-0" : "translate-y-full"
+        )}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex shrink-0 items-center justify-between border-b border-[#27272A] px-5 py-4">
+          <div className="flex items-center gap-2">
+            <Gauge className="h-4.5 w-4.5 text-[var(--accent)]" strokeWidth={1.75} />
+            <h3 className="text-sm font-semibold text-[#E4E4E7]">성능 병목 진단</h3>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="닫기"
+            className="rounded-md p-1 text-[#9CA3AF] hover:text-[#E4E4E7]"
+          >
+            <X className="h-4 w-4" strokeWidth={2} />
+          </button>
+        </div>
+
+        <div className="min-h-0 flex-1 space-y-2 overflow-y-auto px-5 py-4">
+          {entries.map((entry) => (
+            <DiagnosisRow key={entry.id} entry={entry} />
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

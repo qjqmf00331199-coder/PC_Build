@@ -1,4 +1,5 @@
-import type { CPU, GPU, CompatLevel } from "./types";
+import type { CPU, GPU, CompatLevel, Selections } from "./types";
+import { describeGpuPcieGap, describeSsdPcieGap, gpuPcieBottleneck, ssdPcieBottleneck } from "./pcie";
 
 /**
  * CPU-GPU 성능 병목 진단 — 순수 함수 모듈.
@@ -128,6 +129,69 @@ function buildMessage(direction: BottleneckDirection, level: BottleneckLevel, ga
     return `${weaker}가 상대적으로 약해서 병목이 생길 수 있어요 (격차 약 ${gapPercent}%). 아주 심하진 않지만 ${weaker === "CPU" ? "GPU 성능을 100% 다 못 끌어낼 수 있어요." : "CPU 성능을 GPU가 못 따라갈 수 있어요."}`;
   }
   return `${weaker}가 많이 약해서 병목 현상이 심해요 (격차 약 ${gapPercent}%). 이 조합은 추천하지 않아요 — ${weaker}를 한 단계 올리는 걸 고려해보세요.`;
+}
+
+// 병목 진단 박스에 뜨는 항목 하나. CPU-GPU 성능 밸런스뿐 아니라 메인보드-GPU/SSD
+// PCIe 세대 대역폭 체크도 같은 박스에 모아서 보여주기 위한 공통 포맷.
+export interface BottleneckEntry {
+  id: "cpu-gpu" | "mobo-gpu-pcie" | "mobo-ssd-pcie";
+  label: string;
+  level: BottleneckLevel;
+  message: string;
+  scores?: {
+    cpuScore: number;
+    gpuScore: number;
+    cpuTier: PerformanceTier;
+    gpuTier: PerformanceTier;
+    direction: BottleneckDirection;
+  };
+}
+
+const LEVEL_RANK: Record<BottleneckLevel, number> = { success: 0, warning: 1, danger: 2 };
+
+// 선택된 부품 조합에서 진단 가능한 병목 항목들을 전부 모은다. 각 항목은 관련 부품이
+// 둘 다 선택돼야만 등장하므로, 결과가 1개 이상이면 곧 "병목 진단 대상 부품 2개 이상 선택됨"과 같다.
+export function evaluateAllBottlenecks(sel: Selections): BottleneckEntry[] {
+  const { cpu, gpu, motherboard, ssd } = sel;
+  const entries: BottleneckEntry[] = [];
+
+  if (cpu && gpu) {
+    const r = evaluateBottleneck(cpu, gpu);
+    entries.push({
+      id: "cpu-gpu",
+      label: "CPU-GPU 성능 밸런스",
+      level: r.level,
+      message: r.message,
+      scores: { cpuScore: r.cpuScore, gpuScore: r.gpuScore, cpuTier: r.cpuTier, gpuTier: r.gpuTier, direction: r.direction },
+    });
+  }
+
+  if (motherboard && gpu) {
+    const gap = gpuPcieBottleneck(motherboard, gpu);
+    entries.push({
+      id: "mobo-gpu-pcie",
+      label: "메인보드-GPU PCIe 대역폭",
+      level: gap ? "warning" : "success",
+      message: gap ? describeGpuPcieGap(gap) : "메인보드와 GPU의 PCIe 세대가 맞아 대역폭 손실 없이 쓸 수 있어요.",
+    });
+  }
+
+  if (motherboard && ssd) {
+    const gap = ssdPcieBottleneck(motherboard, ssd);
+    entries.push({
+      id: "mobo-ssd-pcie",
+      label: "메인보드-SSD PCIe 대역폭",
+      level: gap ? "warning" : "success",
+      message: gap ? describeSsdPcieGap(gap) : "메인보드와 SSD의 PCIe 세대가 맞아 대역폭 손실 없이 쓸 수 있어요.",
+    });
+  }
+
+  return entries;
+}
+
+export function worstLevel(entries: BottleneckEntry[]): BottleneckLevel | null {
+  if (entries.length === 0) return null;
+  return entries.reduce<BottleneckLevel>((worst, e) => (LEVEL_RANK[e.level] > LEVEL_RANK[worst] ? e.level : worst), "success");
 }
 
 export function evaluateBottleneck(cpu: CPU, gpu: GPU): BottleneckResult {

@@ -1,4 +1,5 @@
 import type { CompatIssue, CompatLevel, PartCategory, Selections } from "./types";
+import { describeGpuPcieGap, describeSsdPcieGap, gpuPcieBottleneck, ssdPcieBottleneck } from "./pcie";
 
 const LEVEL_RANK: Record<CompatLevel, number> = {
   idle: 0,
@@ -64,7 +65,7 @@ function psuFormFactorToken(value: string): "ATX" | "SFX" | null {
 
 export function evaluateIssues(sel: Selections): CompatIssue[] {
   const issues: CompatIssue[] = [];
-  const { cpu, motherboard, ram, gpu, psu, case: pcCase, cooler } = sel;
+  const { cpu, motherboard, ram, ssd, gpu, psu, case: pcCase, cooler } = sel;
 
   // CPU <-> Motherboard
   if (cpu && motherboard && cpu.socket !== motherboard.socket) {
@@ -167,6 +168,32 @@ export function evaluateIssues(sel: Selections): CompatIssue[] {
         level: "danger",
         categories: ["cooler", "case"],
         message: `수랭 라디에이터(${radiatorSize}mm)를 케이스가 지원하지 않습니다${label ? ` (지원: ${label}mm)` : ""}.`,
+      });
+    }
+  }
+
+  // Motherboard <-> SSD (PCIe 세대 대역폭)
+  if (motherboard && ssd) {
+    const gap = ssdPcieBottleneck(motherboard, ssd);
+    if (gap) {
+      issues.push({
+        id: "mobo-ssd-pcie-gen",
+        level: "warning",
+        categories: ["motherboard", "ssd"],
+        message: describeSsdPcieGap(gap),
+      });
+    }
+  }
+
+  // Motherboard <-> GPU (PCIe 세대 차이)
+  if (motherboard && gpu) {
+    const gap = gpuPcieBottleneck(motherboard, gpu);
+    if (gap) {
+      issues.push({
+        id: "mobo-gpu-pcie-gen",
+        level: "warning",
+        categories: ["motherboard", "gpu"],
+        message: describeGpuPcieGap(gap),
       });
     }
   }
