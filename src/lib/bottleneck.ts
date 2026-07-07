@@ -152,9 +152,9 @@ export interface BottleneckEntry {
 
 const LEVEL_RANK: Record<EntryLevel, number> = { pending: -1, success: 0, warning: 1, danger: 2 };
 
-// 선택된 부품 조합에서 진단 가능한 병목 항목들을 전부 모은다. 짝이 되는 부품이 둘 다
-// 있으면 실제 진단 결과를, 한쪽만 있으면 "이 부품을 더 고르면 확인 가능"이라는 pending
-// 항목을 넣는다 — 그래서 관련 부품이 하나라도 선택되면 진단 패널이 뜬다.
+// 진단 항목 3개(CPU-GPU, 메인보드-GPU, 메인보드-SSD)는 부품 선택 여부와 관계없이
+// 항상 전부 반환한다. 짝이 되는 부품이 둘 다 있으면 실제 진단 결과를, 하나라도
+// 없으면 "이 부품을 더 고르면 확인 가능"이라는 pending 항목을 넣는다.
 export function evaluateAllBottlenecks(sel: Selections): BottleneckEntry[] {
   const { cpu, gpu, motherboard, ssd } = sel;
   const entries: BottleneckEntry[] = [];
@@ -168,12 +168,17 @@ export function evaluateAllBottlenecks(sel: Selections): BottleneckEntry[] {
       message: r.message,
       scores: { cpuScore: r.cpuScore, gpuScore: r.gpuScore, cpuTier: r.cpuTier, gpuTier: r.gpuTier, direction: r.direction },
     });
-  } else if (cpu || gpu) {
+  } else {
     entries.push({
       id: "cpu-gpu",
       label: "CPU-GPU 성능 밸런스",
       level: "pending",
-      message: cpu ? "그래픽카드를 고르면 CPU와 성능 밸런스를 확인할 수 있어요." : "CPU를 고르면 GPU와 성능 밸런스를 확인할 수 있어요.",
+      message:
+        cpu && !gpu
+          ? "그래픽카드를 고르면 CPU와 성능 밸런스를 확인할 수 있어요."
+          : !cpu && gpu
+            ? "CPU를 고르면 GPU와 성능 밸런스를 확인할 수 있어요."
+            : "CPU와 그래픽카드를 고르면 성능 밸런스를 확인할 수 있어요.",
     });
   }
 
@@ -185,12 +190,17 @@ export function evaluateAllBottlenecks(sel: Selections): BottleneckEntry[] {
       level: gap ? "warning" : "success",
       message: gap ? describeGpuPcieGap(gap) : "메인보드와 GPU의 PCIe 세대가 맞아 대역폭 손실 없이 쓸 수 있어요.",
     });
-  } else if (motherboard || gpu) {
+  } else {
     entries.push({
       id: "mobo-gpu-pcie",
       label: "메인보드-GPU PCIe 대역폭",
       level: "pending",
-      message: motherboard ? "그래픽카드를 고르면 PCIe 대역폭을 확인할 수 있어요." : "메인보드를 고르면 PCIe 대역폭을 확인할 수 있어요.",
+      message:
+        motherboard && !gpu
+          ? "그래픽카드를 고르면 PCIe 대역폭을 확인할 수 있어요."
+          : !motherboard && gpu
+            ? "메인보드를 고르면 PCIe 대역폭을 확인할 수 있어요."
+            : "메인보드와 그래픽카드를 고르면 PCIe 대역폭을 확인할 수 있어요.",
     });
   }
 
@@ -202,12 +212,17 @@ export function evaluateAllBottlenecks(sel: Selections): BottleneckEntry[] {
       level: gap ? "warning" : "success",
       message: gap ? describeSsdPcieGap(gap) : "메인보드와 SSD의 PCIe 세대가 맞아 대역폭 손실 없이 쓸 수 있어요.",
     });
-  } else if (motherboard || ssd) {
+  } else {
     entries.push({
       id: "mobo-ssd-pcie",
       label: "메인보드-SSD PCIe 대역폭",
       level: "pending",
-      message: motherboard ? "SSD를 고르면 PCIe 대역폭을 확인할 수 있어요." : "메인보드를 고르면 PCIe 대역폭을 확인할 수 있어요.",
+      message:
+        motherboard && !ssd
+          ? "SSD를 고르면 PCIe 대역폭을 확인할 수 있어요."
+          : !motherboard && ssd
+            ? "메인보드를 고르면 PCIe 대역폭을 확인할 수 있어요."
+            : "메인보드와 SSD를 고르면 PCIe 대역폭을 확인할 수 있어요.",
     });
   }
 
