@@ -235,7 +235,7 @@ export function PurchaseReceipt() {
                   loading={danawa === "loading"}
                 />
                 <CompareSiteRow
-                  site="네이버쇼핑"
+                  site={compareRow.info.mallName ?? "네이버쇼핑"}
                   price={compareRow.info.price}
                   link={compareRow.info.link}
                   loading={compareRow.info.price === null && compareRow.info.link === null}

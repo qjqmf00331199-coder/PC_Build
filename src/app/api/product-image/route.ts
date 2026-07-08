@@ -4,9 +4,10 @@ export interface ProductInfo {
   image: string | null;
   price: number | null;
   link: string | null;
+  mallName: string | null;
 }
 
-const EMPTY: ProductInfo = { image: null, price: null, link: null };
+const EMPTY: ProductInfo = { image: null, price: null, link: null, mallName: null };
 
 export async function GET(req: NextRequest) {
   const query = req.nextUrl.searchParams.get("q")?.trim();
@@ -38,7 +39,8 @@ export async function GET(req: NextRequest) {
     const image: string | null = item?.image ?? null;
     const price: number | null = item?.lprice ? Number(item.lprice) : null;
     const link: string | null = item?.link ?? null;
-    return Response.json({ image, price: Number.isFinite(price) ? price : null, link });
+    const mallName: string | null = item?.mallName ?? null;
+    return Response.json({ image, price: Number.isFinite(price) ? price : null, link, mallName });
   } catch {
     return Response.json(EMPTY);
   }

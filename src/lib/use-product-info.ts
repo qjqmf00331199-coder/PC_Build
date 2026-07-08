@@ -6,7 +6,7 @@ import { localImageOverride } from "./local-images";
 import { partImageQuery } from "./part-specs";
 import type { ProductInfo } from "@/app/api/product-image/route";
 
-const EMPTY: ProductInfo = { image: null, price: null, link: null };
+const EMPTY: ProductInfo = { image: null, price: null, link: null, mallName: null };
 
 const infoCache = new Map<string, ProductInfo>();
 const inFlight = new Map<string, Promise<ProductInfo>>();
