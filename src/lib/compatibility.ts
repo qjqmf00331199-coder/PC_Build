@@ -1,5 +1,6 @@
 import type { CompatIssue, CompatLevel, PartCategory, Selections } from "./types";
 import { describeGpuPcieGap, describeSsdPcieGap, gpuPcieBottleneck, ssdPcieBottleneck } from "./pcie";
+import { gpuPsuConnectorNeedsAdapter } from "./power-connector";
 
 const LEVEL_RANK: Record<CompatLevel, number> = {
   idle: 0,
@@ -104,6 +105,17 @@ export function evaluateIssues(sel: Selections): CompatIssue[] {
       level: "danger",
       categories: ["gpu", "psu"],
       message: `PSU 용량(${psu.watt}W)이 GPU 권장 파워(${gpu.recommended_psu_w}W)보다 부족합니다.`,
+    });
+  }
+
+  // GPU <-> PSU (16핀 전원 커넥터 — 12VHPWR/12V-2x6은 규격 호환이라 세대 불일치는 문제 없음,
+  // PSU에 네이티브 16핀 케이블 자체가 없을 때만 어댑터 필요)
+  if (gpu && psu && gpuPsuConnectorNeedsAdapter(gpu, psu)) {
+    issues.push({
+      id: "gpu-psu-connector-adapter",
+      level: "warning",
+      categories: ["gpu", "psu"],
+      message: `GPU는 16핀(12VHPWR/12V-2x6) 전원 커넥터가 필요하지만 PSU(${psu.atx_spec})는 8핀 PCIe 케이블만 제공합니다. GPU 동봉 8핀→16핀 어댑터로 연결은 가능합니다.`,
     });
   }
 

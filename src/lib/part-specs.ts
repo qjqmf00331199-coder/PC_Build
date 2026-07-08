@@ -1,4 +1,5 @@
 import type { Part } from "./types";
+import { describePsuNativeConnector } from "./power-connector";
 
 export function partMeta(part: Part): string | null {
   switch (part.category) {
@@ -118,6 +119,9 @@ export function partFullSpecs(part: Part): SpecRow[] {
         { label: "VRAM", value: `${part.vram_gb}GB` },
         ...(part.tdp_w ? [{ label: "TDP", value: `${part.tdp_w}W` }] : []),
         { label: "전원 커넥터", value: part.connector },
+        ...(part.power_connector_pins === 12
+          ? [{ label: "12핀 커넥터 호환", value: "12VHPWR/12V-2x6 겸용 — PSU가 둘 중 어느 쪽 네이티브 케이블이어도 그대로 연결 가능" }]
+          : []),
         { label: "권장 PSU", value: `${part.recommended_psu_w}W` },
         { label: "길이", value: `${part.length_mm}mm` },
         { label: "두께", value: part.thickness },
@@ -130,6 +134,7 @@ export function partFullSpecs(part: Part): SpecRow[] {
         { label: "등급", value: part.grade },
         { label: "길이", value: `${part.length_mm}mm` },
         { label: "ATX 버전", value: part.atx_version },
+        { label: "GPU 전원 케이블", value: describePsuNativeConnector(part) },
         { label: "폼팩터", value: part.form_factor },
       ];
     case "case":

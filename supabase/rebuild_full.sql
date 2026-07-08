@@ -71,7 +71,9 @@ create table if not exists gpu (
   thickness text not null,
   fans int not null,
   verified boolean not null default true,
-  extra jsonb
+  extra jsonb,
+  power_connector_pins int not null default 8,
+  power_connector_count int not null default 1
 );
 
 create table if not exists psu (
@@ -82,7 +84,9 @@ create table if not exists psu (
   length_mm int not null,
   atx_version text not null,
   form_factor text not null,
-  extra jsonb
+  extra jsonb,
+  atx_spec text not null default 'ATX12V',
+  native_gpu_connector text
 );
 
 create table if not exists pc_case (
@@ -977,8 +981,8 @@ ON CONFLICT (id) DO UPDATE SET
 
 
 -- gpu-01: RTX50
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-01', 'RTX50', 'NVIDIA GeForce RTX 5090 Founders Edition', 32, 575, '16핀', 1000, 304, '3슬롯(61mm)', 2, true, null)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-01', 'RTX50', 'NVIDIA GeForce RTX 5090 Founders Edition', 32, 575, '16핀', 1000, 304, '3슬롯(61mm)', 2, true, null, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -990,11 +994,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-02: RTX50
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-02', 'RTX50', 'PALIT 지포스 RTX 5080 GAMINGPRO D7 16GB', 16, 360, '16핀', 850, 331.9, '3슬롯(60mm)', 3, true, null)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-02', 'RTX50', 'PALIT 지포스 RTX 5080 GAMINGPRO D7 16GB', 16, 360, '16핀', 850, 331.9, '3슬롯(60mm)', 3, true, null, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1006,11 +1010,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-03: RTX50
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-03', 'RTX50', 'MSI 지포스 RTX 5070 Ti 게이밍 트리오 OC 플러스 D7 16GB', 16, 300, '16핀', 750, 338, '3슬롯(50mm)', 3, true, null)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-03', 'RTX50', 'MSI 지포스 RTX 5070 Ti 게이밍 트리오 OC 플러스 D7 16GB', 16, 300, '16핀', 750, 338, '3슬롯(50mm)', 3, true, null, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1022,11 +1026,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-04: RTX50
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-04', 'RTX50', 'MSI 지포스 RTX 5070 벤투스 3X OC D7 12GB', 12, 250, '16핀', 650, 338, '3슬롯(50mm)', 3, true, null)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-04', 'RTX50', 'MSI 지포스 RTX 5070 벤투스 3X OC D7 12GB', 12, 250, '16핀', 650, 338, '3슬롯(50mm)', 3, true, null, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1038,11 +1042,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-05: RTX50
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-05', 'RTX50', 'PALIT 지포스 RTX 5060 Ti Infinity 3 D7 16GB', 16, 180, '8핀', 600, 291.9, '3슬롯', 3, true, null)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-05', 'RTX50', 'PALIT 지포스 RTX 5060 Ti Infinity 3 D7 16GB', 16, 180, '8핀', 600, 291.9, '3슬롯', 3, true, null, 8, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1054,11 +1058,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-06: RTX50
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-06', 'RTX50', '갤럭시 GALAX 지포스 RTX 5060 WHITE OC D7 8GB', 8, 140, '8핀', 550, 250, '2슬롯', 2, true, null)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-06', 'RTX50', '갤럭시 GALAX 지포스 RTX 5060 WHITE OC D7 8GB', 8, 140, '8핀', 550, 250, '2슬롯', 2, true, null, 8, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1070,11 +1074,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-07: RTX40
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-07', 'RTX40', 'NVIDIA GeForce RTX 4090 Founders Edition', 24, 450, '16핀', 850, 304, '3슬롯(61mm)', 2, true, null)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-07', 'RTX40', 'NVIDIA GeForce RTX 4090 Founders Edition', 24, 450, '16핀', 850, 304, '3슬롯(61mm)', 2, true, null, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1086,11 +1090,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-08: RTX40
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-08', 'RTX40', 'ASUS TUF Gaming GeForce RTX 4080 SUPER', 16, 320, '16핀', 750, 348.2, '3.65슬롯(72.6mm)', 3, true, null)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-08', 'RTX40', 'ASUS TUF Gaming GeForce RTX 4080 SUPER', 16, 320, '16핀', 750, 348.2, '3.65슬롯(72.6mm)', 3, true, null, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1102,11 +1106,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-09: RTX40
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-09', 'RTX40', 'MSI GeForce RTX 4070 SUPER Gaming X Slim', 12, 220, '16핀', 650, 307, '2.3슬롯(46mm)', 3, true, null)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-09', 'RTX40', 'MSI GeForce RTX 4070 SUPER Gaming X Slim', 12, 220, '16핀', 650, 307, '2.3슬롯(46mm)', 3, true, null, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1118,11 +1122,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-10: RTX40
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-10', 'RTX40', '이엠텍 지포스 RTX 4060 Ti MIRACLE X3', 8, 160, '8핀', 550, 282, '2.2슬롯(44mm)', 3, true, null)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-10', 'RTX40', '이엠텍 지포스 RTX 4060 Ti MIRACLE X3', 8, 160, '8핀', 550, 282, '2.2슬롯(44mm)', 3, true, null, 8, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1134,11 +1138,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-11: RTX40
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-11', 'RTX40', '갤럭시 GALAX 지포스 RTX 4060 2X OC V2', 8, 115, '8핀', 500, 251, '2슬롯(40mm)', 2, true, null)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-11', 'RTX40', '갤럭시 GALAX 지포스 RTX 4060 2X OC V2', 8, 115, '8핀', 500, 251, '2슬롯(40mm)', 2, true, null, 8, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1150,11 +1154,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-12: RX7000
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-12', 'RX7000', 'SAPPHIRE 라데온 RX 7900 XTX NITRO+ Vapor-X', 24, 420, '8핀x3', 850, 320, '3.5슬롯(71.6mm)', 3, true, null)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-12', 'RX7000', 'SAPPHIRE 라데온 RX 7900 XTX NITRO+ Vapor-X', 24, 420, '8핀x3', 850, 320, '3.5슬롯(71.6mm)', 3, true, null, 8, 3)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1166,11 +1170,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-13: RX7000
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-13', 'RX7000', 'ASUS TUF Gaming 라데온 RX 7800 XT', 16, 263, '8핀x2', 700, 319.8, '2.96슬롯(59.2mm)', 3, true, null)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-13', 'RX7000', 'ASUS TUF Gaming 라데온 RX 7800 XT', 16, 263, '8핀x2', 700, 319.8, '2.96슬롯(59.2mm)', 3, true, null, 8, 2)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1182,11 +1186,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-14: RX7000
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-14', 'RX7000', 'GIGABYTE 라데온 RX 7600 XT GAMING OC', 16, 190, '8핀', 600, 282, '2.5슬롯(53mm)', 3, true, null)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-14', 'RX7000', 'GIGABYTE 라데온 RX 7600 XT GAMING OC', 16, 190, '8핀', 600, 282, '2.5슬롯(53mm)', 3, true, null, 8, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1198,11 +1202,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-15: RX7000
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-15', 'RX7000', 'SAPPHIRE 라데온 RX 7600 PULSE', 8, 165, '8핀', 550, 240, '2.2슬롯(44mm)', 2, true, null)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-15', 'RX7000', 'SAPPHIRE 라데온 RX 7600 PULSE', 8, 165, '8핀', 550, 240, '2.2슬롯(44mm)', 2, true, null, 8, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1214,11 +1218,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-16: RTX40
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-16', 'RTX40', '기가바이트 지포스 RTX 4070 Ti SUPER EAGLE OC ICE D6X 16GB', 16, 285, '16핀', 750, 261, '2.5슬롯(50mm)', 3, true, null)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-16', 'RTX40', '기가바이트 지포스 RTX 4070 Ti SUPER EAGLE OC ICE D6X 16GB', 16, 285, '16핀', 750, 261, '2.5슬롯(50mm)', 3, true, null, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1230,11 +1234,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-17: RTX40
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-17', 'RTX40', 'MSI 지포스 RTX 4060 Ti 벤투스 2X 블랙 OC D6 16GB', 16, 165, '8핀', 550, 199, '2슬롯(42mm)', 2, true, null)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-17', 'RTX40', 'MSI 지포스 RTX 4060 Ti 벤투스 2X 블랙 OC D6 16GB', 16, 165, '8핀', 550, 199, '2슬롯(42mm)', 2, true, null, 8, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1246,11 +1250,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-18: RX9000
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-18', 'RX9000', 'ASUS PRIME 라데온 RX 9070 XT OC D6 16GB', 16, null, '8핀x3', 750, 312, '3슬롯(50mm)', 3, true, '{"boost_mhz": 3010, "oc_mhz": 3030, "pcie": "PCIe5.0x16", "source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-18', 'RX9000', 'ASUS PRIME 라데온 RX 9070 XT OC D6 16GB', 16, null, '8핀x3', 750, 312, '3슬롯(50mm)', 3, true, '{"boost_mhz": 3010, "oc_mhz": 3030, "pcie": "PCIe5.0x16", "source": "danawa"}'::jsonb, 8, 3)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1262,11 +1266,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-19: RX9000
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-19', 'RX9000', 'SAPPHIRE 라데온 RX 9070 XT NITRO+ OC D6 16GB', 16, 330, '16핀(12V2x6)x1', 750, 330.8, '3슬롯(65.7mm)', 3, true, '{"boost_mhz": 3060, "pcie": "PCIe5.0x16", "power_phase": "16페이즈", "source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-19', 'RX9000', 'SAPPHIRE 라데온 RX 9070 XT NITRO+ OC D6 16GB', 16, 330, '16핀(12V2x6)x1', 750, 330.8, '3슬롯(65.7mm)', 3, true, '{"boost_mhz": 3060, "pcie": "PCIe5.0x16", "power_phase": "16페이즈", "source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1278,11 +1282,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-20: RX9000
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-20', 'RX9000', 'GIGABYTE 라데온 RX 9070 XT GAMING OC D6 16GB', 16, null, '8핀x3', 850, 288, '3슬롯(56mm)', 3, true, '{"boost_mhz": 3060, "pcie": "PCIe5.0x16", "source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-20', 'RX9000', 'GIGABYTE 라데온 RX 9070 XT GAMING OC D6 16GB', 16, null, '8핀x3', 850, 288, '3슬롯(56mm)', 3, true, '{"boost_mhz": 3060, "pcie": "PCIe5.0x16", "source": "danawa"}'::jsonb, 8, 3)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1294,11 +1298,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-21: RX9000
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-21', 'RX9000', 'ASRock 라데온 RX 9070 XT CHALLENGER D6 16GB', 16, null, '8핀x2', 800, 290, '3슬롯(56mm)', 3, true, '{"boost_mhz": 2970, "pcie": "PCIe5.0x16", "source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-21', 'RX9000', 'ASRock 라데온 RX 9070 XT CHALLENGER D6 16GB', 16, null, '8핀x2', 800, 290, '3슬롯(56mm)', 3, true, '{"boost_mhz": 2970, "pcie": "PCIe5.0x16", "source": "danawa"}'::jsonb, 8, 2)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1310,11 +1314,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-22: RX9000
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-22', 'RX9000', 'XFX 라데온 RX 9070 XT SWIFT D6 16GB', 16, 304, '8핀x2', 800, 325, '3슬롯(65mm)', 3, true, '{"base_mhz": 1660, "boost_mhz": 2970, "pcie": "PCIe5.0x16", "source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-22', 'RX9000', 'XFX 라데온 RX 9070 XT SWIFT D6 16GB', 16, 304, '8핀x2', 800, 325, '3슬롯(65mm)', 3, true, '{"base_mhz": 1660, "boost_mhz": 2970, "pcie": "PCIe5.0x16", "source": "danawa"}'::jsonb, 8, 2)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1326,11 +1330,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-23: RX9000
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-23', 'RX9000', 'PowerColor 라데온 RX 9070 XT Reaper D6 16GB', 16, null, '8핀x2', 750, 289, '3슬롯(41mm)', 3, true, '{"boost_mhz": 2970, "pcie": "PCIe5.0x16", "source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-23', 'RX9000', 'PowerColor 라데온 RX 9070 XT Reaper D6 16GB', 16, null, '8핀x2', 750, 289, '3슬롯(41mm)', 3, true, '{"boost_mhz": 2970, "pcie": "PCIe5.0x16", "source": "danawa"}'::jsonb, 8, 2)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1342,11 +1346,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-24: RX9000
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-24', 'RX9000', 'XFX 라데온 RX 9060 XT SWIFT DUAL OC D6 16GB', 16, 182, '8핀x1', 450, 270, '2슬롯(49mm)', 2, true, '{"base_mhz": 1900, "boost_mhz": 3320, "pcie": "PCIe5.0x16", "source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-24', 'RX9000', 'XFX 라데온 RX 9060 XT SWIFT DUAL OC D6 16GB', 16, 182, '8핀x1', 450, 270, '2슬롯(49mm)', 2, true, '{"base_mhz": 1900, "boost_mhz": 3320, "pcie": "PCIe5.0x16", "source": "danawa"}'::jsonb, 8, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -1358,15 +1362,15 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 
 -- ============ psu 원본 데이터 ============
 
 
 -- psu-01: FSP Hydro GE 650W
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-01', 'FSP Hydro GE 650W', 650, '골드', 170, 'ATX12V v2.4', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-01', 'FSP Hydro GE 650W', 650, '골드', 170, 'ATX12V v2.4', 'ATX', null, 'ATX12V', null)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -1374,11 +1378,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-02: SuperFlower LEADEX III 650W
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-02', 'SuperFlower LEADEX III 650W', 650, '골드', 165, 'ATX12V v2.32(구형)/ATX3.1(신형)', 'ATX', '{"note": "리비전별 표기 다름"}'::jsonb)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-02', 'SuperFlower LEADEX III 650W', 650, '골드', 165, 'ATX12V v2.32(구형)/ATX3.1(신형)', 'ATX', '{"note": "리비전별 표기 다름"}'::jsonb, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -1386,11 +1390,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-03: XFX XTR 650W Gold
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-03', 'XFX XTR 650W Gold', 650, '골드', 170, 'ATX12V(구형)', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-03', 'XFX XTR 650W Gold', 650, '골드', 170, 'ATX12V(구형)', 'ATX', null, 'ATX12V', null)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -1398,11 +1402,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-04: 시소닉 NEW FOCUS V4 GX-750
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-04', '시소닉 NEW FOCUS V4 GX-750', 750, '골드', 140, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-04', '시소닉 NEW FOCUS V4 GX-750', 750, '골드', 140, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -1410,11 +1414,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-05: EVGA SUPERNOVA 750 GA
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-05', 'EVGA SUPERNOVA 750 GA', 750, '골드', 150, 'ATX12V(구형)', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-05', 'EVGA SUPERNOVA 750 GA', 750, '골드', 150, 'ATX12V(구형)', 'ATX', null, 'ATX12V', null)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -1422,11 +1426,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-06: 맥스엘리트 STARS GEMINI 750W
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-06', '맥스엘리트 STARS GEMINI 750W', 750, '브론즈', 145, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-06', '맥스엘리트 STARS GEMINI 750W', 750, '브론즈', 145, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -1434,11 +1438,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-07: 마이크로닉스 Classic II 850W Gold
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-07', '마이크로닉스 Classic II 850W Gold', 850, '골드', 140, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-07', '마이크로닉스 Classic II 850W Gold', 850, '골드', 140, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -1446,11 +1450,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-08: SuperFlower LEADEX VII 850W
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-08', 'SuperFlower LEADEX VII 850W', 850, '골드', 150, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-08', 'SuperFlower LEADEX VII 850W', 850, '골드', 150, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -1458,11 +1462,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-09: 시소닉 NEW FOCUS V4 GX-850
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-09', '시소닉 NEW FOCUS V4 GX-850', 850, '골드', 140, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-09', '시소닉 NEW FOCUS V4 GX-850', 850, '골드', 140, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -1470,11 +1474,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-10: 시소닉 FOCUS(V4) GX-1000
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-10', '시소닉 FOCUS(V4) GX-1000', 1000, '골드', 140, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-10', '시소닉 FOCUS(V4) GX-1000', 1000, '골드', 140, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -1482,11 +1486,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-11: 마이크로닉스 Classic II 1050W 230V EU
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-11', '마이크로닉스 Classic II 1050W 230V EU', 1050, '골드', 140, 'ATX3.0/구형리비전 12VHPWR', 'ATX', '{"note": "리비전별 표기 다름"}'::jsonb)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-11', '마이크로닉스 Classic II 1050W 230V EU', 1050, '골드', 140, 'ATX3.0/구형리비전 12VHPWR', 'ATX', '{"note": "리비전별 표기 다름"}'::jsonb, 'ATX3.0', '12VHPWR')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -1494,11 +1498,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-12: FSP HYDRO G PRO 1000W
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-12', 'FSP HYDRO G PRO 1000W', 1000, '골드', 150, 'ATX3.0', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-12', 'FSP HYDRO G PRO 1000W', 1000, '골드', 150, 'ATX3.0', 'ATX', null, 'ATX3.0', '12VHPWR')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -1506,7 +1510,7 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 
 -- ============ pc_case 원본 데이터 ============
@@ -2840,8 +2844,8 @@ ON CONFLICT (id) DO UPDATE SET
 -- ============ gpu 추가 (danawa) ============
 
 -- gpu-25: MSI 지포스 RTX 5070 게이밍 트리오 OC D7 12GB 트라이프로져4
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-25', 'RTX50', 'MSI 지포스 RTX 5070 게이밍 트리오 OC D7 12GB 트라이프로져4', 12, 250, '16핀(12V2x6) x1', 650, 338, '3슬롯(50mm)', 3, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-25', 'RTX50', 'MSI 지포스 RTX 5070 게이밍 트리오 OC D7 12GB 트라이프로져4', 12, 250, '16핀(12V2x6) x1', 650, 338, '3슬롯(50mm)', 3, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -2853,11 +2857,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-26: ZOTAC GAMING 지포스 RTX 5070 SOLID OC D7 12GB
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-26', 'RTX50', 'ZOTAC GAMING 지포스 RTX 5070 SOLID OC D7 12GB', 12, 250, '16핀(12V2x6) x1', 650, 304.4, '3슬롯(41.6mm)', 3, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-26', 'RTX50', 'ZOTAC GAMING 지포스 RTX 5070 SOLID OC D7 12GB', 12, 250, '16핀(12V2x6) x1', 650, 304.4, '3슬롯(41.6mm)', 3, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -2869,11 +2873,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-27: MSI 지포스 RTX 5070 Ti 게이밍 트리오 OC D7 16GB 트라이프로져4
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-27', 'RTX50', 'MSI 지포스 RTX 5070 Ti 게이밍 트리오 OC D7 16GB 트라이프로져4', 16, 300, '16핀(12V2x6) x1', 750, 338, '3슬롯(50mm)', 3, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-27', 'RTX50', 'MSI 지포스 RTX 5070 Ti 게이밍 트리오 OC D7 16GB 트라이프로져4', 16, 300, '16핀(12V2x6) x1', 750, 338, '3슬롯(50mm)', 3, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -2885,11 +2889,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-28: ZOTAC GAMING 지포스 RTX 5070 Ti SOLID OC D7 16GB
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-28', 'RTX50', 'ZOTAC GAMING 지포스 RTX 5070 Ti SOLID OC D7 16GB', 16, 300, '16핀(12V2x6) x1', 750, 329.7, '3슬롯(67.8mm)', 3, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-28', 'RTX50', 'ZOTAC GAMING 지포스 RTX 5070 Ti SOLID OC D7 16GB', 16, 300, '16핀(12V2x6) x1', 750, 329.7, '3슬롯(67.8mm)', 3, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -2901,11 +2905,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-29: PALIT 지포스 RTX 5070 Ti GAMINGPRO-S D7 16GB 이엠텍
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-29', 'RTX50', 'PALIT 지포스 RTX 5070 Ti GAMINGPRO-S D7 16GB 이엠텍', 16, 300, '16핀(12V2x6) x1', 750, 331.9, '3슬롯(49.7mm)', 3, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-29', 'RTX50', 'PALIT 지포스 RTX 5070 Ti GAMINGPRO-S D7 16GB 이엠텍', 16, 300, '16핀(12V2x6) x1', 750, 331.9, '3슬롯(49.7mm)', 3, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -2917,11 +2921,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-30: ZOTAC GAMING 지포스 RTX 5070 Ti SOLID CORE OC White D7 16GB
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-30', 'RTX50', 'ZOTAC GAMING 지포스 RTX 5070 Ti SOLID CORE OC White D7 16GB', 16, 300, '16핀(12V2x6) x1', 750, 303.5, '3슬롯(55.7mm)', 3, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-30', 'RTX50', 'ZOTAC GAMING 지포스 RTX 5070 Ti SOLID CORE OC White D7 16GB', 16, 300, '16핀(12V2x6) x1', 750, 303.5, '3슬롯(55.7mm)', 3, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -2933,11 +2937,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-31: GIGABYTE 지포스 RTX 5070 GAMING OC D7 12GB 제이씨현
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-31', 'RTX50', 'GIGABYTE 지포스 RTX 5070 GAMING OC D7 12GB 제이씨현', 12, null, '16핀(12V2x6) x1', 750, 327, '3슬롯(56mm)', 3, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-31', 'RTX50', 'GIGABYTE 지포스 RTX 5070 GAMING OC D7 12GB 제이씨현', 12, null, '16핀(12V2x6) x1', 750, 327, '3슬롯(56mm)', 3, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -2949,11 +2953,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-32: GIGABYTE 지포스 RTX 5070 Ti WINDFORCE OC SFF D7 16GB 피씨디렉트
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-32', 'RTX50', 'GIGABYTE 지포스 RTX 5070 Ti WINDFORCE OC SFF D7 16GB 피씨디렉트', 16, null, '16핀(12V2x6) x1', 750, 304, '3슬롯(50mm)', 3, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-32', 'RTX50', 'GIGABYTE 지포스 RTX 5070 Ti WINDFORCE OC SFF D7 16GB 피씨디렉트', 16, null, '16핀(12V2x6) x1', 750, 304, '3슬롯(50mm)', 3, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -2965,11 +2969,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-33: PALIT 지포스 RTX 5070 INFINITY 3 D7 12GB 이엠텍
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-33', 'RTX50', 'PALIT 지포스 RTX 5070 INFINITY 3 D7 12GB 이엠텍', 12, 250, '16핀(12V2x6) x1', 650, 291.9, '3슬롯(41.3mm)', 3, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-33', 'RTX50', 'PALIT 지포스 RTX 5070 INFINITY 3 D7 12GB 이엠텍', 12, 250, '16핀(12V2x6) x1', 650, 291.9, '3슬롯(41.3mm)', 3, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -2981,11 +2985,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-34: 갤럭시 GALAX 지포스 RTX 5070 Ti EX GAMER WHITE OC D7 16GB
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-34', 'RTX50', '갤럭시 GALAX 지포스 RTX 5070 Ti EX GAMER WHITE OC D7 16GB', 16, 300, '16핀(12V2x6) x1', 750, 322, '3슬롯(52mm)', 3, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-34', 'RTX50', '갤럭시 GALAX 지포스 RTX 5070 Ti EX GAMER WHITE OC D7 16GB', 16, 300, '16핀(12V2x6) x1', 750, 322, '3슬롯(52mm)', 3, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -2997,11 +3001,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-35: MSI 지포스 RTX 5070 벤투스 2X OC D7 12GB
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-35', 'RTX50', 'MSI 지포스 RTX 5070 벤투스 2X OC D7 12GB', 12, 250, '16핀(12V2x6) x1', 650, 236, '2슬롯(50mm)', 2, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-35', 'RTX50', 'MSI 지포스 RTX 5070 벤투스 2X OC D7 12GB', 12, 250, '16핀(12V2x6) x1', 650, 236, '2슬롯(50mm)', 2, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -3013,11 +3017,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-36: ZOTAC GAMING 지포스 RTX 5070 Ti AMP Extreme Infinity D7 16GB
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-36', 'RTX50', 'ZOTAC GAMING 지포스 RTX 5070 Ti AMP Extreme Infinity D7 16GB', 16, 300, '16핀(12V2x6) x1', 750, 332.1, '3슬롯(69.6mm)', 3, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-36', 'RTX50', 'ZOTAC GAMING 지포스 RTX 5070 Ti AMP Extreme Infinity D7 16GB', 16, 300, '16핀(12V2x6) x1', 750, 332.1, '3슬롯(69.6mm)', 3, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -3029,11 +3033,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-37: ZOTAC GAMING 지포스 RTX 5070 Ti SOLID CORE OC D7 16GB
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-37', 'RTX50', 'ZOTAC GAMING 지포스 RTX 5070 Ti SOLID CORE OC D7 16GB', 16, 300, '16핀(12V2x6) x1', 750, 303.5, '3슬롯(55.7mm)', 3, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-37', 'RTX50', 'ZOTAC GAMING 지포스 RTX 5070 Ti SOLID CORE OC D7 16GB', 16, 300, '16핀(12V2x6) x1', 750, 303.5, '3슬롯(55.7mm)', 3, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -3045,11 +3049,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-38: 갤럭시 GALAX 지포스 RTX 5070 WHITE OC D7 12GB
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-38', 'RTX50', '갤럭시 GALAX 지포스 RTX 5070 WHITE OC D7 12GB', 12, 250, '16핀(12V2x6) x1', 650, 240, '2슬롯(39.6mm)', 2, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-38', 'RTX50', '갤럭시 GALAX 지포스 RTX 5070 WHITE OC D7 12GB', 12, 250, '16핀(12V2x6) x1', 650, 240, '2슬롯(39.6mm)', 2, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -3061,11 +3065,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-39: 이엠텍 지포스 RTX 5070 MIRACLE WHITE D7 12GB
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-39', 'RTX50', '이엠텍 지포스 RTX 5070 MIRACLE WHITE D7 12GB', 12, null, '16핀(12V2x6) x1', 650, 329, '3슬롯(45mm)', 3, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-39', 'RTX50', '이엠텍 지포스 RTX 5070 MIRACLE WHITE D7 12GB', 12, null, '16핀(12V2x6) x1', 650, 329, '3슬롯(45mm)', 3, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -3077,11 +3081,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-40: 갤럭시 GALAX 지포스 RTX 5070 Ti BLACK 2X OC D7 16GB
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-40', 'RTX50', '갤럭시 GALAX 지포스 RTX 5070 Ti BLACK 2X OC D7 16GB', 16, 300, '16핀(12V2x6) x1', 750, 239, '2슬롯(45mm)', 2, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-40', 'RTX50', '갤럭시 GALAX 지포스 RTX 5070 Ti BLACK 2X OC D7 16GB', 16, 300, '16핀(12V2x6) x1', 750, 239, '2슬롯(45mm)', 2, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -3093,11 +3097,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-41: COLORFUL 지포스 RTX 5070 Ti 토마호크 EX D7 16GB 피씨디렉트
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-41', 'RTX50', 'COLORFUL 지포스 RTX 5070 Ti 토마호크 EX D7 16GB 피씨디렉트', 16, 300, '16핀(12V2x6) x1', 750, 330.6, '3슬롯(60mm)', 3, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-41', 'RTX50', 'COLORFUL 지포스 RTX 5070 Ti 토마호크 EX D7 16GB 피씨디렉트', 16, 300, '16핀(12V2x6) x1', 750, 330.6, '3슬롯(60mm)', 3, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -3109,11 +3113,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-42: MSI 지포스 RTX 5070 쉐도우 2X OC D7 12GB
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-42', 'RTX50', 'MSI 지포스 RTX 5070 쉐도우 2X OC D7 12GB', 12, 250, '16핀(12V2x6) x1', 650, 231, '2슬롯(50mm)', 2, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-42', 'RTX50', 'MSI 지포스 RTX 5070 쉐도우 2X OC D7 12GB', 12, 250, '16핀(12V2x6) x1', 650, 231, '2슬롯(50mm)', 2, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -3125,11 +3129,11 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- gpu-43: PALIT 지포스 RTX 5070 WHITE OC D7 12GB 이엠텍
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
-VALUES ('gpu-43', 'RTX50', 'PALIT 지포스 RTX 5070 WHITE OC D7 12GB 이엠텍', 12, 250, '16핀(12V2x6) x1', 650, 291, '3슬롯(41.3mm)', 3, true, '{"source": "danawa"}'::jsonb)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
+VALUES ('gpu-43', 'RTX50', 'PALIT 지포스 RTX 5070 WHITE OC D7 12GB 이엠텍', 12, 250, '16핀(12V2x6) x1', 650, 291, '3슬롯(41.3mm)', 3, true, '{"source": "danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series,
   model = EXCLUDED.model,
@@ -3141,14 +3145,14 @@ ON CONFLICT (id) DO UPDATE SET
   thickness = EXCLUDED.thickness,
   fans = EXCLUDED.fans,
   verified = EXCLUDED.verified,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 
 -- ============ psu 추가 (danawa) ============
 
 -- psu-13: 마이크로닉스 Classic II 750W 80PLUS골드 풀모듈러 ATX3.1
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-13', '마이크로닉스 Classic II 750W 80PLUS골드 풀모듈러 ATX3.1', 750, '골드', 140, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-13', '마이크로닉스 Classic II 750W 80PLUS골드 풀모듈러 ATX3.1', 750, '골드', 140, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -3156,11 +3160,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-14: 마이크로닉스 Classic II 풀체인지 750W 80PLUS스탠다드 ATX3.1
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-14', '마이크로닉스 Classic II 풀체인지 750W 80PLUS스탠다드 ATX3.1', 750, '스탠다드', 140, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-14', '마이크로닉스 Classic II 풀체인지 750W 80PLUS스탠다드 ATX3.1', 750, '스탠다드', 140, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -3168,11 +3172,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-15: FSP VITA GD 750W 80PLUS골드 ATX3.1
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-15', 'FSP VITA GD 750W 80PLUS골드 ATX3.1', 750, '골드', 140, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-15', 'FSP VITA GD 750W 80PLUS골드 ATX3.1', 750, '골드', 140, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -3180,11 +3184,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-16: Antec GSK 750W V2 80PLUS골드 풀모듈러 ATX3.1
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-16', 'Antec GSK 750W V2 80PLUS골드 풀모듈러 ATX3.1', 750, '골드', 140, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-16', 'Antec GSK 750W V2 80PLUS골드 풀모듈러 ATX3.1', 750, '골드', 140, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -3192,11 +3196,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-17: AONE 시그니처 750W 80PLUS브론즈 풀모듈러 베이직 ATX3.1
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-17', 'AONE 시그니처 750W 80PLUS브론즈 풀모듈러 베이직 ATX3.1', 750, '브론즈', 160, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-17', 'AONE 시그니처 750W 80PLUS브론즈 풀모듈러 베이직 ATX3.1', 750, '브론즈', 160, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -3204,11 +3208,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-18: SuperFlower SF-750F14GE LEADEX III GOLD UP ATX3.1
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-18', 'SuperFlower SF-750F14GE LEADEX III GOLD UP ATX3.1', 750, '골드', 150, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-18', 'SuperFlower SF-750F14GE LEADEX III GOLD UP ATX3.1', 750, '골드', 150, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -3216,11 +3220,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-19: ASUS PRIME 750W Bronze
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-19', 'ASUS PRIME 750W Bronze', 750, '브론즈', 150, 'ATX12V', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-19', 'ASUS PRIME 750W Bronze', 750, '브론즈', 150, 'ATX12V', 'ATX', null, 'ATX12V', null)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -3228,11 +3232,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-20: MSI MAG A750GN 80PLUS골드 ATX3.1
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-20', 'MSI MAG A750GN 80PLUS골드 ATX3.1', 750, '골드', 140, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-20', 'MSI MAG A750GN 80PLUS골드 ATX3.1', 750, '골드', 140, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -3240,11 +3244,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-21: 리안리 SP750 V2 80PLUS골드 블랙
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-21', '리안리 SP750 V2 80PLUS골드 블랙', 750, '골드', 100, 'ATX12V', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-21', '리안리 SP750 V2 80PLUS골드 블랙', 750, '골드', 100, 'ATX12V', 'ATX', null, 'ATX12V', null)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -3252,11 +3256,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-22: AONE 시그니처 750W 80PLUS골드 풀모듈러 ATX3.1 화이트
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-22', 'AONE 시그니처 750W 80PLUS골드 풀모듈러 ATX3.1 화이트', 750, '골드', 140, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-22', 'AONE 시그니처 750W 80PLUS골드 풀모듈러 ATX3.1 화이트', 750, '골드', 140, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -3264,11 +3268,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-23: 마이크로닉스 Classic II 750W 80PLUS골드 풀모듈러 ATX3.1 화이트
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-23', '마이크로닉스 Classic II 750W 80PLUS골드 풀모듈러 ATX3.1 화이트', 750, '골드', 140, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-23', '마이크로닉스 Classic II 750W 80PLUS골드 풀모듈러 ATX3.1 화이트', 750, '골드', 140, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -3276,11 +3280,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-24: 마이크로닉스 Classic II 750W 80PLUS브론즈 230V EU HDB 핑크
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-24', '마이크로닉스 Classic II 750W 80PLUS브론즈 230V EU HDB 핑크', 750, '브론즈', 140, 'ATX12V', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-24', '마이크로닉스 Classic II 750W 80PLUS브론즈 230V EU HDB 핑크', 750, '브론즈', 140, 'ATX12V', 'ATX', null, 'ATX12V', null)
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -3288,11 +3292,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-25: AONE 시그니처 750W 80PLUS골드 풀모듈러 ATX3.1 블랙
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-25', 'AONE 시그니처 750W 80PLUS골드 풀모듈러 ATX3.1 블랙', 750, '골드', 140, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-25', 'AONE 시그니처 750W 80PLUS골드 풀모듈러 ATX3.1 블랙', 750, '골드', 140, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -3300,11 +3304,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-26: GIGABYTE UD750GM PG5 V2 80PLUS골드 풀모듈러 ATX3.1 피씨디렉트
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-26', 'GIGABYTE UD750GM PG5 V2 80PLUS골드 풀모듈러 ATX3.1 피씨디렉트', 750, '골드', 140, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-26', 'GIGABYTE UD750GM PG5 V2 80PLUS골드 풀모듈러 ATX3.1 피씨디렉트', 750, '골드', 140, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -3312,11 +3316,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-27: SuperFlower SF-750C12FG COMBAT FG 80PLUS골드 ATX3.1
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-27', 'SuperFlower SF-750C12FG COMBAT FG 80PLUS골드 ATX3.1', 750, '골드', 140, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-27', 'SuperFlower SF-750C12FG COMBAT FG 80PLUS골드 ATX3.1', 750, '골드', 140, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -3324,11 +3328,11 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- psu-28: 엔티스 EG 750W 80PLUS골드 풀모듈러 ATX3.1
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
-VALUES ('psu-28', '엔티스 EG 750W 80PLUS골드 풀모듈러 ATX3.1', 750, '골드', 140, 'ATX3.1', 'ATX', null)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
+VALUES ('psu-28', '엔티스 EG 750W 80PLUS골드 풀모듈러 ATX3.1', 750, '골드', 140, 'ATX3.1', 'ATX', null, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model,
   watt = EXCLUDED.watt,
@@ -3336,7 +3340,7 @@ ON CONFLICT (id) DO UPDATE SET
   length_mm = EXCLUDED.length_mm,
   atx_version = EXCLUDED.atx_version,
   form_factor = EXCLUDED.form_factor,
-  extra = EXCLUDED.extra;
+  extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 
 -- ============ pc_case 추가 (danawa) ============
@@ -3861,21 +3865,21 @@ ON CONFLICT (id) DO UPDATE SET
   m2_pcie_top = EXCLUDED.m2_pcie_top, m2_pcie_verified = EXCLUDED.m2_pcie_verified;
 
 -- 그래픽카드 (TDP 360W: ROG 공식 스펙 페이지에 명시 확인 -- 초안의 "미공개" 표기는 오류, 정정)
-INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra)
+INSERT INTO gpu (id, series, model, vram_gb, tdp_w, connector, recommended_psu_w, length_mm, thickness, fans, verified, extra, power_connector_pins, power_connector_count)
 VALUES ('gpu-44', 'RTX50', 'ASUS ROG Astral GeForce RTX 5080 O16G 하츠네 미쿠 에디션', 16, 360, '16핀(12V2x6)x1', 850, 357.6, '3.8슬롯(76mm)', 4, true,
-  '{"boost_mhz": 2760, "oc_mhz": 2790, "pcie": "PCIe5.0x16", "stream_processors": 10752, "ai_tops": 1899, "ai_tops_note": "AI sparsity 기준", "memory_type": "GDDR7", "memory_bandwidth_gbps": 960, "output": "HDMI2.1a x2, DP2.1a x3", "support": "HDCP2.3, 8K 지원, HDR 지원", "cooling": "제로팬(0-dB기술), 베이퍼챔버+위상변화 GPU 열패드", "extras": "LED 라이트, 백플레이트, Dual BIOS, DrMOS, GPU Tweak3, 3x8핀 to 16핀 커넥터, VGA지지대", "as_years": 3, "note": "TDP 360W, 권장파워 850W는 ROG 공식 스펙 페이지(rog.asus.com)에서 재검증 확인됨", "edition": "hatsune_miku", "source": "rog.asus.com,newegg,amazon,danawa"}'::jsonb)
+  '{"boost_mhz": 2760, "oc_mhz": 2790, "pcie": "PCIe5.0x16", "stream_processors": 10752, "ai_tops": 1899, "ai_tops_note": "AI sparsity 기준", "memory_type": "GDDR7", "memory_bandwidth_gbps": 960, "output": "HDMI2.1a x2, DP2.1a x3", "support": "HDCP2.3, 8K 지원, HDR 지원", "cooling": "제로팬(0-dB기술), 베이퍼챔버+위상변화 GPU 열패드", "extras": "LED 라이트, 백플레이트, Dual BIOS, DrMOS, GPU Tweak3, 3x8핀 to 16핀 커넥터, VGA지지대", "as_years": 3, "note": "TDP 360W, 권장파워 850W는 ROG 공식 스펙 페이지(rog.asus.com)에서 재검증 확인됨", "edition": "hatsune_miku", "source": "rog.asus.com,newegg,amazon,danawa"}'::jsonb, 12, 1)
 ON CONFLICT (id) DO UPDATE SET
   series = EXCLUDED.series, model = EXCLUDED.model, vram_gb = EXCLUDED.vram_gb, tdp_w = EXCLUDED.tdp_w,
   connector = EXCLUDED.connector, recommended_psu_w = EXCLUDED.recommended_psu_w, length_mm = EXCLUDED.length_mm,
-  thickness = EXCLUDED.thickness, fans = EXCLUDED.fans, verified = EXCLUDED.verified, extra = EXCLUDED.extra;
+  thickness = EXCLUDED.thickness, fans = EXCLUDED.fans, verified = EXCLUDED.verified, extra = EXCLUDED.extra, power_connector_pins = EXCLUDED.power_connector_pins, power_connector_count = EXCLUDED.power_connector_count;
 
 -- 파워 (길이 190x150x86mm: ROG 공식 스펙 페이지 재검증 결과 초안 값과 100% 일치, 변경 없음)
-INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra)
+INSERT INTO psu (id, model, watt, grade, length_mm, atx_version, form_factor, extra, atx_spec, native_gpu_connector)
 VALUES ('psu-29', 'ASUS ROG Thor 1200W Platinum III 하츠네 미쿠 에디션', 1200, '플래티넘', 190, 'ATX3.1', 'ATX',
-  '{"width_mm": 150, "height_mm": 86, "connectors": "PCIe16핀(12V2x6)x1, PCIe8핀x4, SATAx7", "efficiency_pct": 92, "features": "GaN MOSFET, GPU-First 전압안정기, 자성 OLED 디스플레이, 터보모드, 10년 보증", "edition": "hatsune_miku", "source": "rog.asus.com,newegg,danawa"}'::jsonb)
+  '{"width_mm": 150, "height_mm": 86, "connectors": "PCIe16핀(12V2x6)x1, PCIe8핀x4, SATAx7", "efficiency_pct": 92, "features": "GaN MOSFET, GPU-First 전압안정기, 자성 OLED 디스플레이, 터보모드, 10년 보증", "edition": "hatsune_miku", "source": "rog.asus.com,newegg,danawa"}'::jsonb, 'ATX3.1', '12V-2x6')
 ON CONFLICT (id) DO UPDATE SET
   model = EXCLUDED.model, watt = EXCLUDED.watt, grade = EXCLUDED.grade, length_mm = EXCLUDED.length_mm,
-  atx_version = EXCLUDED.atx_version, form_factor = EXCLUDED.form_factor, extra = EXCLUDED.extra;
+  atx_version = EXCLUDED.atx_version, form_factor = EXCLUDED.form_factor, extra = EXCLUDED.extra, atx_spec = EXCLUDED.atx_spec, native_gpu_connector = EXCLUDED.native_gpu_connector;
 
 -- 케이스 (radiator_top_mm 정정: 초안 420 -> 공식 스펙 실제값 360. front=420/psu=220/cooler높이190/gpu450은 초안과 일치 확인)
 INSERT INTO pc_case (id, model, tower_type, supported_mb, gpu_max_length_mm, cpu_cooler_max_height_mm, psu_support, psu_position, psu_max_length_mm, radiator_top_mm, radiator_front_mm, radiator_side_mm)

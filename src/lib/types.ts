@@ -65,7 +65,12 @@ export interface GPU {
   fans: number;
   verified: boolean;
   extra: Record<string, unknown> | null;
+  power_connector_pins: 8 | 12;
+  power_connector_count: number;
 }
+
+export type AtxSpec = "ATX12V" | "ATX3.0" | "ATX3.1";
+export type GpuPowerConnectorGen = "12VHPWR" | "12V-2x6";
 
 export interface PSU {
   id: string;
@@ -77,6 +82,8 @@ export interface PSU {
   atx_version: string;
   form_factor: string;
   extra: Record<string, unknown> | null;
+  atx_spec: AtxSpec;
+  native_gpu_connector: GpuPowerConnectorGen | null;
 }
 
 export interface PCCase {
