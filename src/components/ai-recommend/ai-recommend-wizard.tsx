@@ -201,7 +201,12 @@ export function AiRecommendWizard({
   };
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-2xl flex-col justify-center px-6 py-16">
+    // landing-gate wraps every screen in an absolute-inset-0 + overflow-hidden shell
+    // (no page-level scroll to fall back on), so this component must own its own
+    // scroll container — otherwise a tall result (8 parts + issues + button) just
+    // gets clipped with no way to reach the bottom
+    <div className="mx-auto h-dvh max-w-2xl overflow-y-auto px-6 py-16">
+      <div className="flex min-h-full flex-col justify-center">
       {showPopupAd && <PopupAd onClose={() => setShowPopupAd(false)} />}
       <button
         type="button"
@@ -389,6 +394,7 @@ export function AiRecommendWizard({
           </button>
         </div>
       )}
+      </div>
     </div>
   );
 }

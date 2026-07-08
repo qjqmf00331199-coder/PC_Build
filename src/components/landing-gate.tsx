@@ -165,7 +165,11 @@ export function LandingGate({ parts }: { parts: PartsData }) {
           )}
 
           {view === "landing" && (
-            <div className="relative mx-auto flex min-h-dvh max-w-3xl flex-col items-center justify-center px-6 py-16 text-center">
+            // same absolute-inset-0 + overflow-hidden shell as the other screens (no
+            // page-level scroll), so this owns its own scroll container too — see
+            // ai-recommend-wizard.tsx for the same fix on the AI result screen
+            <div className="mx-auto h-dvh max-w-3xl overflow-y-auto px-6 py-16">
+            <div className="relative flex min-h-full flex-col items-center justify-center text-center">
               <AdSlots narrow />
               <div className="mb-2 flex items-center gap-2 text-[10px] tracking-[0.2em] text-[var(--accent)] sm:text-xs">
                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
@@ -232,6 +236,7 @@ export function LandingGate({ parts }: { parts: PartsData }) {
                   </Link>
                 </div>
               </footer>
+            </div>
             </div>
           )}
         </AnimatedScreen>
