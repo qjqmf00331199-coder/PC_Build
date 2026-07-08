@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { ChevronDown, Gauge } from "lucide-react";
-import { BottleneckModal, BOTTLENECK_LEVEL_CONFIG } from "./bottleneck-gauge";
+import { BOTTLENECK_LEVEL_CONFIG } from "./bottleneck-gauge";
 import { BuildProvider, useBuild } from "./build-provider";
 import { CaseIllustration } from "./case-illustration";
 import { CategoryStage } from "./category-stage";
@@ -13,6 +14,10 @@ import { evaluateAllBottlenecks, worstLevel } from "@/lib/bottleneck";
 import type { PartsData } from "@/lib/supabase/fetch-parts";
 import type { Selections } from "@/lib/types";
 import { cn } from "@/lib/utils";
+
+const BottleneckModal = dynamic(() =>
+  import("./bottleneck-gauge").then((m) => m.BottleneckModal)
+);
 
 function MobileCompactBar() {
   const { activeCategory } = useBuild();

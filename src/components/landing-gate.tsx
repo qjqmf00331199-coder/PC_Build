@@ -2,13 +2,17 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import dynamic from "next/dynamic";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { AdSlots } from "@/components/ad-slots";
 import { BuildChecker } from "@/components/build/build-checker";
-import { AiRecommendWizard } from "@/components/ai-recommend/ai-recommend-wizard";
 import type { PartsData } from "@/lib/supabase/fetch-parts";
 import type { Selections } from "@/lib/types";
 import { cn } from "@/lib/utils";
+
+const AiRecommendWizard = dynamic(() =>
+  import("@/components/ai-recommend/ai-recommend-wizard").then((m) => m.AiRecommendWizard)
+);
 
 const FEATURES = [
   { title: "실시간 호환성 체크", desc: "소켓, 전원, 크기까지 부품 고를 때마다 즉시 확인" },

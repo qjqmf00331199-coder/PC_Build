@@ -41,6 +41,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
+      <head>
+        <link rel="preconnect" href="https://cdn.jsdelivr.net" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+      </head>
       <body className={`${inter.variable} ${jetbrainsMono.variable} overflow-x-hidden antialiased`}>
         {children}
       </body>

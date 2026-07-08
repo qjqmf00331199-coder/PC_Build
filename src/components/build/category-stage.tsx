@@ -1,11 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import type { PartsData } from "@/lib/supabase/fetch-parts";
 import { useBuild } from "./build-provider";
 import { CategoryHub } from "./category-hub";
-import { CategoryDetail } from "./category-detail";
+
+const CategoryDetail = dynamic(() =>
+  import("./category-detail").then((m) => m.CategoryDetail)
+) as typeof import("./category-detail").CategoryDetail;
 
 const DURATION = 0.28;
 const EASE = [0.4, 0, 0.2, 1] as const;

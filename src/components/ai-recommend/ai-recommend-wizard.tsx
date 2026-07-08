@@ -1,12 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import type { CompatIssue, PartCategory, Selections } from "@/lib/types";
 import { CATEGORY_LABEL, CATEGORY_ORDER } from "@/lib/compatibility";
 import { partSpecLine, partTitle } from "@/lib/part-specs";
 import { formatPriceKrw, useProductInfo } from "@/lib/use-product-info";
 import { cn } from "@/lib/utils";
-import { PopupAd } from "@/components/popup-ad";
+
+const PopupAd = dynamic(() => import("@/components/popup-ad").then((m) => m.PopupAd));
 
 type StepId = "purpose" | "priority" | "brand" | "preference" | "detail";
 
