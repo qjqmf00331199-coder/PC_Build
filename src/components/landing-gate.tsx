@@ -6,6 +6,7 @@ import dynamic from "next/dynamic";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import { AdSlots } from "@/components/ad-slots";
 import { BuildChecker } from "@/components/build/build-checker";
+import { PrivacyContent, TermsContent } from "@/components/legal-content";
 import type { PartsData } from "@/lib/supabase/fetch-parts";
 import type { Selections } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -19,24 +20,39 @@ const FEATURES = [
   { title: "한눈에 보는 견적", desc: "선택한 부품과 예상 총액을 사이드에서 바로 확인" },
 ];
 
-type View = "landing" | "ai" | "build";
+type View = "landing" | "ai" | "build" | "privacy" | "terms";
+type SubView = Exclude<View, "landing">;
 type NavState = { view: View; depth: number };
-type Direction = "left" | "right";
+type Direction = "left" | "right" | "up" | "down";
 
 const DURATION = 0.28;
 const EASE = [0.4, 0, 0.2, 1] as const;
 
 // direction the landing screen exits toward when entering each view
-const EXIT_DIRECTION: Record<"ai" | "build", Direction> = { ai: "right", build: "left" };
-const opposite = (d: Direction): Direction => (d === "left" ? "right" : "left");
+// privacy/terms use "up" (bottom-sheet feel) instead of the horizontal
+// left/right used by ai/build
+const EXIT_DIRECTION: Record<SubView, Direction> = {
+  ai: "right",
+  build: "left",
+  privacy: "up",
+  terms: "up",
+};
+const OPPOSITE: Record<Direction, Direction> = { left: "right", right: "left", up: "down", down: "up" };
+const opposite = (d: Direction): Direction => OPPOSITE[d];
 
 // dir = the direction content moves in: the outgoing screen exits toward
 // `dir`, the incoming screen starts from the opposite side and moves toward
 // `dir` too, so both slide past each other instead of one just vanishing
+const OFFSET: Record<Direction, { x?: string; y?: string }> = {
+  left: { x: "100%" },
+  right: { x: "-100%" },
+  up: { y: "100%" },
+  down: { y: "-100%" },
+};
 const variants: Variants = {
-  enter: (dir: Direction) => ({ x: dir === "left" ? "100%" : "-100%", opacity: 0 }),
-  center: { x: "0%", opacity: 1 },
-  exit: (dir: Direction) => ({ x: dir === "left" ? "-100%" : "100%", opacity: 0 }),
+  enter: (dir: Direction) => ({ ...OFFSET[dir], opacity: 0 }),
+  center: { x: "0%", y: "0%", opacity: 1 },
+  exit: (dir: Direction) => ({ ...OFFSET[opposite(dir)], opacity: 0 }),
 };
 
 // pointerEvents can't be animated, and framer-motion's own timing hooks for
@@ -95,9 +111,9 @@ export function LandingGate({ parts }: { parts: PartsData }) {
       const state = e.state as NavState | null;
       const nextView = state?.view ?? "landing";
       const prevView = viewRef.current;
-      if (nextView === "landing" && (prevView === "ai" || prevView === "build")) {
+      if (nextView === "landing" && prevView !== "landing") {
         setDirection(opposite(EXIT_DIRECTION[prevView]));
-      } else if ((nextView === "ai" || nextView === "build") && prevView === "landing") {
+      } else if (nextView !== "landing" && prevView === "landing") {
         setDirection(EXIT_DIRECTION[nextView]);
       }
       setView(nextView);
@@ -108,7 +124,7 @@ export function LandingGate({ parts }: { parts: PartsData }) {
 
   // one level deeper than wherever we are now (landing -> ai/build); AnimatePresence
   // (below) animates the actual slide once `view` changes, so this just flips state
-  const enter = (next: "ai" | "build") => {
+  const enter = (next: SubView) => {
     setDirection(EXIT_DIRECTION[next]);
     const depth = ((window.history.state as NavState | null)?.depth ?? 0) + 1;
     window.history.pushState({ ...window.history.state, view: next, depth }, "");
@@ -132,7 +148,7 @@ export function LandingGate({ parts }: { parts: PartsData }) {
     if (depth > 0) {
       window.history.go(-depth);
     } else {
-      if (view === "ai" || view === "build") setDirection(opposite(EXIT_DIRECTION[view]));
+      if (view !== "landing") setDirection(opposite(EXIT_DIRECTION[view]));
       setView("landing");
     }
   };
@@ -231,16 +247,41 @@ export function LandingGate({ parts }: { parts: PartsData }) {
                   <span className="pl-3">· 제품 이미지: 네이버쇼핑 API / 각 제조사</span>
                 </p>
                 <div className="flex items-center gap-3">
-                  <Link href="/privacy" className="hover:text-[#9CA3AF]">
+                  {/* href kept for middle-click/crawlers; left-click intercepted so the page
+                      slides in-app instead of a full route nav (no network/blank gap) */}
+                  <Link
+                    href="/privacy"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      enter("privacy");
+                    }}
+                    className="hover:text-[#9CA3AF]"
+                  >
                     개인정보처리방침
                   </Link>
                   <span className="text-[#27272A]">|</span>
-                  <Link href="/terms" className="hover:text-[#9CA3AF]">
+                  <Link
+                    href="/terms"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      enter("terms");
+                    }}
+                    className="hover:text-[#9CA3AF]"
+                  >
                     이용약관
                   </Link>
                 </div>
               </footer>
             </div>
+            </div>
+          )}
+
+          {(view === "privacy" || view === "terms") && (
+            <div className="mx-auto h-dvh max-w-2xl overflow-y-auto px-6 py-16 text-sm leading-relaxed text-[#E4E4E7]">
+              <button type="button" onClick={backToLanding} className="text-xs text-[var(--accent)]">
+                ↓ 트라이핏(TriFit)으로 돌아가기
+              </button>
+              {view === "privacy" ? <PrivacyContent /> : <TermsContent />}
             </div>
           )}
         </AnimatedScreen>
