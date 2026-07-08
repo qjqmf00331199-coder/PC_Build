@@ -1,7 +1,8 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
 
 const DURATION = 0.28;
@@ -14,13 +15,6 @@ const EASE = [0.4, 0, 0.2, 1] as const;
 export function LegalPage({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [leaving, setLeaving] = useState(false);
-
-  // plain <a> below skips next/link's automatic prefetch, so without this the
-  // router.push after the exit animation has to fetch "/" cold — a blank gap
-  // right after the content fades out. Warm the cache on mount instead.
-  useEffect(() => {
-    router.prefetch("/");
-  }, [router]);
 
   const goBack = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -35,9 +29,9 @@ export function LegalPage({ children }: { children: React.ReactNode }) {
       transition={{ duration: DURATION, ease: EASE }}
       className="mx-auto max-w-2xl px-6 py-16 text-sm leading-relaxed text-[#E4E4E7]"
     >
-      <a href="/" onClick={goBack} className="text-xs text-[var(--accent)]">
+      <Link href="/" onClick={goBack} className="text-xs text-[var(--accent)]">
         ↓ 트라이핏(TriFit)으로 돌아가기
-      </a>
+      </Link>
       {children}
     </motion.div>
   );
