@@ -135,7 +135,7 @@ function BuildCheckerShell({ parts, onLogoClick }: { parts: PartsData; onLogoCli
   return (
     <div
       className={cn(
-        "relative mx-auto flex h-dvh max-w-6xl flex-col overflow-hidden px-3 pb-14 pt-3 sm:px-4 sm:pt-4 lg:px-6 lg:pb-6 lg:pt-4",
+        "relative mx-auto flex h-dvh max-w-6xl flex-col overflow-hidden px-3 pb-14 pt-3 sm:px-4 sm:pt-4 lg:px-6 lg:pt-4 2xl:pb-6",
         isMikuBuild && "miku-theme"
       )}
     >

@@ -68,6 +68,9 @@ export function AdSlots({ narrow = false }: { narrow?: boolean }) {
   // the AI wizard / landing screens are much narrower (max-w-2xl/3xl), so they already
   // have room from xl(1280px) up — showing rails there instead of leaving a dead gutter.
   const railBreakpoint = narrow ? "xl:flex" : "2xl:flex";
+  // mobile bar must stay visible right up until the rails take over, otherwise
+  // mid-width viewports (e.g. 1024~1535px on the non-narrow build page) show no ad at all
+  const mobileBarHiddenBreakpoint = narrow ? "xl:hidden" : "2xl:hidden";
 
   const desktopAdIndex = useRandomAdIndex(DESKTOP_ADS.length);
   const desktopAdSrc = DESKTOP_ADS[desktopAdIndex];
@@ -105,7 +108,12 @@ export function AdSlots({ narrow = false }: { narrow?: boolean }) {
 
       {/* mobile: bar pinned to the bottom of the viewport, fixed 56px height so
           the app above can reserve exactly enough space and never overlap it */}
-      <div className="fixed inset-x-0 bottom-0 z-[60] flex h-14 items-center justify-center overflow-hidden border-t border-[#27272A] bg-[#0A0A0B] lg:hidden">
+      <div
+        className={cn(
+          "fixed inset-x-0 bottom-0 z-[60] flex h-14 items-center justify-center overflow-hidden border-t border-[#27272A] bg-[#0A0A0B]",
+          mobileBarHiddenBreakpoint
+        )}
+      >
         <a href={AD_LINK} target="_blank" rel="noopener noreferrer" aria-label="광고" className="relative h-full w-[320px] max-w-full overflow-hidden">
           <div
             className="flex h-full transition-transform duration-500 ease-in-out"
