@@ -132,10 +132,15 @@ export function BottleneckModal({
         )}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex shrink-0 items-center justify-between border-b border-[#27272A] px-5 py-4">
-          <div className="flex items-center gap-2">
-            <Gauge className="h-4.5 w-4.5 text-[var(--accent)]" strokeWidth={1.75} />
-            <h3 className="text-sm font-semibold text-[#E4E4E7]">성능 병목 진단</h3>
+        <div className="flex shrink-0 items-start justify-between border-b border-[#27272A] px-5 py-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <Gauge className="h-4.5 w-4.5 text-[var(--accent)]" strokeWidth={1.75} />
+              <h3 className="text-sm font-semibold text-[#E4E4E7]">성능 병목 진단</h3>
+            </div>
+            <p className="mt-1 text-[10px] leading-snug text-[#71717A]">
+              벤치마크 점수가 아닌 코어 개수에 따른 점수입니다. 실제 성능과는 차이가 있을 수 있습니다.
+            </p>
           </div>
           <button
             type="button"
