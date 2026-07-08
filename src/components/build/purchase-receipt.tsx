@@ -288,7 +288,7 @@ function CompareSiteRow({
     <a
       href={link}
       target="_blank"
-      rel="noopener noreferrer"
+      rel="noopener"
       className="flex items-center justify-between rounded-lg border border-[#27272A] bg-[#0A0A0B] px-3 py-3 transition-colors hover:border-[var(--accent)]"
     >
       {content}
