@@ -1,5 +1,6 @@
 import type { CPU, GPU, CompatLevel, Selections } from "./types";
 import { describeGpuPcieGap, describeSsdPcieGap, gpuPcieBottleneck, ssdPcieBottleneck } from "./pcie";
+import { describeGpuPsuConnectorFit, gpuPsuConnectorNeedsAdapter } from "./power-connector";
 
 /**
  * CPU-GPU 성능 병목 진단 — 순수 함수 모듈.
@@ -137,7 +138,7 @@ function buildMessage(direction: BottleneckDirection, level: BottleneckLevel, ga
 // 병목 진단 박스에 뜨는 항목 하나. CPU-GPU 성능 밸런스뿐 아니라 메인보드-GPU/SSD
 // PCIe 세대 대역폭 체크도 같은 박스에 모아서 보여주기 위한 공통 포맷.
 export interface BottleneckEntry {
-  id: "cpu-gpu" | "mobo-gpu-pcie" | "mobo-ssd-pcie";
+  id: "cpu-gpu" | "mobo-gpu-pcie" | "mobo-ssd-pcie" | "gpu-psu-connector";
   label: string;
   level: EntryLevel;
   message: string;
@@ -156,7 +157,7 @@ const LEVEL_RANK: Record<EntryLevel, number> = { pending: -1, success: 0, warnin
 // 항상 전부 반환한다. 짝이 되는 부품이 둘 다 있으면 실제 진단 결과를, 하나라도
 // 없으면 "이 부품을 더 고르면 확인 가능"이라는 pending 항목을 넣는다.
 export function evaluateAllBottlenecks(sel: Selections): BottleneckEntry[] {
-  const { cpu, gpu, motherboard, ssd } = sel;
+  const { cpu, gpu, motherboard, ssd, psu } = sel;
   const entries: BottleneckEntry[] = [];
 
   if (cpu && gpu) {
@@ -223,6 +224,28 @@ export function evaluateAllBottlenecks(sel: Selections): BottleneckEntry[] {
           : !motherboard && ssd
             ? "메인보드를 고르면 PCIe 대역폭을 확인할 수 있어요."
             : "메인보드와 SSD를 고르면 PCIe 대역폭을 확인할 수 있어요.",
+    });
+  }
+
+  if (gpu && psu) {
+    const needsAdapter = gpuPsuConnectorNeedsAdapter(gpu, psu);
+    entries.push({
+      id: "gpu-psu-connector",
+      label: "GPU-PSU 전원 커넥터",
+      level: needsAdapter ? "warning" : "success",
+      message: describeGpuPsuConnectorFit(gpu, psu),
+    });
+  } else {
+    entries.push({
+      id: "gpu-psu-connector",
+      label: "GPU-PSU 전원 커넥터",
+      level: "pending",
+      message:
+        gpu && !psu
+          ? "파워서플라이를 고르면 12VHPWR/12V-2x6 커넥터 호환을 확인할 수 있어요."
+          : !gpu && psu
+            ? "그래픽카드를 고르면 12VHPWR/12V-2x6 커넥터 호환을 확인할 수 있어요."
+            : "그래픽카드와 파워서플라이를 고르면 12VHPWR/12V-2x6 커넥터 호환을 확인할 수 있어요.",
     });
   }
 
