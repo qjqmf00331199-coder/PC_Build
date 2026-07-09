@@ -117,19 +117,38 @@ export function BuildChecker({
   parts,
   initialSelections,
   onLogoClick,
+  onOpenPrivacy,
+  onOpenTerms,
 }: {
   parts: PartsData;
   initialSelections?: Selections;
   onLogoClick?: () => void;
+  onOpenPrivacy?: () => void;
+  onOpenTerms?: () => void;
 }) {
   return (
     <BuildProvider parts={parts} initialSelections={initialSelections}>
-      <BuildCheckerShell parts={parts} onLogoClick={onLogoClick} />
+      <BuildCheckerShell
+        parts={parts}
+        onLogoClick={onLogoClick}
+        onOpenPrivacy={onOpenPrivacy}
+        onOpenTerms={onOpenTerms}
+      />
     </BuildProvider>
   );
 }
 
-function BuildCheckerShell({ parts, onLogoClick }: { parts: PartsData; onLogoClick?: () => void }) {
+function BuildCheckerShell({
+  parts,
+  onLogoClick,
+  onOpenPrivacy,
+  onOpenTerms,
+}: {
+  parts: PartsData;
+  onLogoClick?: () => void;
+  onOpenPrivacy?: () => void;
+  onOpenTerms?: () => void;
+}) {
   const { isMikuBuild } = useBuild();
 
   return (
@@ -154,6 +173,18 @@ function BuildCheckerShell({ parts, onLogoClick }: { parts: PartsData; onLogoCli
           <p className="text-[11px] tracking-wide text-[#9CA3AF] lg:text-sm">
             부품을 고르면 즉시 소켓·전원·크기 호환성을 확인합니다.
           </p>
+          {/* kept in the header's normal flow (not pinned to the screen bottom) so it
+              never fights the fixed mobile ad bar or the "구매하러 가기" CTA for the
+              same 56px-tall reserved strip at the bottom of this h-dvh/overflow-hidden shell */}
+          <span className="ml-auto flex items-center gap-2 text-[10px] text-[#71717A]">
+            <button type="button" onClick={onOpenPrivacy} className="hover:text-[#9CA3AF]">
+              개인정보처리방침
+            </button>
+            <span className="text-[#3F3F46]">|</span>
+            <button type="button" onClick={onOpenTerms} className="hover:text-[#9CA3AF]">
+              이용약관
+            </button>
+          </span>
         </div>
         {isMikuBuild && (
           // eslint-disable-next-line @next/next/no-img-element

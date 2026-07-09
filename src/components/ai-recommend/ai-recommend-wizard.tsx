@@ -99,9 +99,13 @@ const LOADING_MESSAGE_SCHEDULE: { delay: number; message: string }[] = [
 export function AiRecommendWizard({
   onApply,
   onCancel,
+  onOpenPrivacy,
+  onOpenTerms,
 }: {
   onApply: (selections: Selections) => void;
   onCancel: () => void;
+  onOpenPrivacy?: () => void;
+  onOpenTerms?: () => void;
 }) {
   const [stepIndex, setStepIndex] = useState(0);
   const [direction, setDirection] = useState<"forward" | "backward">("forward");
@@ -215,7 +219,7 @@ export function AiRecommendWizard({
         onClick={onCancel}
         className="mb-8 self-start text-xs text-[#9CA3AF] transition-colors hover:text-[var(--accent)]"
       >
-        ← 처음으로
+        처음으로 →
       </button>
 
       {phase === "quiz" && (
@@ -412,6 +416,16 @@ export function AiRecommendWizard({
           </button>
         </div>
       )}
+
+      <footer className="mt-10 flex items-center justify-center gap-3 text-[11px] text-[#71717A]">
+        <button type="button" onClick={onOpenPrivacy} className="hover:text-[var(--accent)]">
+          개인정보처리방침
+        </button>
+        <span className="text-[#27272A]">|</span>
+        <button type="button" onClick={onOpenTerms} className="hover:text-[var(--accent)]">
+          이용약관
+        </button>
+      </footer>
       </div>
     </div>
   );

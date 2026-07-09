@@ -40,6 +40,17 @@ const EXIT_DIRECTION: Record<SubView, Direction> = {
 const OPPOSITE: Record<Direction, Direction> = { left: "right", right: "left", up: "down", down: "up" };
 const opposite = (d: Direction): Direction => OPPOSITE[d];
 
+// privacy/terms always slide as a bottom sheet (up to open, down to close)
+// regardless of which screen (landing/ai/build) they're opened from; only the
+// landing <-> ai/build transition uses the horizontal EXIT_DIRECTION table.
+function directionFor(prevView: View, nextView: View): Direction {
+  if (nextView === "privacy" || nextView === "terms") return "up";
+  if (prevView === "privacy" || prevView === "terms") return "down";
+  if (nextView === "landing" && prevView !== "landing") return opposite(EXIT_DIRECTION[prevView as SubView]);
+  if (nextView !== "landing" && prevView === "landing") return EXIT_DIRECTION[nextView as SubView];
+  return "left";
+}
+
 // dir = the direction content moves in: the outgoing screen exits toward
 // `dir`, the incoming screen starts from the opposite side and moves toward
 // `dir` too, so both slide past each other instead of one just vanishing
@@ -111,11 +122,7 @@ export function LandingGate({ parts }: { parts: PartsData }) {
       const state = e.state as NavState | null;
       const nextView = state?.view ?? "landing";
       const prevView = viewRef.current;
-      if (nextView === "landing" && prevView !== "landing") {
-        setDirection(opposite(EXIT_DIRECTION[prevView]));
-      } else if (nextView !== "landing" && prevView === "landing") {
-        setDirection(EXIT_DIRECTION[nextView]);
-      }
+      setDirection(directionFor(prevView, nextView));
       setView(nextView);
     };
     window.addEventListener("popstate", onPopState);
@@ -167,6 +174,8 @@ export function LandingGate({ parts }: { parts: PartsData }) {
                   setInitialSelections(undefined);
                   backToLanding();
                 }}
+                onOpenPrivacy={() => enter("privacy")}
+                onOpenTerms={() => enter("terms")}
               />
             </div>
           )}
@@ -180,6 +189,8 @@ export function LandingGate({ parts }: { parts: PartsData }) {
                   setInitialSelections(selections);
                   swapInPlace("build");
                 }}
+                onOpenPrivacy={() => enter("privacy")}
+                onOpenTerms={() => enter("terms")}
               />
             </>
           )}
@@ -278,8 +289,11 @@ export function LandingGate({ parts }: { parts: PartsData }) {
 
           {(view === "privacy" || view === "terms") && (
             <div className="mx-auto h-dvh max-w-2xl overflow-y-auto px-6 py-16 text-sm leading-relaxed text-[#E4E4E7]">
-              <button type="button" onClick={backToLanding} className="text-xs text-[var(--accent)]">
-                ↓ 트라이핏(TriFit)으로 돌아가기
+              {/* returns to whichever screen (landing/ai/build) this sheet was opened
+                  from — that's just whatever history entry sits one step back, since
+                  enter() always pushes a fresh entry when opening privacy/terms */}
+              <button type="button" onClick={() => window.history.back()} className="text-xs text-[var(--accent)]">
+                ↓ 뒤로가기
               </button>
               {view === "privacy" ? <PrivacyContent /> : <TermsContent />}
             </div>
