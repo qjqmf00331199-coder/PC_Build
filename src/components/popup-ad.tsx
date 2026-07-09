@@ -13,7 +13,8 @@ const RING_CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 export function PopupAd({ onClose }: { onClose: () => void }) {
   const [startIndex] = useState(() => Math.floor(Math.random() * POPUP_IMAGES.length));
   const [imageIndex, setImageIndex] = useState(startIndex);
-  const [secondsLeft, setSecondsLeft] = useState(5);
+  // 총 6초(AUTO_CLOSE_MS) 중 숫자는 5,4,3,2,1 다섯 칸만 쓰고, 마지막 1초는 × 표시 칸
+  const [secondsLeft, setSecondsLeft] = useState(AUTO_CLOSE_MS / 1000 - 1);
   const [depleted, setDepleted] = useState(false);
 
   useEffect(() => {
@@ -34,9 +35,16 @@ export function PopupAd({ onClose }: { onClose: () => void }) {
 
   const src = POPUP_IMAGES[imageIndex];
 
+  // X 버튼이든 배경(카드 바깥)이든, 자동으로 닫히기 전에 뭘 누르든 광고 링크로 보내고 닫는다.
+  // 카드 안(이미지 링크·X버튼)은 stopPropagation으로 배경 클릭이 중복 발동해 탭이 두 번 열리는 걸 막는다.
+  const openAdAndClose = () => {
+    window.open(AD_LINK, "_blank", "noopener,noreferrer");
+    onClose();
+  };
+
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4">
-      <div className="popup-ad-scale-in relative w-full max-w-sm">
+    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 p-4" onClick={openAdAndClose}>
+      <div className="popup-ad-scale-in relative w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
         <a
           href={AD_LINK}
           target="_blank"
@@ -60,7 +68,7 @@ export function PopupAd({ onClose }: { onClose: () => void }) {
         </a>
         <button
           type="button"
-          onClick={onClose}
+          onClick={openAdAndClose}
           aria-label="광고 닫기"
           className="absolute -right-3 -top-3 flex h-9 w-9 items-center justify-center rounded-full bg-[#0A0A0B]"
         >
