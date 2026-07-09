@@ -54,9 +54,22 @@ const CATEGORY_SEARCH_HINT: Partial<Record<Part["category"], string>> = {
   cooler: "쿨러",
 };
 
+// 검색어 뒤에 붙여서 완본체/조립 PC가 아닌 단품 카테고리임을 명시.
+const CATEGORY_SEARCH_SUFFIX: Partial<Record<Part["category"], string>> = {
+  case: "케이스",
+  cpu: "CPU",
+  gpu: "그래픽카드",
+  motherboard: "메인보드",
+  ram: "RAM",
+  ssd: "SSD",
+  psu: "파워서플라이",
+  cooler: "쿨러",
+};
+
 export function partImageQuery(part: Part): string {
   const prefix = partMeta(part) ?? CATEGORY_SEARCH_HINT[part.category] ?? "";
-  return [prefix, partTitle(part)].filter(Boolean).join(" ");
+  const suffix = CATEGORY_SEARCH_SUFFIX[part.category] ?? "";
+  return [prefix, partTitle(part), suffix].filter(Boolean).join(" ");
 }
 
 export function partNote(part: Part): string | null {
