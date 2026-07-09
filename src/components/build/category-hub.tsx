@@ -13,7 +13,7 @@ import type { PartsData } from "@/lib/supabase/fetch-parts";
 import { cn } from "@/lib/utils";
 
 export function CategoryHub({ parts }: { parts: PartsData }) {
-  const { selections, categoryStatus, issuesFor, openCategory, resetSelections, partInfo } = useBuild();
+  const { selections, categoryStatus, issuesFor, openCategory, resetSelections, partInfo, selectPart } = useBuild();
 
   return (
     <div className="h-full overflow-y-auto pr-1">
@@ -39,6 +39,11 @@ export function CategoryHub({ parts }: { parts: PartsData }) {
             issueCount={issuesFor(category).length}
             price={selections[category] ? partInfo[category].price : null}
             onOpen={() => openCategory(category)}
+            onRemove={
+              selections[category]
+                ? () => selectPart(category, selections[category]!)
+                : undefined
+            }
           />
         ))}
       </div>
@@ -56,6 +61,7 @@ function CategoryCard<K extends PartCategory>({
   issueCount,
   price,
   onOpen,
+  onRemove,
 }: {
   category: K;
   options: PartMap[K][];
@@ -64,6 +70,7 @@ function CategoryCard<K extends PartCategory>({
   issueCount: number;
   price: number | null;
   onOpen: () => void;
+  onRemove?: () => void;
 }) {
   const Icon = CATEGORY_ICON[category as PartCategory];
 
@@ -83,7 +90,29 @@ function CategoryCard<K extends PartCategory>({
           <Icon className="h-4.5 w-4.5 text-[#9CA3AF]" strokeWidth={1.75} />
           <span className="text-sm font-semibold text-[#E4E4E7]">{CATEGORY_LABEL[category]}</span>
         </div>
-        <StatusBadge level={status} />
+        {onRemove ? (
+          <span
+            role="button"
+            tabIndex={0}
+            onClick={(e) => {
+              e.stopPropagation();
+              onRemove();
+            }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                e.stopPropagation();
+                onRemove();
+              }
+            }}
+            title="선택 해제"
+            className="cursor-pointer"
+          >
+            <StatusBadge level={status} />
+          </span>
+        ) : (
+          <StatusBadge level={status} />
+        )}
       </div>
 
       <div className="flex items-end justify-between gap-2">
