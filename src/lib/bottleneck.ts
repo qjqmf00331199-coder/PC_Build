@@ -121,18 +121,23 @@ export function tierOf(score: number): PerformanceTier {
   return "D";
 }
 
-// 임계값을 러프하게 잡는다: 약간의 성능 차이는 실사용에 체감 안 되는 수준이라
-// 문제없음으로 본다. 중간 정도부터 "생길 수 있음" 정도로만 경고하고,
-// 격차가 아주 커야만 비추천으로 올린다.
-function buildMessage(direction: BottleneckDirection, level: BottleneckLevel, gapPercent: number): string {
+const TIER_ORDER: PerformanceTier[] = ["D", "C", "B", "A", "S"];
+
+function tierRank(tier: PerformanceTier): number {
+  return TIER_ORDER.indexOf(tier);
+}
+
+// 원점수 % 격차 대신 티어 단계 차이로 판정한다: 같은 티어거나 한 단계 차이(예: A-B)는
+// 체감상 문제없는 수준으로 보고, 두 단계부터 경고, 세 단계 이상 벌어지면 비추천으로 올린다.
+function buildMessage(direction: BottleneckDirection, level: BottleneckLevel, tierGap: number): string {
   if (direction === "balanced" || level === "success") {
-    return "CPU와 GPU 밸런스에 이상 없어요. 약간의 성능 차이는 있어도 병목 걱정 없이 쓸 수 있어요.";
+    return "CPU와 GPU 티어 차이가 1단계 이하라 병목 걱정 없이 쓸 수 있어요.";
   }
   const weaker = direction === "cpu" ? "CPU" : "GPU";
   if (level === "warning") {
-    return `${weaker}가 상대적으로 약해서 병목이 생길 수 있어요 (격차 약 ${gapPercent}%). 아주 심하진 않지만 ${weaker === "CPU" ? "GPU 성능을 100% 다 못 끌어낼 수 있어요." : "CPU 성능을 GPU가 못 따라갈 수 있어요."}`;
+    return `${weaker}가 상대적으로 약해서 병목이 생길 수 있어요 (티어 ${tierGap}단계 차이). 아주 심하진 않지만 ${weaker === "CPU" ? "GPU 성능을 100% 다 못 끌어낼 수 있어요." : "CPU 성능을 GPU가 못 따라갈 수 있어요."}`;
   }
-  return `${weaker}가 많이 약해서 병목 현상이 심해요 (격차 약 ${gapPercent}%). 이 조합은 추천하지 않아요 — ${weaker}를 한 단계 올리는 걸 고려해보세요.`;
+  return `${weaker}가 많이 약해서 병목 현상이 심해요 (티어 ${tierGap}단계 차이). 이 조합은 추천하지 않아요 — ${weaker}를 한 단계 올리는 걸 고려해보세요.`;
 }
 
 // 병목 진단 박스에 뜨는 항목 하나. CPU-GPU 성능 밸런스뿐 아니라 메인보드-GPU/SSD
@@ -260,19 +265,22 @@ export function worstLevel(entries: BottleneckEntry[]): EntryLevel | null {
 export function evaluateBottleneck(cpu: CPU, gpu: GPU): BottleneckResult {
   const cpuScore = scoreCpu(cpu);
   const gpuScore = scoreGpu(gpu);
+  const cpuTier = tierOf(cpuScore);
+  const gpuTier = tierOf(gpuScore);
   const gapPercent = Math.round((Math.abs(gpuScore - cpuScore) / Math.max(cpuScore, gpuScore, 1)) * 100);
+  const tierGap = Math.abs(tierRank(cpuTier) - tierRank(gpuTier));
 
   const direction: BottleneckDirection = gpuScore > cpuScore ? "cpu" : cpuScore > gpuScore ? "gpu" : "balanced";
-  const level: BottleneckLevel = gapPercent < 15 ? "success" : gapPercent < 35 ? "warning" : "danger";
+  const level: BottleneckLevel = tierGap <= 1 ? "success" : tierGap === 2 ? "warning" : "danger";
 
   return {
     cpuScore,
     gpuScore,
-    cpuTier: tierOf(cpuScore),
-    gpuTier: tierOf(gpuScore),
+    cpuTier,
+    gpuTier,
     gapPercent,
     direction,
     level,
-    message: buildMessage(direction, level, gapPercent),
+    message: buildMessage(direction, level, tierGap),
   };
 }
