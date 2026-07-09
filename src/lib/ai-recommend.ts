@@ -64,11 +64,20 @@ function hasThemeTag(part: Part): boolean {
   return "extra" in part && typeof part.extra === "object" && part.extra !== null && "edition" in part.extra;
 }
 
+// 브랜드 선호는 "AI에게 알려주고 지켜주길 기대"가 아니라 확정된 사용자 요구라서,
+// 텍스트로 부탁하는 대신 CPU 목록 자체에서 다른 브랜드를 통째로 제거한다 —
+// 토큰도 절반 아끼고, AI가 무시할 여지도 없앤다.
+function filterByBrand(category: PartCategory, items: Part[], brand: BrandPreference): Part[] {
+  if (category !== "cpu" || brand === "any") return items;
+  const wanted = brand === "intel" ? "Intel" : "AMD";
+  return items.filter((part) => "brand" in part && part.brand === wanted);
+}
+
 // 프롬프트에 넣을 부품 목록: 가격 필드는 DB에 아예 없으니 제외할 것도 없음.
 // id를 반드시 포함시켜서, AI가 스펙을 새로 지어내지 못하고 id로만 고르게 강제한다.
-export function compactPartsForPrompt(parts: PartsData): string {
+export function compactPartsForPrompt(parts: PartsData, brand: BrandPreference = "any"): string {
   return CATEGORY_ORDER.map((category) => {
-    const all = parts[category] as Part[];
+    const all = filterByBrand(category, parts[category] as Part[], brand);
     const themed = all.filter(hasThemeTag);
     const sampled = sampleEvenly(all, MAX_OPTIONS_PER_CATEGORY);
     const merged = [...new Set([...themed, ...sampled])];
@@ -110,7 +119,7 @@ export function buildUserPrompt(parts: PartsData, answers: AiRecommendAnswers): 
     detailLine,
     "",
     "[부품 목록]",
-    compactPartsForPrompt(parts),
+    compactPartsForPrompt(parts, answers.brand),
   ].join("\n");
 }
 
