@@ -79,7 +79,7 @@ export function CategoryStage({ parts }: { parts: PartsData }) {
       <AnimatePresence initial={false} custom={direction}>
         <AnimatedScreen key={activeCategory ?? "hub"} animKey={activeCategory ?? "hub"} direction={direction}>
           {activeCategory === null ? (
-            <CategoryHub parts={parts} />
+            <CategoryHub />
           ) : (
             <CategoryDetail category={activeCategory} options={parts[activeCategory]} />
           )}

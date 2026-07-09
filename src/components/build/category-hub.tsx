@@ -9,10 +9,9 @@ import { formatPriceKrw } from "@/lib/use-product-info";
 import { useBuild } from "./build-provider";
 import { StatusBadge } from "./status-badge";
 import { PurchaseReceipt } from "./purchase-receipt";
-import type { PartsData } from "@/lib/supabase/fetch-parts";
 import { cn } from "@/lib/utils";
 
-export function CategoryHub({ parts }: { parts: PartsData }) {
+export function CategoryHub() {
   const { selections, categoryStatus, issuesFor, openCategory, resetSelections, partInfo, selectPart } = useBuild();
 
   return (
@@ -33,7 +32,6 @@ export function CategoryHub({ parts }: { parts: PartsData }) {
           <CategoryCard
             key={category}
             category={category}
-            options={parts[category]}
             selected={selections[category]}
             status={categoryStatus[category]}
             issueCount={issuesFor(category).length}
@@ -55,7 +53,6 @@ export function CategoryHub({ parts }: { parts: PartsData }) {
 
 function CategoryCard<K extends PartCategory>({
   category,
-  options,
   selected,
   status,
   issueCount,
@@ -64,7 +61,6 @@ function CategoryCard<K extends PartCategory>({
   onRemove,
 }: {
   category: K;
-  options: PartMap[K][];
   selected: PartMap[K] | undefined;
   status: "success" | "warning" | "danger" | "idle";
   issueCount: number;
@@ -120,7 +116,6 @@ function CategoryCard<K extends PartCategory>({
           <p className={cn("truncate text-sm", selected ? "text-[#E4E4E7]" : "text-[#9CA3AF]")}>
             {selected ? partTitle(selected) : "미선택"}
           </p>
-          <p className="mt-0.5 text-xs text-[#9CA3AF]">{options.length}개 옵션</p>
         </div>
         {selected && (
           <span className="shrink-0 font-mono text-sm font-semibold text-[var(--accent)]">
