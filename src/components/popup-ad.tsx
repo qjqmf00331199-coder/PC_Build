@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 
 const AD_LINK = "https://nbcamp.spartaclub.kr/";
@@ -17,9 +17,19 @@ export function PopupAd({ onClose }: { onClose: () => void }) {
   const [secondsLeft, setSecondsLeft] = useState(AUTO_CLOSE_MS / 1000 - 1);
   const [depleted, setDepleted] = useState(false);
 
+  // ai-recommend-wizard.tsx passes onClose as an inline arrow fn, so it's a new
+  // reference on every parent re-render (loading message ticking, price fetches
+  // resolving, etc). Keeping onClose in the effect's deps re-ran this whole
+  // effect on each of those renders, which reset raf/tick/close timers back to
+  // 0 — the number stuck on screen the longest is just whichever one happened
+  // to be showing when the parent last re-rendered. Stash it in a ref instead
+  // so the effect (and its timers) run exactly once, for real.
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
   useEffect(() => {
     const raf = requestAnimationFrame(() => setDepleted(true));
-    const closeTimer = setTimeout(onClose, AUTO_CLOSE_MS);
+    const closeTimer = setTimeout(() => onCloseRef.current(), AUTO_CLOSE_MS);
     const switchTimer = setTimeout(
       () => setImageIndex((i) => (i + 1) % POPUP_IMAGES.length),
       IMAGE_SWITCH_MS
@@ -31,7 +41,7 @@ export function PopupAd({ onClose }: { onClose: () => void }) {
       clearTimeout(switchTimer);
       clearInterval(tickTimer);
     };
-  }, [onClose]);
+  }, []);
 
   const src = POPUP_IMAGES[imageIndex];
 
