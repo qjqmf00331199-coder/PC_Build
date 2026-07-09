@@ -80,7 +80,7 @@ export function PurchaseReceipt() {
   };
 
   return (
-    <div className="mt-4 border-t border-[#27272A] pt-4">
+    <div className="mt-4 border-t border-[#27272A] pt-4 pb-4">
       <button
         type="button"
         disabled={selectedCount === 0}
