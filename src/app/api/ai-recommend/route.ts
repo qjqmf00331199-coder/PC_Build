@@ -69,6 +69,15 @@ function toGeminiRequestBody(messages: ChatMessage[]) {
   };
 }
 
+// 429(RESOURCE_EXHAUSTED)는 무료 티어의 일일 요청 한도 초과라 대기 후 재시도해도 자정 전엔
+// 절대 안 풀린다(실측: retry-after가 9.7s→36.5s→59.5s로 계속 늘어남). 재시도로 붙잡고 있으면
+// 응답 시간만 늘어나고 성공률은 그대로라, 즉시 실패시켜 안전 조합으로 빨리 넘어가게 한다.
+class RateLimitError extends Error {
+  constructor() {
+    super("Gemini API 요청 한도 초과 (429)");
+  }
+}
+
 async function callGemini(apiKey: string, messages: ChatMessage[], timeoutMs: number): Promise<string> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -85,6 +94,9 @@ async function callGemini(apiKey: string, messages: ChatMessage[], timeoutMs: nu
     if (!res.ok) {
       const bodyText = await res.text().catch(() => "");
       console.warn("[ai-recommend][debug] Gemini error body:", bodyText.slice(0, 1000));
+      if (res.status === 429) {
+        throw new RateLimitError();
+      }
       throw new Error(`Gemini API 응답 오류: ${res.status}`);
     }
     const data = await res.json();
@@ -149,6 +161,11 @@ export async function POST(req: NextRequest) {
       try {
         raw = await callGemini(apiKey, messages, remaining);
       } catch (err) {
+        if (err instanceof RateLimitError) {
+          // 일일 한도 초과는 재시도해도 풀리지 않으므로 남은 attempt를 낭비하지 않고 바로 대체한다.
+          console.warn("[ai-recommend] Gemini 요청 한도(429) 초과, 안전 조합으로 즉시 대체");
+          return safeguard("AI 서비스 요청 한도가 초과되어 검증된 기본 조합으로 대체했습니다. 잠시 후 다시 시도해주세요.");
+        }
         // 타임아웃/API 오류 등 네트워크성 실패는 이번 시도만 버리고 남은 예산으로 재시도한다 —
         // 여기서 그냥 continue하면 MAX_ATTEMPTS 재시도가 실질적으로 소진된다.
         console.warn(`[ai-recommend] Gemini 호출 실패 (시도 ${attempt + 1}/${MAX_ATTEMPTS}):`, err);

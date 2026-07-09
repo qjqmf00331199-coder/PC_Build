@@ -35,6 +35,19 @@ export function PrivacyContent() {
         해당 API 호출은 서비스 서버에서 이루어지며, 요청·응답 내용은 별도 데이터베이스에 저장하지 않고 응답을 화면에 반환한
         뒤 폐기합니다. 단, API 제공사의 인프라가 국외에 위치할 수 있어 처리 과정에서 국외 서버를 경유합니다.
       </p>
+      <p className="mt-3 text-[#9CA3AF]">
+        서비스는 Gemini API 무료 등급(free tier)을 사용하고 있어, 전송된 입력값이 Google의 자체 정책에 따라 서비스
+        개선 목적으로 처리될 수 있습니다. 자세한 내용은{" "}
+        <a
+          href="https://ai.google.dev/gemini-api/terms"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-[var(--accent)] underline"
+        >
+          Gemini API 이용약관
+        </a>
+        을 참고해주세요.
+      </p>
 
       <h2 className="mt-8 text-base font-semibold text-[var(--accent)]">3. 부품 데이터베이스(Supabase)</h2>
       <p className="mt-3 text-[#9CA3AF]">
@@ -81,7 +94,8 @@ export function TermsContent() {
       <h2 className="mt-8 text-base font-semibold text-[var(--accent)]">1. 서비스의 성격</h2>
       <p className="mt-3 text-[#9CA3AF]">
         트라이핏(TriFit, 이하 &quot;서비스&quot;)은 PC 부품 선택 시 소켓·전원·크기 등 호환성을 참고용으로 안내하는
-        개인 학습 목적의 비상업적 웹 도구입니다. 회원가입, 결제, 구매 중개 기능은 제공하지 않습니다.
+        개인 학습 목적의 비상업적 웹 도구입니다. 회원가입, 결제, 구매 중개 기능은 제공하지 않습니다. 본 서비스는
+        18세 이상 이용자를 대상으로 합니다.
       </p>
 
       <h2 className="mt-8 text-base font-semibold text-[var(--accent)]">2. 정보 정확성에 대한 면책</h2>
