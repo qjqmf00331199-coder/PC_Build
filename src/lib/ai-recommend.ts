@@ -1,5 +1,5 @@
 import type { PartsData } from "./supabase/fetch-parts";
-import type { PartCategory, Selections } from "./types";
+import type { Part, PartCategory, Selections } from "./types";
 import { CATEGORY_LABEL, CATEGORY_ORDER, evaluateIssues } from "./compatibility";
 import { partSpecLine, partTitle } from "./part-specs";
 
@@ -47,11 +47,32 @@ function splitSockets(value: string): string[] {
   return value.split(";").map((s) => s.trim()).filter(Boolean);
 }
 
+// Groq 무료 티어(TPM 한도)에 프롬프트가 걸리지 않도록 카테고리당 이 개수까지만 AI에게 보여준다.
+// (부품 수가 계속 늘어나서 전체를 다 보내면 요청 하나가 토큰 한도를 넘어 매번 실패한다.)
+const MAX_OPTIONS_PER_CATEGORY = 20;
+
+// 균등 간격으로 표본을 뽑아 특정 브랜드/세대에 쏠리지 않게 한다.
+function sampleEvenly<T>(items: T[], max: number): T[] {
+  if (items.length <= max) return items;
+  const step = items.length / max;
+  return Array.from({ length: max }, (_, i) => items[Math.min(items.length - 1, Math.round(i * step))]);
+}
+
+// "하츠네 미쿠 에디션" 등 테마 부품은 표본에서 잘려나가면 시스템 프롬프트 규칙 11번이
+// 무의미해지므로, 표본 추출과 무관하게 항상 포함시킨다.
+function hasThemeTag(part: Part): boolean {
+  return "extra" in part && typeof part.extra === "object" && part.extra !== null && "edition" in part.extra;
+}
+
 // 프롬프트에 넣을 부품 목록: 가격 필드는 DB에 아예 없으니 제외할 것도 없음.
 // id를 반드시 포함시켜서, AI가 스펙을 새로 지어내지 못하고 id로만 고르게 강제한다.
 export function compactPartsForPrompt(parts: PartsData): string {
   return CATEGORY_ORDER.map((category) => {
-    const lines = parts[category]
+    const all = parts[category] as Part[];
+    const themed = all.filter(hasThemeTag);
+    const sampled = sampleEvenly(all, MAX_OPTIONS_PER_CATEGORY);
+    const merged = [...new Set([...themed, ...sampled])];
+    const lines = merged
       .map((part) => `  - ${part.id} | ${partTitle(part)} | ${partSpecLine(part)}`)
       .join("\n");
     return `[${CATEGORY_LABEL[category]} (key: ${category})]\n${lines}`;

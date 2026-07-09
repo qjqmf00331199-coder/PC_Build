@@ -20,10 +20,10 @@ import {
 import { CATEGORY_LABEL } from "@/lib/compatibility";
 import type { Selections } from "@/lib/types";
 
-const NIM_ENDPOINT = "https://integrate.api.nvidia.com/v1/chat/completions";
-const NIM_MODEL = "meta/llama-3.1-70b-instruct";
+const GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions";
+const GROQ_MODEL = "llama-3.3-70b-versatile";
 const MAX_ATTEMPTS = 3;
-// 전체 요청 최장 1분 예산 — 개별 NIM 호출 타임아웃은 남은 예산에 맞춰 매 시도마다 재계산한다.
+// 전체 요청 최장 1분 예산 — 개별 Groq 호출 타임아웃은 남은 예산에 맞춰 매 시도마다 재계산한다.
 const OVERALL_BUDGET_MS = 58_000;
 const MIN_ATTEMPT_TIMEOUT_MS = 3_000;
 
@@ -42,35 +42,40 @@ function isPreference(value: unknown): value is Preference {
   return value === "quiet" || value === "compact" || value === "none";
 }
 
-interface NimMessage {
+interface ChatMessage {
   role: "system" | "user" | "assistant";
   content: string;
 }
 
-async function callNim(apiKey: string, messages: NimMessage[], timeoutMs: number): Promise<string> {
+async function callGroq(apiKey: string, messages: ChatMessage[], timeoutMs: number): Promise<string> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
-    const res = await fetch(NIM_ENDPOINT, {
+    const res = await fetch(GROQ_ENDPOINT, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: NIM_MODEL,
+        model: GROQ_MODEL,
         messages,
         temperature: 0.3,
         max_tokens: 400,
+        response_format: { type: "json_object" },
       }),
       signal: controller.signal,
     });
-    if (!res.ok) throw new Error(`NIM API 응답 오류: ${res.status}`);
+    if (!res.ok) {
+      const bodyText = await res.text().catch(() => "");
+      console.warn("[ai-recommend][debug] Groq error body:", bodyText.slice(0, 1000));
+      throw new Error(`Groq API 응답 오류: ${res.status}`);
+    }
     const data = await res.json();
     return data.choices?.[0]?.message?.content ?? "";
   } catch (err) {
     if (err instanceof Error && err.name === "AbortError") {
-      throw new Error(`NIM API 응답 지연 (${timeoutMs}ms 초과)`);
+      throw new Error(`Groq API 응답 지연 (${timeoutMs}ms 초과)`);
     }
     throw err;
   } finally {
@@ -89,7 +94,7 @@ export async function POST(req: NextRequest) {
 
   const answers: AiRecommendAnswers = { purpose, priority, brand, preference, detail };
   const parts = await getAllParts();
-  const apiKey = process.env.NVIDIA_API_KEY;
+  const apiKey = process.env.GROQ_API_KEY;
 
   const safeguard = (reason: string) => {
     const selections = findGuaranteedSafeSelections(parts);
@@ -102,10 +107,10 @@ export async function POST(req: NextRequest) {
   };
 
   if (!apiKey) {
-    return safeguard("NVIDIA_API_KEY가 설정되지 않아 검증된 기본 조합을 보여드려요.");
+    return safeguard("GROQ_API_KEY가 설정되지 않아 검증된 기본 조합을 보여드려요.");
   }
 
-  const messages: NimMessage[] = [
+  const messages: ChatMessage[] = [
     { role: "system", content: AI_SYSTEM_PROMPT },
     { role: "user", content: buildUserPrompt(parts, answers) },
   ];
@@ -123,7 +128,16 @@ export async function POST(req: NextRequest) {
         return safeguard("AI 추천이 1분 내에 끝나지 않아 검증된 기본 조합으로 대체했습니다.");
       }
 
-      const raw = await callNim(apiKey, messages, remaining);
+      let raw: string;
+      try {
+        raw = await callGroq(apiKey, messages, remaining);
+      } catch (err) {
+        // 타임아웃/API 오류 등 네트워크성 실패는 이번 시도만 버리고 남은 예산으로 재시도한다 —
+        // 여기서 그냥 continue하면 MAX_ATTEMPTS 재시도가 실질적으로 소진된다.
+        console.warn(`[ai-recommend] Groq 호출 실패 (시도 ${attempt + 1}/${MAX_ATTEMPTS}):`, err);
+        continue;
+      }
+
       const picked = parseAiPicks(raw);
       if (!picked) {
         messages.push({ role: "assistant", content: raw });
@@ -167,7 +181,7 @@ export async function POST(req: NextRequest) {
     console.warn("[ai-recommend] AI가 danger 없는 조합을 못 찾음, 안전 조합으로 대체", lastSelections);
     return safeguard("AI가 완전히 호환되는 조합을 찾지 못해 검증된 기본 조합으로 대체했습니다.");
   } catch (err) {
-    console.warn("[ai-recommend] NVIDIA NIM 호출 실패, 검증된 기본 조합으로 대체:", err);
+    console.warn("[ai-recommend] Groq 호출 실패, 검증된 기본 조합으로 대체:", err);
     return safeguard("AI 추천 처리 중 오류가 발생해 검증된 기본 조합으로 대체했습니다.");
   }
 }
