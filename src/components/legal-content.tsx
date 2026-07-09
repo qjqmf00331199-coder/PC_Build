@@ -27,8 +27,8 @@ export function PrivacyContent() {
 
       <h2 className="mt-8 text-base font-semibold text-[var(--accent)]">2. 정보의 처리 목적 및 제3자 제공</h2>
       <p className="mt-3 text-[#9CA3AF]">
-        AI 추천 기능은 입력값을 서버를 거쳐 외부 AI 모델 제공사(<span className="text-[#E4E4E7]">Google Gemini API</span>, 모델:
-        Gemini 2.5 Flash)에 전달하여 추천 부품 조합을 생성합니다. 전달되는 정보는 설문 답변과 자유 텍스트뿐이며, 이름·이메일·연락처 등
+        AI 추천 기능은 입력값을 서버를 거쳐 외부 AI 모델 제공사(<span className="text-[#E4E4E7]">Groq API</span>, 모델:
+        Llama 3.3 70B)에 전달하여 추천 부품 조합을 생성합니다. 전달되는 정보는 설문 답변과 자유 텍스트뿐이며, 이름·이메일·연락처 등
         신원을 식별할 수 있는 정보는 수집하지 않으므로 함께 전송되지 않습니다.
       </p>
       <p className="mt-3 text-[#9CA3AF]">
@@ -36,15 +36,15 @@ export function PrivacyContent() {
         뒤 폐기합니다. 단, API 제공사의 인프라가 국외에 위치할 수 있어 처리 과정에서 국외 서버를 경유합니다.
       </p>
       <p className="mt-3 text-[#9CA3AF]">
-        서비스는 Gemini API 무료 등급(free tier)을 사용하고 있어, 전송된 입력값이 Google의 자체 정책에 따라 서비스
+        서비스는 Groq API 무료 등급(free tier)을 사용하고 있어, 전송된 입력값이 Groq의 자체 정책에 따라 서비스
         개선 목적으로 처리될 수 있습니다. 자세한 내용은{" "}
         <a
-          href="https://ai.google.dev/gemini-api/terms"
+          href="https://groq.com/terms-of-use"
           target="_blank"
           rel="noopener noreferrer"
           className="text-[var(--accent)] underline"
         >
-          Gemini API 이용약관
+          Groq 이용약관
         </a>
         을 참고해주세요.
       </p>

@@ -47,9 +47,10 @@ function splitSockets(value: string): string[] {
   return value.split(";").map((s) => s.trim()).filter(Boolean);
 }
 
-// Gemini 무료 티어(TPM 한도)에 프롬프트가 걸리지 않도록 카테고리당 이 개수까지만 AI에게 보여준다.
-// (부품 수가 계속 늘어나서 전체를 다 보내면 요청 하나가 토큰 한도를 넘어 매번 실패한다.)
-const MAX_OPTIONS_PER_CATEGORY = 20;
+// Groq 무료 티어 TPM(분당 토큰) 한도가 12k로 낮아, 동시 접속이 여러 명 겹쳐도
+// 합산 토큰이 한도를 넘지 않도록 카테고리당 이 개수까지만 AI에게 보여준다.
+// (실측: 20개일 때 프롬프트 하나가 약 12,700자 — 동시 요청 1~2개만으로도 TPM을 다 씀.)
+const MAX_OPTIONS_PER_CATEGORY = 4;
 
 // 균등 간격으로 표본을 뽑아 특정 브랜드/세대에 쏠리지 않게 한다.
 function sampleEvenly<T>(items: T[], max: number): T[] {

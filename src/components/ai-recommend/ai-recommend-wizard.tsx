@@ -274,7 +274,7 @@ export function AiRecommendWizard({
 
           {isLastStep && (
             <p className="mt-4 text-[11px] leading-relaxed text-[#71717A]">
-              입력하신 답변은 AI 추천 생성을 위해 해외 서버(Google Gemini)로 전송되며, 저장되지 않고 즉시 폐기됩니다.{" "}
+              입력하신 답변은 AI 추천 생성을 위해 해외 서버(Groq)로 전송되며, 저장되지 않고 즉시 폐기됩니다.{" "}
               <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-[var(--accent)]">
                 자세히
               </a>
@@ -345,9 +345,16 @@ export function AiRecommendWizard({
           <p className="mb-4 text-xs text-[#9CA3AF]">{result.reason}</p>
 
           {result.fallback && (
-            <p className="mb-3 rounded-md border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-xs text-yellow-400">
-              AI 대신 검증된 기본 조합을 보여드리고 있어요.
-            </p>
+            <div className="mb-3 flex items-center justify-between gap-3 rounded-md border border-yellow-500/40 bg-yellow-500/10 px-3 py-2 text-xs text-yellow-400">
+              <span>AI 대신 검증된 기본 조합을 보여드리고 있어요.</span>
+              <button
+                type="button"
+                onClick={() => void submit()}
+                className="shrink-0 rounded-full border border-yellow-500/40 px-3 py-1 font-semibold text-yellow-300 transition-colors hover:border-[var(--accent)] hover:text-[var(--accent)]"
+              >
+                다시 시도
+              </button>
+            </div>
           )}
 
           {result.issues.length > 0 && (
