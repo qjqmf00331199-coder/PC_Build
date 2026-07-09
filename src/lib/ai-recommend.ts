@@ -73,11 +73,23 @@ function filterByBrand(category: PartCategory, items: Part[], brand: BrandPrefer
   return items.filter((part) => "brand" in part && part.brand === wanted);
 }
 
+// GPU series는 RTX*/GTX*가 NVIDIA, RX*가 AMD. "영상/방송용" 목적일 때는 AMD 그래픽카드만
+// 보이게 한다 — series 값 자체(RX7000, RX9000, RX500...)가 전부 "RX"로 시작한다.
+function filterGpuForPurpose(category: PartCategory, items: Part[], purpose: Purpose): Part[] {
+  if (category !== "gpu" || purpose !== "editing") return items;
+  return items.filter((part) => "series" in part && part.series.startsWith("RX"));
+}
+
 // 프롬프트에 넣을 부품 목록: 가격 필드는 DB에 아예 없으니 제외할 것도 없음.
 // id를 반드시 포함시켜서, AI가 스펙을 새로 지어내지 못하고 id로만 고르게 강제한다.
-export function compactPartsForPrompt(parts: PartsData, brand: BrandPreference = "any"): string {
+export function compactPartsForPrompt(
+  parts: PartsData,
+  brand: BrandPreference = "any",
+  purpose: Purpose = "gaming"
+): string {
   return CATEGORY_ORDER.map((category) => {
-    const all = filterByBrand(category, parts[category] as Part[], brand);
+    let all = filterByBrand(category, parts[category] as Part[], brand);
+    all = filterGpuForPurpose(category, all, purpose);
     const themed = all.filter(hasThemeTag);
     const sampled = sampleEvenly(all, MAX_OPTIONS_PER_CATEGORY);
     const merged = [...new Set([...themed, ...sampled])];
@@ -119,7 +131,7 @@ export function buildUserPrompt(parts: PartsData, answers: AiRecommendAnswers): 
     detailLine,
     "",
     "[부품 목록]",
-    compactPartsForPrompt(parts, answers.brand),
+    compactPartsForPrompt(parts, answers.brand, answers.purpose),
   ].join("\n");
 }
 
