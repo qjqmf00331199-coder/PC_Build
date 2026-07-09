@@ -27,8 +27,8 @@ export function PrivacyContent() {
 
       <h2 className="mt-8 text-base font-semibold text-[var(--accent)]">2. 정보의 처리 목적 및 제3자 제공</h2>
       <p className="mt-3 text-[#9CA3AF]">
-        AI 추천 기능은 입력값을 서버를 거쳐 외부 AI 모델 제공사(<span className="text-[#E4E4E7]">NVIDIA NIM API</span>, 모델:
-        Llama 3.1)에 전달하여 추천 부품 조합을 생성합니다. 전달되는 정보는 설문 답변과 자유 텍스트뿐이며, 이름·이메일·연락처 등
+        AI 추천 기능은 입력값을 서버를 거쳐 외부 AI 모델 제공사(<span className="text-[#E4E4E7]">Google Gemini API</span>, 모델:
+        Gemini 2.5 Flash)에 전달하여 추천 부품 조합을 생성합니다. 전달되는 정보는 설문 답변과 자유 텍스트뿐이며, 이름·이메일·연락처 등
         신원을 식별할 수 있는 정보는 수집하지 않으므로 함께 전송되지 않습니다.
       </p>
       <p className="mt-3 text-[#9CA3AF]">

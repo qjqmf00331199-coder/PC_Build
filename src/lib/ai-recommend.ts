@@ -47,7 +47,7 @@ function splitSockets(value: string): string[] {
   return value.split(";").map((s) => s.trim()).filter(Boolean);
 }
 
-// Groq 무료 티어(TPM 한도)에 프롬프트가 걸리지 않도록 카테고리당 이 개수까지만 AI에게 보여준다.
+// Gemini 무료 티어(TPM 한도)에 프롬프트가 걸리지 않도록 카테고리당 이 개수까지만 AI에게 보여준다.
 // (부품 수가 계속 늘어나서 전체를 다 보내면 요청 하나가 토큰 한도를 넘어 매번 실패한다.)
 const MAX_OPTIONS_PER_CATEGORY = 20;
 

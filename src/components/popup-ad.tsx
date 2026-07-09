@@ -47,14 +47,14 @@ export function PopupAd({ onClose }: { onClose: () => void }) {
           <Image
             key={src}
             src={src}
-            alt="광고"
+            alt=""
             width={600}
             height={338}
             priority
             className="ad-fade-in w-full object-contain"
           />
           <div className="relative bg-white py-1.5">
-            <span className="absolute bottom-0.5 left-2 text-[6px] leading-none text-[#A1A1AA]">AD</span>
+            <span aria-hidden="true" className="absolute bottom-0.5 left-2 text-[6px] leading-none text-[#A1A1AA]">AD</span>
             <p className="text-center text-[9px] text-[#71717A]">광고는 운영자에게 큰 힘이 됩니다!</p>
           </div>
         </a>

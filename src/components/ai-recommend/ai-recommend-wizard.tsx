@@ -267,10 +267,19 @@ export function AiRecommendWizard({
                 rows={4}
                 autoFocus
                 className="mt-6 w-full resize-none rounded-lg border border-[#27272A] bg-[#111113] p-3 text-sm text-[#E4E4E7] outline-none focus:border-[var(--accent)]"
-                placeholder="자유롭게 적어주세요. 비워둬도 괜찮아요."
+                placeholder="자유롭게 적어주세요. 비워둬도 괜찮아요. (이름, 연락처 등 개인정보는 입력하지 마세요)"
               />
             )}
           </div>
+
+          {isLastStep && (
+            <p className="mt-4 text-[11px] leading-relaxed text-[#71717A]">
+              입력하신 답변은 AI 추천 생성을 위해 해외 서버(Google Gemini)로 전송되며, 저장되지 않고 즉시 폐기됩니다.{" "}
+              <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline hover:text-[var(--accent)]">
+                자세히
+              </a>
+            </p>
+          )}
 
           <div className="mt-8 flex gap-3">
             {stepIndex > 0 && (

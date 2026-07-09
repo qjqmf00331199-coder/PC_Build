@@ -13,7 +13,10 @@ const ROTATE_MAX_MS = 5000;
 
 function AdBadge() {
   return (
-    <span className="pointer-events-none absolute bottom-0.5 left-1 z-10 text-[6px] leading-none text-white/60">
+    <span
+      aria-hidden="true"
+      className="pointer-events-none absolute bottom-0.5 left-1 z-10 text-[6px] leading-none text-white/60"
+    >
       AD
     </span>
   );
@@ -84,7 +87,7 @@ export function AdSlots({ narrow = false }: { narrow?: boolean }) {
           <Image
             key={desktopAdSrc}
             src={desktopAdSrc}
-            alt="광고"
+            alt=""
             width={160}
             height={600}
             className="ad-fade-in rounded-lg border border-[#27272A] bg-[#151517] object-contain"
@@ -97,7 +100,7 @@ export function AdSlots({ narrow = false }: { narrow?: boolean }) {
           <Image
             key={desktopAdSrc}
             src={desktopAdSrc}
-            alt="광고"
+            alt=""
             width={160}
             height={600}
             className="ad-fade-in rounded-lg border border-[#27272A] bg-[#151517] object-contain"
@@ -124,7 +127,7 @@ export function AdSlots({ narrow = false }: { narrow?: boolean }) {
           >
             {MOBILE_ADS.map((src) => (
               <div key={src} className="relative h-full shrink-0" style={{ width: `${100 / MOBILE_ADS.length}%` }}>
-                <Image src={src} alt="광고" fill sizes="320px" className="rounded bg-[#151517] object-contain" />
+                <Image src={src} alt="" fill sizes="320px" className="rounded bg-[#151517] object-contain" />
               </div>
             ))}
           </div>
